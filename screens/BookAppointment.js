@@ -68,23 +68,22 @@ const BookAppointment = ({ navigation, route }) => {
                 >
                     <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>Select Date</Text>
                     <View style={styles.datePickerContainer}>
-                        <DatePickerView
-                            open={openStartDatePicker}
-                            startDate={startDate}
-                            selectedDate={startedDate}
-                            onClose={() => setOpenStartDatePicker(false)}
-                            onChangeStartDate={(date) => {
-                                console.log(date);
+                    <DatePickerView
+    open={openStartDatePicker}
+    startDate={startDate}
+    selectedDate={startedDate}
+    onClose={() => setOpenStartDatePicker(false)}
+    onChangeStartDate={(date) => {
+        const formattedDate = date.split('/').join('-');  
+        setStartedDate(formattedDate);
+    }}
+    onSelectedChange={(date) => {      // ✅ Add this
+        const formattedDate = date.split('/').join('-');  
+        setStartedDate(formattedDate);
+    }}
+    minDate={new Date()} 
+/>
 
-                                const formattedDate = date.split('/').join('-');  // Converts "2025/04/04" to "2025-04-04"
-                                setStartedDate(formattedDate);
-                                console.log(formattedDate);
-
-
-                            }}
-
-                            minDate={new Date()} 
-                        />
                     </View>
                     <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>Select Hour</Text>
                     <FlatList
