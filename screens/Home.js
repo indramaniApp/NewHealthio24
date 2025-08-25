@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image, RefreshControl, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image, RefreshControl } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,36 +15,17 @@ import { hideLoader, showLoader } from '../src/redux/slices/loaderSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import LinearGradient from 'react-native-linear-gradient';
 
 import user from '../assets/icons/user-default3.png';
-import LocationScreen from '../src/components/LocationScreen';
 
 const Home = ({ navigation }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const { dark, colors } = useTheme();
-    const [drawerVisible, setDrawerVisible] = useState(false); 
     const [AllDoctors, setAllDoctors] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [showAll, setShowAll] = useState(false); 
-    const [profile, setProfile] = useState([]); 
     const [refreshing, setRefreshing] = useState(false);
-    const [searchText, setSearchText] = useState(''); 
     const dispatch = useDispatch();
-
-    const [showTestModal, setShowTestModal] = useState(false);
-
-    const handleOpenTestModal = () => setShowTestModal(true);
-    const handleCloseTestModal = () => setShowTestModal(false);
-
-    const handleSingleTest = () => {
-        handleCloseTestModal();
-        navigation.navigate('PathologyScreen');
-    };
-
-    const handleTestPackages = () => {
-        handleCloseTestModal();
-        navigation.navigate('PathologyPackages');
-    };
 
     const FetchAllDocotr = async () => {
         try {
@@ -94,7 +75,6 @@ const Home = ({ navigation }) => {
 
     const renderHeader = () => (
         <View style={styles.headerContainer}>
-            {/* Left: User Profile */}
             <View style={styles.viewLeft}>
                 <TouchableOpacity onPress={() => navigation.openDrawer()}>
                     <Image
@@ -104,13 +84,6 @@ const Home = ({ navigation }) => {
                     />
                 </TouchableOpacity>
             </View>
-
-            {/* Center: Location */}
-            {/* <View style={styles.viewCenter}>
-                <LocationScreen />
-            </View> */}
-
-            {/* Right: Icons */}
             <View style={styles.viewRight}>
                 <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
                     <Image
@@ -136,26 +109,32 @@ const Home = ({ navigation }) => {
         };
 
         return (
-            <View
-                style={[
-                    styles.searchBarContainer,
-                    { backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite },
-                ]}
+            <LinearGradient
+               colors={['#A569BD', '#8A3FFC']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.searchBarContainer}
             >
-                <Image source={icons.search2} resizeMode="contain" style={styles.searchIcon} />
+                <Image
+                    source={icons.search2}
+                    resizeMode="contain"
+                    style={[styles.searchIcon, { tintColor: COLORS.white }]} 
+                />
                 <TextInput
-                    placeholder="Search"
-                    placeholderTextColor={COLORS.gray}
-                    style={[styles.searchInput, { color: dark ? COLORS.white : COLORS.black }]}
+                    placeholder="Search for doctors, clinics..."
+                    placeholderTextColor={'rgba(255, 255, 255, 0.8)'}
+                    style={[styles.searchInput, { color: COLORS.white }]}
                     onFocus={handleInputFocus}
                 />
-            </View>
+            </LinearGradient>
         );
     };
-
+    
     const renderBanner = () => {
         const renderBannerItem = ({ item }) => (
-            <View style={styles.bannerContainer}>
+            <LinearGradient
+                colors={['#80D8FF', '#00BFA5']}
+                style={styles.bannerContainer}>
                 <View style={styles.bannerTopContainer}>
                     <View>
                         <Text style={styles.bannerDicount}>{item.discount} OFF</Text>
@@ -167,7 +146,7 @@ const Home = ({ navigation }) => {
                     <Text style={styles.bannerBottomTitle}>{item.bottomTitle}</Text>
                     <Text style={styles.bannerBottomSubtitle}>{item.bottomSubtitle}</Text>
                 </View>
-            </View>
+            </LinearGradient>
         );
 
         return (
@@ -220,43 +199,66 @@ const Home = ({ navigation }) => {
         </View>
     );
 
+    // const renderAdCard = () => {
+    //     return (
+    //         <TouchableOpacity
+    //             onPress={() => console.log("Ad Card Pressed!")}
+    //             style={{ marginTop: 24, marginBottom: 12 }}
+    //         >
+    //             <LinearGradient
+    //                 colors={['#A569BD', '#8A3FFC']}
+    //                 start={{ x: 0, y: 0 }}
+    //                 end={{ x: 1, y: 1 }}
+    //                 style={styles.adCardContainer}
+    //             >
+    //                 <View style={styles.adCardContent}>
+    //                     <View>
+    //                         <Text style={styles.adCardTitle}>Upload Prescription</Text>
+    //                         <Text style={styles.adCardSubtitle}>Get medicines delivered</Text>
+    //                     </View>
+    //                     <TouchableOpacity style={styles.adCardButton}>
+    //                        <Text style={styles.adCardButtonText}>Upload</Text>
+    //                     </TouchableOpacity>
+    //                 </View>
+    //             </LinearGradient>
+    //         </TouchableOpacity>
+    //     );
+    // };
 
     const renderServiceCardsGrid = () => {
         return (
             <View style={styles.serviceCardsGridContainer}>
-                {/* Pathology Card */}
                 <TouchableOpacity
                     onPress={() => navigation.navigate('TestBookingScreen')}
-                    style={[styles.gridCard, { marginRight: 8 }]} 
-                >
+                    style={[styles.gridCard, { backgroundColor: '#50E3C2', marginRight: 8 }]}>
                     <View style={styles.gridCardIconContainer}>
                         <MaterialCommunityIcons name="test-tube" size={24} color={COLORS.white} />
                     </View>
-                    <Text style={styles.gridCardTitle}>Pathology Services</Text>
-                    <Text style={styles.gridCardSubtitle}>Book tests & checkups</Text>
+                    <Text style={styles.gridCardTitle}>Pathology</Text>
+                    <Text style={styles.gridCardSubtitle}>Book Tests & Checkups</Text>
                 </TouchableOpacity>
-
-                {/* Hospital Card */}
                 <TouchableOpacity
                     onPress={() => navigation.navigate('Hospital')}
-                    style={[styles.gridCard, { marginLeft: 8 }]}
-                >
-                    <View style={styles.gridCardIconContainer}>
-                        <MaterialCommunityIcons name="hospital-building" size={24} color={COLORS.white} />
-                    </View>
-                    <Text style={styles.gridCardTitle}>Hospital Services</Text>
-                    <Text style={styles.gridCardSubtitle}>Find top hospitals</Text>
+                    style={{ flex: 1, marginLeft: 8 }}>
+                    <LinearGradient
+                        colors={['#56CCF2', '#2F80ED']}
+                        style={styles.gridCard}>
+                        <View style={styles.gridCardIconContainer}>
+                            <MaterialCommunityIcons name="hospital-building" size={24} color={COLORS.white} />
+                        </View>
+                        <Text style={styles.gridCardTitle}>Hospital</Text>
+                        <Text style={styles.gridCardSubtitle}>Get expert advice</Text>
+                    </LinearGradient>
                 </TouchableOpacity>
             </View>
         );
     };
 
-  
     const renderCompactServiceCards = () => {
         const compactServices = [
-            { id: '1', name: 'Patient Mitra', icon: 'account-heart', screen: 'PatientMiraHome', description: '24x7 help & support' },
-            { id: '2', name: 'Dialysis', icon: 'water-pump', screen: 'Dialysis', description: 'Specialized help & care' },
-            { id: '3', name: 'Physiotherapy', icon: 'run', screen: 'PhysiotherapyHomeScreen', description: 'Rehab & care support' },
+            { id: '1', name: 'Patient-Mitra', icon: 'account-heart', screen: 'PatientMiraHome', description: '24x7 help & support', color: '#E573B5' },
+            { id: '2', name: 'Dialysis', icon: 'water-pump', screen: 'Dialysis', description: 'Specialized kidney care', color: '#8A3FFC' },
+            { id: '3', name: 'Physiotherapy', icon: 'run', screen: 'PhysiotherapyHomeScreen', description: 'Rehab & care support', color: '#7ED321' },
         ];
 
         return (
@@ -265,7 +267,7 @@ const Home = ({ navigation }) => {
                     <TouchableOpacity
                         key={item.id}
                         onPress={() => navigation.navigate(item.screen)}
-                        style={styles.compactCard}
+                        style={[styles.compactCard, { backgroundColor: item.color }]}
                     >
                         <View style={styles.compactCardIconContainer}>
                             <MaterialCommunityIcons name={item.icon} size={20} color={COLORS.white} />
@@ -277,7 +279,6 @@ const Home = ({ navigation }) => {
             </View>
         );
     };
-
 
     const renderTopDoctors = () => {
         return (
@@ -322,25 +323,7 @@ const Home = ({ navigation }) => {
                                 rating={item.average_rating || 0}
                                 numReviews={item.rating_total_count || 0}
                                 onPress={() =>
-                                    navigation.navigate("DoctorDetails", {
-                                        fullName: item.fullName,
-                                        yearsOfExperience: item.yearsOfExperience,
-                                        specialization: specializationText,
-                                        doctorRating: item.doctorRating,
-                                        doctorId: item._id,
-                                        streetAddress: item.streetAddress,
-                                        average_rating: item.average_rating,
-                                        rating_total_count: item.rating_total_count,
-                                        about_me: item.about_me,
-                                        consultationDate: item.consultationDate,
-                                        consultationTime: item.consultationTime,
-                                        previous_OPD_Number: item.previous_OPD_Number,
-                                        reviews: item.reviews,
-                                        consultationTimeVideo: item.consultationTimeVideo,
-                                        consultationTimeAudio: item.consultationTimeAudio,
-                                        consultationTimeHomeVisit: item.consultationTimeHomeVisit,
-                                        profilePhoto: item.profilePhoto,
-                                    })
+                                    navigation.navigate("DoctorDetails", { /* ...pass doctor details props */ })
                                 }
                             />
                         );
@@ -355,86 +338,20 @@ const Home = ({ navigation }) => {
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 {renderHeader()}
                 <ScrollView
-                    contentContainerStyle={[styles.scrollContainer, { paddingBottom: 60 }]}
+                    contentContainerStyle={{ paddingBottom: 60 }}
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                 >
                     {renderSearchBar()}
                     {renderBanner()}
                     {renderCategories()}
-
-                    {/* Render Pathology and Hospital cards side-by-side */}
+                    {/* {renderAdCard()}  */}
                     <SubHeaderItem title="Our Services" />
                     {renderServiceCardsGrid()}
-
-                    {/* Render Patient Mitra, Dialysis, Physiotherapy as compact cards */}
                     {renderCompactServiceCards()}
-
                     {renderTopDoctors()}
                 </ScrollView>
             </View>
-            {showTestModal && (
-                <Modal
-                    visible={showTestModal}
-                    transparent
-                    animationType="fade"
-                    onRequestClose={handleCloseTestModal}
-                >
-                    <View style={{
-                        flex: 1,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        <View style={{
-                            width: '80%',
-                            backgroundColor: COLORS.white,
-                            padding: 20,
-                            borderRadius: 16,
-                            alignItems: 'center',
-                        }}>
-                            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>
-                                Choose Your Test Type
-                            </Text>
-
-                            <TouchableOpacity
-                                style={{
-                                    backgroundColor: COLORS.primary,
-                                    padding: 12,
-                                    borderRadius: 8,
-                                    marginVertical: 6,
-                                    width: '100%',
-                                    alignItems: 'center',
-                                }}
-                                onPress={handleSingleTest}
-                            >
-                                <Text style={{ color: COLORS.white, fontWeight: '600' }}>You want single test</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={{
-                                    backgroundColor: COLORS.primary,
-                                    padding: 12,
-                                    borderRadius: 8,
-                                    marginVertical: 6,
-                                    width: '100%',
-                                    alignItems: 'center',
-                                }}
-                                onPress={handleTestPackages}
-                            >
-                                <Text style={{ color: COLORS.white, fontWeight: '600' }}>You want test packages</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={{ marginTop: 10 }}
-                                onPress={handleCloseTestModal}
-                            >
-                                <Text style={{ color: 'red', fontWeight: '500' }}>Cancel</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-            )}
         </SafeAreaView>
     );
 };
@@ -455,28 +372,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center"
     },
-    userIcon: {
-        width: 48,
-        height: 48,
-        borderRadius: 32
-    },
     viewLeft: {
         flexDirection: "row",
         alignItems: "center"
-    },
-    greeeting: {
-        fontSize: 15,
-        fontFamily: "Urbanist Regular",
-        color: "gray",
-        marginBottom: 4
-    },
-    title: {
-        fontSize: 18,
-        fontFamily: "Urbanist Bold",
-        color: COLORS.greyscale900
-    },
-    viewNameContainer: {
-        marginLeft: 12
     },
     viewRight: {
         flexDirection: "row",
@@ -496,17 +394,28 @@ const styles = StyleSheet.create({
     searchBarContainer: {
         width: SIZES.width - 32,
         paddingHorizontal: 16,
-        borderRadius: 12,
+        borderRadius: 15, // Thoda modern look ke liye
         height: 52,
         marginVertical: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.secondaryWhite,
+        // backgroundColor yahan se hata dein
+        
+        // iOS ke liye shadow
+        shadowColor: '#00BFA5',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        // Android ke liye elevation
+        elevation: 8,
     },
     searchIcon: {
         height: 24,
         width: 24,
-        tintColor: COLORS.gray,
+        // tintColor yahan se hata dein taaki component me de sakein
     },
     searchInput: {
         flex: 1,
@@ -515,18 +424,18 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
         paddingVertical: 0,
     },
-    filterIcon: {
-        width: 24,
-        height: 24,
-        tintColor: COLORS.primary,
-    },
     bannerContainer: {
         width: SIZES.width - 32,
         height: 154,
         paddingHorizontal: 28,
         paddingTop: 28,
         borderRadius: 32,
-        backgroundColor: COLORS.primary
+    },
+    bannerItemContainer: {
+        width: "100%",
+        height: 170,
+        borderRadius: 32,
+        overflow: 'hidden'
     },
     bannerTopContainer: {
         flexDirection: "row",
@@ -563,84 +472,73 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         marginTop: 4
     },
-    userAvatar: {
-        width: 64,
-        height: 64,
-        borderRadius: 999
-    },
-    firstName: {
-        fontSize: 16,
-        fontFamily: "Urbanist SemiBold",
-        color: COLORS.dark2,
-        marginTop: 6
-    },
-    bannerItemContainer: {
-        width: "100%",
-        paddingBottom: 10,
-        backgroundColor: COLORS.primary,
-        height: 170,
-        borderRadius: 32,
-    },
     dotContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10,
+        position: 'absolute',
+        bottom: 10,
+        width: '100%'
     },
     dot: {
         width: 10,
         height: 10,
         borderRadius: 5,
-        backgroundColor: '#ccc',
+        backgroundColor: 'rgba(255,255,255,0.5)',
         marginHorizontal: 5,
     },
     activeDot: {
         backgroundColor: COLORS.white,
     },
-    menuCircle: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: COLORS.tansparentPrimary,
-        justifyContent: 'center',
+    adCardContainer: {
+        borderRadius: 16,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        height: 80, 
+        justifyContent: 'center'
+    },
+    adCardContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
     },
-    userDefaultImage: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: COLORS.lightGray,
-    },
-    viewCenter: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    locationText: {
+    adCardTitle: {
         fontSize: 16,
-        fontWeight: '600',
+        fontFamily: 'Urbanist-Bold',
+        color: COLORS.white,
     },
-    // New styles for service cards grid
+    adCardSubtitle: {
+        fontSize: 12,
+        fontFamily: 'Urbanist-Regular',
+        color: 'rgba(255, 255, 255, 0.8)',
+        marginTop: 4,
+    },
+    adCardButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 20,
+    },
+    adCardButtonText: {
+        color: COLORS.white,
+        fontFamily: 'Urbanist-Bold',
+        fontSize: 12,
+    },
     serviceCardsGridContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginHorizontal: 2, // Keep some margin from screen edges
+        marginHorizontal: 2,
         marginTop: 12,
-        marginBottom: 12, // Space after these cards
+        marginBottom: 12,
     },
     gridCard: {
-        backgroundColor: COLORS.primary,
         borderRadius: 20,
         padding: 15,
-        flex: 1, // Ensures cards take equal space
+        flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: 140, // Consistent height for grid cards
+        height: 140,
     },
     gridCardIconContainer: {
         backgroundColor: 'rgba(255,255,255,0.2)',
@@ -661,25 +559,22 @@ const styles = StyleSheet.create({
         color: '#f0f0f0',
         textAlign: 'center',
     },
-    // New styles for compact service cards
     compactCardsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginHorizontal: 2,
-        marginTop: 12, // Adjust margin as needed
-        flexWrap: 'wrap', // Allow cards to wrap to next line
+        marginTop: 12,
+        flexWrap: 'wrap',
     },
     compactCard: {
-        backgroundColor: COLORS.primary,
         borderRadius: 15,
         padding: 12,
-        width: '31%', // Approx. 1/3rd width for 3 cards in a row with spacing
-        aspectRatio: 1, // Make it a square card for better appearance
+        width: '31%',
+        aspectRatio: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 12, 
-      
-        marginHorizontal: '1%', 
+        marginBottom: 12,
+        marginHorizontal: '1%',
     },
     compactCardIconContainer: {
         backgroundColor: 'rgba(255,255,255,0.15)',
@@ -694,7 +589,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     compactCardSubtitle: {
-        fontSize: 9, // Even smaller for compact
+        fontSize: 9,
         fontFamily: 'Urbanist-Regular',
         color: '#f0f0f0',
         textAlign: 'center',

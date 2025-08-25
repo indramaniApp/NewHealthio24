@@ -19,7 +19,8 @@ import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
 
-const RAZORPAY_KEY_ID = 'rzp_test_GvwPgZcP2tn6O2';
+// const RAZORPAY_KEY_ID = 'rzp_test_GvwPgZcP2tn6O2';
+const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
 
 const PatientMitraBookByPayment = ({ route, navigation }) => {
   const { packageId, startedDate, selectedHour } = route?.params || {};
@@ -28,7 +29,7 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
   const [patientGender, setPatientGender] = useState('');
   const [patientAge, setPatientAge] = useState('');
   const [location, setLocation] = useState('');
-  const [referralId, setReferralId] = useState(''); // New Referral ID state
+  const [referralId, setReferralId] = useState(''); 
 
   const dispatch = useDispatch();
 
@@ -107,6 +108,7 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
       if (response?.status === 'success') {
         Toast.show('Payment Verified & Package Booked');
         navigation.navigate('Home');
+
       } else {
         Toast.show(response?.message || 'Payment verification failed');
       }
