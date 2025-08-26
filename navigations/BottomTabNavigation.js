@@ -9,6 +9,7 @@ import { showLoader, hideLoader } from '../src/redux/slices/loaderSlice';
 import { fetchData } from '../src/redux/slices/dataSlice';
 import DrawerNavigator from './DrawerNavigation';
 import Wallet from '../screens/newScreens/WalletScreen';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,40 +28,66 @@ const BottomTabNavigation = () => {
         dispatch(fetchData(tabName));
     };
 
-    const getTabIcon = (focused, iconFocused, iconUnfocused, label) => (
-        <View style={{ 
-            alignItems: "center", 
-            justifyContent: 'center',
-            width: 80, // enough width to show long words
-        }}>
-            <Image
-                source={focused ? iconFocused : iconUnfocused}
-                resizeMode='contain'
-                style={{
-                    height: 24,
-                    width: 24,
-                    tintColor: focused ? COLORS.primary : COLORS.gray3,
-                    marginBottom: 2
-                }}
-            />
+ 
+    const getTabIcon = (focused, iconFocused, iconUnfocused, label, gradientColors) => (
+        <View style={{ alignItems: "center", justifyContent: 'center', width: 80 }}>
+            {focused ? (
+                <LinearGradient
+                    colors={gradientColors}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                        padding: 8,
+                        borderRadius: 20,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: 2,
+                    }}
+                >
+                    <Image
+                        source={iconFocused}
+                        resizeMode="contain"
+                        style={{
+                            height: 24,
+                            width: 24,
+                            tintColor: COLORS.white,
+                        }}
+                    />
+                </LinearGradient>
+            ) : (
+                <Image
+                    source={iconUnfocused}
+                    resizeMode="contain"
+                    style={{
+                        height: 24,
+                        width: 24,
+                        tintColor: COLORS.gray3,
+                        marginBottom: 2,
+                    }}
+                />
+            )}
             <Text
                 style={{
                     fontSize: 11,
-                    fontWeight: focused ? '700' : '500',
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                    textAlign: 'center',
+                    fontWeight: focused ? "700" : "500",
+                    color: focused ? gradientColors[0] : COLORS.gray3,
+                    textAlign: "center",
                 }}
             >
                 {label}
             </Text>
             {focused && (
-                <View style={{
-                    height: 2,
-                    width: 20,
-                    backgroundColor: COLORS.primary,
-                    marginTop: 4,
-                    borderRadius: 1,
-                }} />
+                <LinearGradient
+                    colors={gradientColors}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                        height: 2,
+                        width: 20,
+                        marginTop: 4,
+                        borderRadius: 1,
+                    }}
+                />
             )}
         </View>
     );
@@ -71,15 +98,22 @@ const BottomTabNavigation = () => {
                 tabBarShowLabel: false,
                 headerShown: false,
                 tabBarStyle: {
-                    position: 'absolute',
+                    position: "absolute",
                     bottom: 0,
                     right: 0,
                     left: 0,
-                    height: Platform.OS === 'ios' ? 80 : 60,
-                    backgroundColor: dark ? COLORS.dark1 : COLORS.white,
-                    borderTopColor: dark ? COLORS.gray3 : "#eee",
-                    elevation: 0,
+                    height: Platform.OS === "ios" ? 80 : 60,
+                    borderTopWidth: 0,
                 },
+           
+                tabBarBackground: () => (
+                    <LinearGradient
+                        colors={dark ? ["#1e1e1e", "#121212"] : ["#f8fafc", "#e0f2fe"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={{ flex: 1 }}
+                    />
+                ),
             }}
         >
             {/* Home */}
@@ -90,7 +124,8 @@ const BottomTabNavigation = () => {
                     focus: () => { handleTabChange("Home"); handleFetchData("Home"); },
                 }}
                 options={{
-                    tabBarIcon: ({ focused }) => getTabIcon(focused, icons.home, icons.home2Outline, "Home")
+                    tabBarIcon: ({ focused }) =>
+                        getTabIcon(focused, icons.home, icons.home2Outline, "Home", ["#3B82F6", "#60A5FA"]) // Blue gradient
                 }}
             />
 
@@ -102,7 +137,8 @@ const BottomTabNavigation = () => {
                     focus: () => { handleTabChange("Appointment"); handleFetchData("Appointment"); },
                 }}
                 options={{
-                    tabBarIcon: ({ focused }) => getTabIcon(focused, icons.calendar5, icons.calendar, "Appointment")
+                    tabBarIcon: ({ focused }) =>
+                        getTabIcon(focused, icons.calendar5, icons.calendar, "Appointment", ["#10B981", "#34D399"]) // Green gradient
                 }}
             />
 
@@ -114,7 +150,8 @@ const BottomTabNavigation = () => {
                     focus: () => { handleTabChange("Wallet"); handleFetchData("Wallet"); },
                 }}
                 options={{
-                    tabBarIcon: ({ focused }) => getTabIcon(focused, icons.wallet, icons.walletOutline, "Wallet")
+                    tabBarIcon: ({ focused }) =>
+                        getTabIcon(focused, icons.wallet, icons.walletOutline, "Wallet", ["#8B5CF6", "#A78BFA"]) // Purple gradient
                 }}
             />
 
@@ -126,7 +163,8 @@ const BottomTabNavigation = () => {
                     focus: () => { handleTabChange("History"); handleFetchData("History"); },
                 }}
                 options={{
-                    tabBarIcon: ({ focused }) => getTabIcon(focused, icons.document, icons.documentOutline, "History")
+                    tabBarIcon: ({ focused }) =>
+                        getTabIcon(focused, icons.document, icons.documentOutline, "History", ["#F59E0B", "#FBBF24"]) // Amber gradient
                 }}
             />
 
@@ -138,7 +176,8 @@ const BottomTabNavigation = () => {
                     focus: () => { handleTabChange("Profile"); handleFetchData("Profile"); },
                 }}
                 options={{
-                    tabBarIcon: ({ focused }) => getTabIcon(focused, icons.user, icons.userOutline, "Profile")
+                    tabBarIcon: ({ focused }) =>
+                        getTabIcon(focused, icons.user, icons.userOutline, "Profile", ["#EF4444", "#F87171"]) // Red gradient
                 }}
             />
         </Tab.Navigator>
