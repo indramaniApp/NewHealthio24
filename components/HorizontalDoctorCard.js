@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS, icons } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import LinearGradient from 'react-native-linear-gradient'; 
+// LinearGradient is no longer needed for the card background
+// import LinearGradient from 'react-native-linear-gradient';
 
 const HorizontalDoctorCard = ({
     name,
@@ -19,19 +20,16 @@ const HorizontalDoctorCard = ({
     surgery,
 }) => {
     const [isFavourite, setIsFavourite] = useState(false);
+    // useTheme is no longer used for card color, but can be kept for other purposes
     const { dark } = useTheme();
 
     return (
         <TouchableOpacity
             onPress={onPress}
-            style={styles.touchableWrapper} 
+            style={styles.touchableWrapper}
         >
-            <LinearGradient
-                colors={dark ? ['#185a9d', '#0f3a63'] : ['#43cea2', '#185a9d']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.container}
-            >
+            {/* === MODIFICATION: Replaced LinearGradient with a View for white background === */}
+            <View style={styles.container}>
                 <Image source={{ uri: image }} style={styles.image} />
 
                 {isAvailable && (
@@ -78,50 +76,51 @@ const HorizontalDoctorCard = ({
                         </TouchableOpacity>
                     </View>
                 </View>
-            </LinearGradient>
+            </View>
         </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
+    // === MODIFICATION START: Updated styles for white card design ===
     touchableWrapper: {
         borderRadius: 20,
         marginBottom: 16,
-        shadowColor: "#185a9d",
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.3,
+        backgroundColor: COLORS.white, // Add background color here for shadow to work on iOS
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
         shadowRadius: 8,
-        elevation: 10,
+        elevation: 8,
     },
     container: {
         flexDirection: 'row',
         padding: 12,
         borderRadius: 20,
         alignItems: 'center',
+        backgroundColor: COLORS.white, // Card background is now white
     },
     image: {
         width: 100,
         height: 110,
         borderRadius: 16,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        borderWidth: 1.5,
-        borderColor: 'rgba(255, 255, 255, 0.4)',
+        // Removed unnecessary background and border styles
     },
     columnContainer: {
         flex: 1,
         marginLeft: 16,
-        minHeight: 110, 
+        minHeight: 110,
         justifyContent: 'space-between',
     },
     name: {
         fontSize: 18,
         fontFamily: 'Urbanist-Bold',
-        color: COLORS.white,
+        color: COLORS.black, // Text color is now black
     },
     location: {
         fontSize: 13,
         fontFamily: 'Urbanist-Regular',
-        color: 'rgba(255, 255, 255, 0.85)',
+        color: COLORS.greyscale700, // Secondary text is now grey
         marginTop: 4,
     },
     bottomViewContainer: {
@@ -133,18 +132,18 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 20,
         fontFamily: 'Urbanist-Bold',
-        color: COLORS.white,
+        color: COLORS.black, // Price color is now black
     },
     heartIcon: {
         width: 24,
         height: 24,
-        tintColor: COLORS.white,
+        tintColor: COLORS.greyscale500, // Icon color is now grey
     },
     reviewContainer: {
         position: 'absolute',
         top: 20,
         left: 20,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        backgroundColor: '#1E9E61', // 'OPEN' badge is now green
         borderRadius: 7,
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -155,6 +154,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         fontFamily: 'Urbanist-Bold',
     },
+    // === MODIFICATION END ===
     viewContainer: {
         flexDirection: 'row',
         alignItems: 'center',

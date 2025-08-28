@@ -164,7 +164,7 @@ export const categories = [
         id: "1",
         name: "Physician",
         icon: icons.friends,
-        iconColor: "rgba(36, 107, 253, 1)", // Blue
+        iconColor: "rgba(36, 107, 253, 1)", 
         backgroundColor: "rgba(36, 107, 253, .12)",
         onPress: "CategoryGeneralist"
     },
