@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     columnContainer: {
         flex: 1,
         marginLeft: 16,
-        minHeight: 110, // ✅ auto height with minimum limit
+        minHeight: 110, 
         justifyContent: 'space-between',
     },
     name: {

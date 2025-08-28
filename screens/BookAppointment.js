@@ -28,7 +28,7 @@ const BookAppointment = ({ navigation, route }) => {
       <TouchableOpacity onPress={() => handleHourSelect(item.hour)} style={{ flex: 1 }}>
         {isSelected ? (
           <LinearGradient
-            colors={['#8E2DE2', '#FF6FD8']} // Purple → Pink
+            colors={['#8E2DE2', '#FF6FD8']} 
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={[styles.hourButton, { borderWidth: 0 }]}
@@ -64,7 +64,7 @@ const BookAppointment = ({ navigation, route }) => {
 
           {/* Stylish Gradient Calendar */}
           <LinearGradient
-            colors={['#8E2DE2', '#FF6FD8']}   // Purple → Pink
+            colors={['#8E2DE2', '#FF6FD8']}   
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.calendarWrapper}
@@ -87,7 +87,7 @@ const BookAppointment = ({ navigation, route }) => {
                 todayTextColor: '#FFEB3B',
                 selectedDayTextColor: '#8E2DE2',
                 selectedDayBackgroundColor: '#FFFFFF',
-                textSectionTitleColor: '#FFD700', // Sun/Mon/Tue headers golden
+                textSectionTitleColor: '#FFD700', 
                 textDayFontFamily: 'Urbanist SemiBold',
                 textMonthFontFamily: 'Urbanist Bold',
                 textDayHeaderFontFamily: 'Urbanist SemiBold',
@@ -134,7 +134,7 @@ const BookAppointment = ({ navigation, route }) => {
           }
         >
           <LinearGradient
-            colors={['#FF6FD8', '#8E2DE2']} // Gradient Button (Pink → Purple)
+            colors={['#FF6FD8', '#8E2DE2']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradientBtn}

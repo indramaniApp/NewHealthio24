@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image, RefreshControl } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { COLORS, SIZES, icons, images } from '../constants'; 
+import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import { useTheme } from '../theme/ThemeProvider';
@@ -172,7 +172,7 @@ const Home = ({ navigation }) => {
 
         return (
             <LinearGradient
-                colors={['#A569BD', '#8A3FFC']}
+                colors={['#4CAF50', '#2E7D32']} // Green gradient
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.searchBarContainer}
@@ -233,7 +233,7 @@ const Home = ({ navigation }) => {
             </View>
         );
     };
-    
+
 
     const renderCategories = () => (
         <View>
@@ -243,7 +243,7 @@ const Home = ({ navigation }) => {
                 keyExtractor={(item) => item.id.toString()}
                 horizontal={false}
                 numColumns={4}
-                scrollEnabled={false} 
+                scrollEnabled={false}
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.categoryContainer}
@@ -391,7 +391,7 @@ const Home = ({ navigation }) => {
                             rating={item.average_rating || 0}
                             numReviews={item.rating_total_count || 0}
                             onPress={() =>
-                              navigation.navigate("DoctorDetails", { doctor: item })
+                                navigation.navigate("DoctorDetails", { doctor: item })
                             }
                         />
                     );
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
         marginVertical: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: '#00BFA5',
+        shadowColor: '#4CAF50',
         shadowOffset: {
             width: 0,
             height: 4,
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     activeDot: {
         backgroundColor: COLORS.white,
     },
-    
+
 
     categoryContainer: {
         flex: 1,
