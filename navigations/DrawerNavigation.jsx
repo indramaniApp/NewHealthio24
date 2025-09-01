@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Linking
 } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -122,7 +123,13 @@ const CustomDrawerContent = ({ navigation }) => {
           {drawerItems.map((item, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => navigation.navigate(item.name)}
+              onPress={() => {
+                if (item.name === 'Articles') {
+                  Linking.openURL('https://healthio24news.com/');
+                } else {
+                  navigation.navigate(item.name);
+                }
+              }}
               style={styles.itemContainer}
             >
               <View style={styles.iconContainer}>

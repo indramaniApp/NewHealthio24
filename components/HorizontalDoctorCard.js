@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS, icons } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-// LinearGradient is no longer needed for the card background
-// import LinearGradient from 'react-native-linear-gradient';
+
 
 const HorizontalDoctorCard = ({
     name,
@@ -20,7 +19,7 @@ const HorizontalDoctorCard = ({
     surgery,
 }) => {
     const [isFavourite, setIsFavourite] = useState(false);
-    // useTheme is no longer used for card color, but can be kept for other purposes
+ 
     const { dark } = useTheme();
 
     return (
@@ -28,7 +27,7 @@ const HorizontalDoctorCard = ({
             onPress={onPress}
             style={styles.touchableWrapper}
         >
-            {/* === MODIFICATION: Replaced LinearGradient with a View for white background === */}
+         
             <View style={styles.container}>
                 <Image source={{ uri: image }} style={styles.image} />
 
@@ -82,11 +81,11 @@ const HorizontalDoctorCard = ({
 };
 
 const styles = StyleSheet.create({
-    // === MODIFICATION START: Updated styles for white card design ===
+ 
     touchableWrapper: {
-        borderRadius: 20,
+        borderRadius: 2,
         marginBottom: 16,
-        backgroundColor: COLORS.white, // Add background color here for shadow to work on iOS
+        backgroundColor: COLORS.white,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -98,13 +97,13 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 20,
         alignItems: 'center',
-        backgroundColor: COLORS.white, // Card background is now white
+        backgroundColor: COLORS.white,
     },
     image: {
         width: 100,
         height: 110,
         borderRadius: 16,
-        // Removed unnecessary background and border styles
+    
     },
     columnContainer: {
         flex: 1,
@@ -115,12 +114,12 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 18,
         fontFamily: 'Urbanist-Bold',
-        color: COLORS.black, // Text color is now black
+        color: COLORS.black, 
     },
     location: {
         fontSize: 13,
         fontFamily: 'Urbanist-Regular',
-        color: COLORS.greyscale700, // Secondary text is now grey
+        color: COLORS.greyscale700,
         marginTop: 4,
     },
     bottomViewContainer: {
@@ -132,18 +131,18 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 20,
         fontFamily: 'Urbanist-Bold',
-        color: COLORS.black, // Price color is now black
+        color: COLORS.black, 
     },
     heartIcon: {
         width: 24,
         height: 24,
-        tintColor: COLORS.greyscale500, // Icon color is now grey
+        tintColor: COLORS.greyscale500, 
     },
     reviewContainer: {
         position: 'absolute',
         top: 20,
         left: 20,
-        backgroundColor: '#1E9E61', // 'OPEN' badge is now green
+        backgroundColor: '#1E9E61', 
         borderRadius: 7,
         paddingHorizontal: 8,
         paddingVertical: 4,

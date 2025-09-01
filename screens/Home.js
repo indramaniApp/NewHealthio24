@@ -71,7 +71,8 @@ const originalCategories = [
 
 const categories = originalCategories.map(category => ({
     ...category,
-    gradientColors: [category.iconColor, lightenColor(category.iconColor)]
+    gradientColors: [category.iconColor, lightenColor(category.iconColor)],
+    iconColor: '#fff' // Set icon color to white for all categories
 }));
 
 const Home = ({ navigation }) => {
@@ -144,14 +145,14 @@ const Home = ({ navigation }) => {
                     <Image
                         source={icons.notificationBell2}
                         resizeMode='contain'
-                        style={[styles.bellIcon, { tintColor: dark ? COLORS.white : COLORS.greyscale900 }]}
+                        style={[styles.bellIcon, { tintColor: dark ? COLORS.white : COLORS.white }]}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate("Favourite")}>
                     <Image
                         source={icons.heartOutline}
                         resizeMode='contain'
-                        style={[styles.bookmarkIcon, { tintColor: dark ? COLORS.white : COLORS.greyscale900 }]}
+                        style={[styles.bookmarkIcon, { tintColor: dark ? COLORS.white : COLORS.white }]}
                     />
                 </TouchableOpacity>
             </View>
@@ -187,8 +188,8 @@ const Home = ({ navigation }) => {
 
     const renderBanner = () => {
         const renderBannerItem = ({ item }) => (
-            <LinearGradient
-                colors={['rgba(255, 143, 0, 1)', 'rgba(255, 143, 0, 1)']}
+            <LinearGradient 
+                colors={['#0077b6','#00b4db']}
                 style={styles.bannerContainer}>
                 <View style={styles.bannerTopContainer}>
                     <View>
@@ -254,44 +255,42 @@ const Home = ({ navigation }) => {
                                 resizeMode="contain"
                             />
                         </View>
-                        <Text style={[styles.categoryName, { color: COLORS.white }]}>{item.name}</Text>
+                        <Text style={[styles.categoryName, { color: COLORS.black }]}>{item.name}</Text>
                     </TouchableOpacity>
                 )}
             />
         </View>
     );
 
-    // === MODIFICATION START: Updated renderServiceCardsGrid function ===
+
     const renderServiceCardsGrid = () => (
         <View style={styles.serviceCardsGridContainer}>
             <TouchableOpacity
                 onPress={() => navigation.navigate('TestBookingScreen')}
-                style={[styles.gridCard, { backgroundColor: COLORS.white, marginRight: 8 }]}>
-                <View style={[styles.gridCardIconContainer, { backgroundColor: 'rgba(80, 227, 194, 0.15)' }]}>
-                    <MaterialCommunityIcons name="test-tube" size={24} color={'#50E3C2'} />
+                style={[styles.gridCard, { backgroundColor:"#00b4db", marginRight: 8 }]}>
+                <View style={[styles.gridCardIconContainer, { backgroundColor: '#fff' }]}>
+                    <MaterialCommunityIcons name="test-tube" size={24} color={'#0077b6'} />
                 </View>
                 <Text style={styles.gridCardTitle}>Pathology</Text>
                 <Text style={styles.gridCardSubtitle}>Book Tests & Checkups</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={() => navigation.navigate('Hospital')}
-                style={[styles.gridCard, { backgroundColor: COLORS.white, marginLeft: 8 }]}>
-                <View style={[styles.gridCardIconContainer, { backgroundColor: 'rgba(86, 204, 242, 0.15)' }]}>
-                    <MaterialCommunityIcons name="hospital-building" size={24} color={'#56CCF2'} />
+                style={[styles.gridCard, { backgroundColor: "#00b4db", marginLeft: 8 }]}>
+                <View style={[styles.gridCardIconContainer, { backgroundColor: '#fff' }]}>
+                    <MaterialCommunityIcons name="hospital-building" size={24} color={'#0077b6'} />
                 </View>
                 <Text style={styles.gridCardTitle}>Hospital</Text>
                 <Text style={styles.gridCardSubtitle}>Get expert advice</Text>
             </TouchableOpacity>
         </View>
     );
-    // === MODIFICATION END ===
 
-    // === MODIFICATION START: Updated renderCompactServiceCards function ===
     const renderCompactServiceCards = () => {
         const compactServices = [
-            { id: '1', name: 'Patient-Mitra', icon: 'account-heart', screen: 'PatientMiraHome', description: '24x7 help & support', color: '#E573B5', iconBg: 'rgba(229, 115, 181, 0.15)' },
-            { id: '2', name: 'Dialysis', icon: 'water-pump', screen: 'Dialysis', description: 'Specialized kidney care', color: '#8A3FFC', iconBg: 'rgba(138, 63, 252, 0.15)' },
-            { id: '3', name: 'Physiotherapy', icon: 'run', screen: 'PhysiotherapyHomeScreen', description: 'Rehab & care support', color: '#7ED321', iconBg: 'rgba(126, 211, 33, 0.15)' },
+            { id: '1', name: 'Patient-Mitra', icon: 'account-heart', screen: 'PatientMiraHome', description: '24x7 help & support', color: '#0077b6', iconBg: '#fff' },
+            { id: '2', name: 'Dialysis', icon: 'water-pump', screen: 'Dialysis', description: 'Specialized kidney care', color: '#0077b6', iconBg: '#fff' },
+            { id: '3', name: 'Physiotherapy', icon: 'run', screen: 'PhysiotherapyHomeScreen', description: 'Rehab & care support', color: '#0077b6', iconBg: '#fff' },
         ];
 
         return (
@@ -300,7 +299,7 @@ const Home = ({ navigation }) => {
                     <TouchableOpacity
                         key={item.id}
                         onPress={() => navigation.navigate(item.screen)}
-                        style={[styles.compactCard, { backgroundColor: COLORS.white }]}
+                        style={[styles.compactCard, { backgroundColor: "#00b4db" }]}
                     >
                         <View style={[styles.compactCardIconContainer, { backgroundColor: item.iconBg }]}>
                             <MaterialCommunityIcons name={item.icon} size={20} color={item.color} />
@@ -365,7 +364,7 @@ const Home = ({ navigation }) => {
 
     return (
         <LinearGradient
-            colors={['#185a9d', '#43cea2']}
+            colors={['#00b4db', '#fff','#fff','#fff','#ffff','#ffff']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={styles.area}>
@@ -406,7 +405,11 @@ const styles = StyleSheet.create({
     },
     viewLeft: {
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        height: 42,
+        width: 42,
+        backgroundColor: "#fff",
+        borderRadius:21
     },
     viewRight: {
         flexDirection: "row",
@@ -504,18 +507,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
-        bottom: 10,
+        bottom: 2,
         width: '100%'
     },
     dot: {
         width: 10,
         height: 10,
         borderRadius: 5,
-        backgroundColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: 'black',
         marginHorizontal: 5,
     },
     activeDot: {
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.primary,
     },
     categoryContainer: {
         flex: 1,
@@ -529,7 +532,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
-        backgroundColor: COLORS.white,
+        backgroundColor: "#0077b6",
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
@@ -545,7 +548,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Urbanist-Medium',
         textAlign: 'center',
         width: '95%',
-        color: COLORS.white,
+        color: COLORS.white, 
     },
     serviceCardsGridContainer: {
         flexDirection: 'row',
@@ -554,7 +557,7 @@ const styles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 12,
     },
-    // === MODIFICATION START: Updated service card styles ===
+   
     gridCard: {
         borderRadius: 20,
         padding: 15,
@@ -578,17 +581,19 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     gridCardTitle: {
-        fontSize: 14,
+        fontSize: 15,
         fontFamily: 'Urbanist-Bold',
-        color: COLORS.black,
+        color: "#fff",
         textAlign: 'center',
+        fontWeight: 'bold',
         marginBottom: 4,
     },
     gridCardSubtitle: {
-        fontSize: 10,
+        fontSize: 12,
         fontFamily: 'Urbanist-Regular',
-        color: COLORS.greyscale700,
+        color: COLORS.white,
         textAlign: 'center',
+        fontWeight: 'bold',
     },
     compactCardsContainer: {
         flexDirection: 'row',
@@ -623,14 +628,16 @@ const styles = StyleSheet.create({
     compactCardTitle: {
         fontSize: 12,
         fontFamily: 'Urbanist-Bold',
-        color: COLORS.black,
+        color: COLORS.white,
         textAlign: 'center',
+        fontWeight: 'bold'
     },
     compactCardSubtitle: {
-        fontSize: 9,
+        fontSize: 10,
         fontFamily: 'Urbanist-Regular',
-        color: COLORS.greyscale700,
+        color: COLORS.white,
         textAlign: 'center',
+        fontWeight: 'bold',
         marginTop: 2,
     },
     // === MODIFICATION END ===

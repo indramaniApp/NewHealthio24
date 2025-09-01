@@ -108,7 +108,7 @@ const BottomTabNavigation = () => {
            
                 tabBarBackground: () => (
                     <LinearGradient
-                        colors={dark ? ["#1e1e1e", "#121212"] : ["#f8fafc", "#e0f2fe"]}
+                        colors={dark ? ["#1e1e1e", "#121212"] : ["#fff", "#fff"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{ flex: 1 }}
@@ -125,7 +125,7 @@ const BottomTabNavigation = () => {
                 }}
                 options={{
                     tabBarIcon: ({ focused }) =>
-                        getTabIcon(focused, icons.home, icons.home2Outline, "Home", ["#3B82F6", "#60A5FA"]) // Blue gradient
+                        getTabIcon(focused, icons.home, icons.home2Outline, "Home", ["#00b4db", "#00b4db"])
                 }}
             />
 
@@ -138,7 +138,7 @@ const BottomTabNavigation = () => {
                 }}
                 options={{
                     tabBarIcon: ({ focused }) =>
-                        getTabIcon(focused, icons.calendar5, icons.calendar, "Appointment", ["#10B981", "#34D399"]) // Green gradient
+                        getTabIcon(focused, icons.calendar5, icons.calendar, "Appointment", ["#00b4db", "#00b4db"])
                 }}
             />
 
@@ -151,7 +151,7 @@ const BottomTabNavigation = () => {
                 }}
                 options={{
                     tabBarIcon: ({ focused }) =>
-                        getTabIcon(focused, icons.wallet, icons.walletOutline, "Wallet", ["#8B5CF6", "#A78BFA"]) // Purple gradient
+                        getTabIcon(focused, icons.wallet, icons.walletOutline, "Wallet", ["#00b4db", "#00b4db"]) 
                 }}
             />
 
@@ -164,7 +164,7 @@ const BottomTabNavigation = () => {
                 }}
                 options={{
                     tabBarIcon: ({ focused }) =>
-                        getTabIcon(focused, icons.document, icons.documentOutline, "History", ["#F59E0B", "#FBBF24"]) // Amber gradient
+                        getTabIcon(focused, icons.document, icons.documentOutline, "History", ["#0077b6", "#0077b6"]) // Amber gradient
                 }}
             />
 
@@ -177,7 +177,7 @@ const BottomTabNavigation = () => {
                 }}
                 options={{
                     tabBarIcon: ({ focused }) =>
-                        getTabIcon(focused, icons.user, icons.userOutline, "Profile", ["#EF4444", "#F87171"]) // Red gradient
+                        getTabIcon(focused, icons.user, icons.userOutline, "Profile",["#0077b6", "#0077b6"]) // Red gradient
                 }}
             />
         </Tab.Navigator>

@@ -1,7 +1,8 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
+import { StatusBar } from 'react-native';
 import { AddNewAddress, AddNewCard, Address, ArticlesDetails, ArticlesSeeAll, BookAppointment, CancelAppointment, CancelAppointmentPaymentMethods, Categories, ChangeEmail, ChangePIN, ChangePassword, Chat, CreateNewPIN, CreateNewPassword, CustomerService, DoctorDetails, DoctorReviews, EReceipt, EditProfile, EnterYourPIN, Favourite, FillYourProfile, ForgotPasswordEmail, ForgotPasswordMethods, ForgotPasswordPhoneNumber, HelpCenter, InviteFriends, LeaveReview, Login, Messaging, MyAppointmentMessaging, MyAppointmentVideoCall, MyAppointmentVoiceCall, MyBookmarkedArticles, Notifications, OTPVerification, Onboarding1, Onboarding2, Onboarding3, Onboarding4, PatientDetails, PaymentMethods, RescheduleAppointment, ReviewSummary, Search, SelectPackage, SelectRescheduleAppointmentDate, SessionEnded, SettingsLanguage, SettingsNotifications, SettingsPayment, SettingsPrivacyPolicy, SettingsSecurity, Signup, TopDoctors, TrendingArticles, VideoCall, VideoCallHistoryDetails, VideoCallHistoryDetailsPlayRecordings, VoiceCall, VoiceCallHistoryDetails, VoiceCallHistoryDetailsPlayRecordings, Welcome } from '../screens';
 import BottomTabNavigation from './BottomTabNavigation';
 
@@ -97,11 +98,6 @@ import Physiotherapy from '../src/screens/DrawerRelatedScreens/Physiotherapy';
 
 
 
-
-
-
-
-
 const Stack = createNativeStackNavigator();
 
 const AppNavigation = () => {
@@ -131,14 +127,30 @@ const AppNavigation = () => {
     checkIfFirstLaunch()
   }, [])
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor('#00b4db');
+    StatusBar.setBarStyle('light-content');
+  }, []);
+
   if (isLoading) {
     return null
   }
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#00b4db',  
+  },
+};
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={MyTheme}>
       <Stack.Navigator
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          statusBarColor: '#00b4db',
+          statusBarStyle: 'light',
+        }}
 
         initialRouteName={!userToken ? 'Onboarding1' : 'Main'}>
         <Stack.Screen name="Onboarding1" component={Onboarding1} />
@@ -292,65 +304,64 @@ const AppNavigation = () => {
         <Stack.Screen name="CompletedReceipt" component={CompletedReceipt} />
          <Stack.Screen name="Physiotherapy" component={Physiotherapy} />
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       </Stack.Navigator>
     </NavigationContainer>
   )
 }
 
 export default AppNavigation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
