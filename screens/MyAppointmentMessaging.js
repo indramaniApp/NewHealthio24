@@ -25,7 +25,7 @@ const MyAppointmentMessaging = ({ navigation, route }) => {
           />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: dark ? COLORS.white : COLORS.black }]}>
-          My Appointment
+          My Appointmentssssssss
         </Text>
       </View>
       <TouchableOpacity>

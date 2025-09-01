@@ -25,10 +25,10 @@ const App = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Loader visible={loading} />
 
-      {/* The background color on this View is still a good fallback */}
+   
       <View style={{ flex: 1, backgroundColor: '#00b4db' }}>
         <SafeAreaProvider>
-          {/* 👇 UPDATED STATUS BAR 👇 */}
+  
           <StatusBar
             barStyle="light-content"
             backgroundColor="#00b4db"

@@ -142,17 +142,20 @@ const Home = ({ navigation }) => {
             </View>
             <View style={styles.viewRight}>
                 <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-                    <Image
-                        source={icons.notificationBell2}
-                        resizeMode='contain'
-                        style={[styles.bellIcon, { tintColor: dark ? COLORS.white : COLORS.white }]}
+                 
+                    <MaterialCommunityIcons 
+                        name="bell-outline" 
+                        size={24} 
+                        color={dark ? COLORS.white : COLORS.white}
+                        style={{ marginRight: 12 }} 
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate("Favourite")}>
-                    <Image
-                        source={icons.heartOutline}
-                        resizeMode='contain'
-                        style={[styles.bookmarkIcon, { tintColor: dark ? COLORS.white : COLORS.white }]}
+                 
+                    <MaterialCommunityIcons 
+                        name="heart-outline" 
+                        size={24} 
+                        color={dark ? COLORS.white : COLORS.white}
                     />
                 </TouchableOpacity>
             </View>
@@ -409,7 +412,9 @@ const styles = StyleSheet.create({
         height: 42,
         width: 42,
         backgroundColor: "#fff",
-        borderRadius:21
+        borderRadius:21,
+            flexDirection: "row",
+        alignItems: "center",
     },
     viewRight: {
         flexDirection: "row",
@@ -640,7 +645,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 2,
     },
-    // === MODIFICATION END ===
+     headerContainer: {
+        flexDirection: "row",
+        width: SIZES.width - 32,
+        justifyContent: "space-between",
+        alignItems: "center"
+    },
+  
+   
 });
 
 export default Home;

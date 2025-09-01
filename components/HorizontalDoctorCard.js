@@ -83,7 +83,7 @@ const HorizontalDoctorCard = ({
 const styles = StyleSheet.create({
  
     touchableWrapper: {
-        borderRadius: 2,
+        borderRadius: 10,
         marginBottom: 16,
         backgroundColor: COLORS.white,
         shadowColor: "#000",
