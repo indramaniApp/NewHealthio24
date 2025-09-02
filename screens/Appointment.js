@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, SafeAreaView } from 'react-native';
-import { COLORS, icons, images } from '../constants';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
 import { UpcomingBooking, CompletedBooking, CancelledBooking } from '../tabs';
-import LinearGradient from 'react-native-linear-gradient'; // Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -19,94 +18,68 @@ const Appointment = ({ navigation }) => {
         }
     }
 
+    // MODIFICATION: Updated tab colors to be visible on the new gradient background
     const fixedColors = {
-        background: '#FFFFFF',
-        tabActive: '#007AFF',
-        tabInactive: '#555555',
-        underline: '#E0E0E0',
+        tabActive: '#FFFFFF',
+        tabInactive: 'rgba(255, 255, 255, 0.7)',
+        underline: 'rgba(255, 255, 255, 0.3)',
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: fixedColors.background }}>
-            {/* === MODIFICATION START === */}
-            {/* Header */}
+        // MODIFICATION: Removed background color from SafeAreaView
+        <SafeAreaView style={styles.safeArea}>
+            {/* MODIFICATION: LinearGradient now wraps the entire screen content */}
             <LinearGradient
-                colors={['#00b4db', '#0077b6']}
-                style={styles.headerContainer}
+                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
+                style={styles.gradientContainer}
             >
-                <View style={styles.headerLeft}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        {/* Go back icon is better here than logo */}
-                        <Image source={icons.back} style={styles.headerIcon} />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>My Appointments</Text>
+                {/* Tabs */}
+                <View style={styles.tabsContainer}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('upcoming')}>
+                            <Text style={[styles.tabText, { color: selectedTab === 'upcoming' ? fixedColors.tabActive : fixedColors.tabInactive }]}>Upcoming</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('uploaded')}>
+                            <Text style={[styles.tabText, { color: selectedTab === 'uploaded' ? fixedColors.tabActive : fixedColors.tabInactive }]}>Uploaded</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('completed')}>
+                            <Text style={[styles.tabText, { color: selectedTab === 'completed' ? fixedColors.tabActive : fixedColors.tabInactive }]}>Completed</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Underline */}
+                    <View style={styles.underlineWrapper}>
+                        <View style={[styles.fullUnderline, { backgroundColor: fixedColors.underline }]} />
+                        <View style={{
+                            position: 'absolute',
+                            width: underlineWidth,
+                            height: 2,
+                            // MODIFICATION: Active underline is now solid white
+                            backgroundColor: fixedColors.tabActive,
+                            left: selectedTab === 'upcoming' ? 0 : selectedTab === 'uploaded' ? underlineWidth : 2 * underlineWidth
+                        }} />
+                    </View>
                 </View>
-                <TouchableOpacity>
-                    <Image source={icons.moreCircle} style={styles.headerIcon} />
-                </TouchableOpacity>
+
+                {/* Screen content */}
+                <View style={styles.contentContainer}>
+                    {renderSelectedScreen()}
+                </View>
             </LinearGradient>
-            {/* === MODIFICATION END === */}
-
-            {/* Tabs */}
-            <View style={{ marginTop: 10 }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('upcoming')}>
-                        <Text style={[styles.tabText, { color: selectedTab === 'upcoming' ? fixedColors.tabActive : fixedColors.tabInactive }]}>Upcoming</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('uploaded')}>
-                        <Text style={[styles.tabText, { color: selectedTab === 'uploaded' ? fixedColors.tabActive : fixedColors.tabInactive }]}>Uploaded</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('completed')}>
-                        <Text style={[styles.tabText, { color: selectedTab === 'completed' ? fixedColors.tabActive : fixedColors.tabInactive }]}>Completed</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Underline */}
-                <View style={{ position: 'relative', height: 2, marginTop: 4 }}>
-                    <View style={{ position: 'absolute', width: '100%', height: 2, backgroundColor: fixedColors.underline }} />
-                    <View style={{
-                        position: 'absolute',
-                        width: underlineWidth,
-                        height: 2,
-                        backgroundColor: fixedColors.tabActive,
-                        left: selectedTab === 'upcoming' ? 0 : selectedTab === 'uploaded' ? underlineWidth : 2 * underlineWidth
-                    }} />
-                </View>
-            </View>
-
-            {/* Screen content */}
-            <View style={{ flex: 1 }}>
-                {renderSelectedScreen()}
-            </View>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    // Updated header styles
-    headerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12, // Added vertical padding
+    safeArea: {
+        flex: 1,
     },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center'
+    gradientContainer: {
+        flex: 1,
     },
-    headerIcon: { // Renamed for clarity
-        width: 24,
-        height: 24,
-        tintColor: '#fff' // Set icon color to white
+    tabsContainer: {
+        marginTop: 10,
     },
-    headerTitle: {
-        fontSize: 20,
-        marginLeft: 16,
-        fontWeight: 'bold',
-        color: '#fff' // Set text color to white
-    },
-    // Tab styles remain the same
     tab: {
         flex: 1,
         alignItems: 'center',
@@ -115,6 +88,19 @@ const styles = StyleSheet.create({
     tabText: {
         fontSize: 16,
         fontWeight: '600'
+    },
+    underlineWrapper: {
+        position: 'relative',
+        height: 2,
+        marginTop: 4,
+    },
+    fullUnderline: {
+        position: 'absolute',
+        width: '100%',
+        height: 2,
+    },
+    contentContainer: {
+        flex: 1,
     },
 });
 

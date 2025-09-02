@@ -7,10 +7,7 @@ import { useTheme } from '../theme/ThemeProvider';
 
 const ArticlesDetails = ({ navigation }) => {
   const { colors, dark } = useTheme();
-  /**
-  * Render header
-  */
-  const renderHeader = () => {
+ renderHeader = () => {
     const [isFavourite, setIsFavourite] = useState(false);
 
     return (

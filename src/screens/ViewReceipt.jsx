@@ -16,14 +16,15 @@ import { COLORS } from '../../constants';
 import { useTheme } from '../../theme/ThemeProvider';
 import Header from '../../components/Header';
 import Button from '../../components/Button';
+import LinearGradient from 'react-native-linear-gradient';
 
-const ViewReceipt = ({ route,navigation }) => {
+const ViewReceipt = ({ route, navigation }) => {
     const dispatch = useDispatch();
     const { dark } = useTheme();
 
     const receipt = route?.params?.receiptData?.[0] || {};
     const {
-        _id: transaction_id = 'TXN123456',  
+        _id: transaction_id = 'TXN123456',
         order_id = 'INV0001',
         createdAt = '2025-05-23',
         payment_id = 'pay_1234567890',
@@ -35,28 +36,13 @@ const ViewReceipt = ({ route,navigation }) => {
 
     const generatePDF = async () => {
         dispatch(showLoader());
-
         const html = `
       <html>
         <head>
           <style>
-            body {
-              font-family: Arial;
-              padding: 24px;
-              font-size: 14px;
-              color: #333;
-            }
-            h1 {
-              text-align: center;
-              font-size: 20px;
-              margin-bottom: 0;
-            }
-            h2 {
-              text-align: center;
-              font-size: 14px;
-              color: #888;
-              margin-top: 4px;
-            }
+            body { font-family: Arial; padding: 24px; font-size: 14px; color: #333; }
+            h1 { text-align: center; font-size: 20px; margin-bottom: 0; }
+            h2 { text-align: center; font-size: 14px; color: #888; margin-top: 4px; }
             .section { margin-top: 20px; }
             .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
             .table-header { font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
@@ -68,7 +54,6 @@ const ViewReceipt = ({ route,navigation }) => {
         <body>
           <h1>Healthio24</h1>
           <h2>Receipt / Tax Invoice</h2>
-
           <div class="section">
             <div class="row"><div><b>Transaction ID:</b></div><div>${transaction_id}</div></div>
             <div class="row"><div><b>Order No:</b></div><div>${order_id}</div></div>
@@ -77,7 +62,6 @@ const ViewReceipt = ({ route,navigation }) => {
             <div class="row"><div><b>Method:</b></div><div>${payment_method}</div></div>
             <div class="row"><div><b>Status:</b></div><div>${status}</div></div>
           </div>
-
           <div class="section">
             <div class="table-header row">
               <div>Description</div>
@@ -87,20 +71,17 @@ const ViewReceipt = ({ route,navigation }) => {
               <div>${purpose}</div>
               <div>${amount}</div>
             </div>
-
             <div class="row total">
               <div>Total</div>
               <div>₹ ${amount}</div>
             </div>
           </div>
-
           <div class="footer">
             Thank you for choosing Healthio24!
           </div>
         </body>
       </html>
     `;
-
         try {
             const file = await RNHTMLtoPDF.convert({
                 html,
@@ -117,42 +98,50 @@ const ViewReceipt = ({ route,navigation }) => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : COLORS.white }}>
-            <Header title="Invoice" 
+        <SafeAreaView style={styles.safeArea}>
+            <LinearGradient
+                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
+                style={styles.gradientContainer}
+            >
+                <Header
+                    title="Invoice"
                     onBackPress={() => navigation.goBack()}
+                    style={{ backgroundColor: 'transparent' }}
+                    titleStyle={{ color: COLORS.white }}
+                    tintColor={COLORS.white}
+                />
+                <ScrollView contentContainerStyle={styles.container}>
+                    <View style={[styles.card, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
+                        <Text style={[styles.headerText, { color: dark ? COLORS.white : COLORS.black }]}>Healthio24</Text>
+                        <Text style={[styles.subHeader, { color: COLORS.gray }]}>Receipt / Tax Invoice</Text>
 
-            />
-            <ScrollView contentContainerStyle={styles.container}>
-                <View style={[styles.card, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
-                    <Text style={[styles.headerText, { color: dark ? COLORS.white : COLORS.black }]}>Healthio24</Text>
-                    <Text style={[styles.subHeader, { color: COLORS.gray }]}>Receipt / Tax Invoice</Text>
+                        <TextItem label="Transaction ID" value={transaction_id} dark={dark} />
+                        <TextItem label="Order No" value={order_id} dark={dark} />
+                        <TextItem label="Payment ID" value={payment_id} dark={dark} />
+                        <TextItem label="Date" value={createdAt} dark={dark} />
+                        <TextItem label="Method" value={payment_method} dark={dark} />
+                        <TextItem label="Status" value={status} dark={dark} />
 
-                    <TextItem label="Transaction ID" value={transaction_id} dark={dark} />
-                    <TextItem label="Order No" value={order_id} dark={dark} />
-                    <TextItem label="Payment ID" value={payment_id} dark={dark} />
-                    <TextItem label="Date" value={createdAt} dark={dark} />
-                    <TextItem label="Method" value={payment_method} dark={dark} />
-                    <TextItem label="Status" value={status} dark={dark} />
+                        <View style={styles.divider} />
 
-                    <View style={styles.divider} />
+                        <View style={styles.row}>
+                            <Text style={[styles.text, { fontWeight: 'bold' }]}>Description</Text>
+                            <Text style={[styles.text, { fontWeight: 'bold' }]}>Amount</Text>
+                        </View>
+                        <View style={styles.row}>
+                            <Text style={styles.text}>{purpose}</Text>
+                            <Text style={styles.text}>₹ {amount}</Text>
+                        </View>
 
-                    <View style={styles.row}>
-                        <Text style={[styles.text, { fontWeight: 'bold' }]}>Description</Text>
-                        <Text style={[styles.text, { fontWeight: 'bold' }]}>Amount</Text>
+                        <View style={[styles.row, { marginTop: 16 }]}>
+                            <Text style={[styles.totalText, { color: COLORS.primary }]}>Total</Text>
+                            <Text style={[styles.totalText, { color: COLORS.primary }]}>₹ {amount}</Text>
+                        </View>
                     </View>
-                    <View style={styles.row}>
-                        <Text style={styles.text}>{purpose}</Text>
-                        <Text style={styles.text}>₹ {amount}</Text>
-                    </View>
 
-                    <View style={[styles.row, { marginTop: 16 }]}>
-                        <Text style={[styles.totalText, { color: COLORS.primary }]}>Total</Text>
-                        <Text style={[styles.totalText, { color: COLORS.primary }]}>₹ {amount}</Text>
-                    </View>
-                </View>
-
-                <Button title="Download Invoice PDF" filled style={{ marginTop: 24 }} onPress={generatePDF} />
-            </ScrollView>
+                    <Button title="Download Invoice PDF" filled style={{ marginTop: 24 }} onPress={generatePDF} />
+                </ScrollView>
+            </LinearGradient>
         </SafeAreaView>
     );
 };
@@ -165,6 +154,12 @@ const TextItem = ({ label, value, dark }) => (
 );
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
+    gradientContainer: {
+        flex: 1,
+    },
     container: {
         padding: 16,
         paddingBottom: 40,
@@ -179,7 +174,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 20,
-        fontFamily: 'Urbanist Bold',
+        fontFamily: 'Urbanist-Bold',
         textAlign: 'center',
     },
     subHeader: {
@@ -187,23 +182,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 4,
     },
-    sectionTitle: {
-        fontSize: 16,
-        fontFamily: 'Urbanist Bold',
-        marginTop: 12,
-        marginBottom: 4,
-    },
     text: {
         fontSize: 14,
-        fontFamily: 'Urbanist Regular',
+        fontFamily: 'Urbanist-Regular',
     },
     label: {
         fontSize: 13,
-        fontFamily: 'Urbanist Medium',
+        fontFamily: 'Urbanist-Medium',
     },
     value: {
         fontSize: 14,
-        fontFamily: 'Urbanist SemiBold',
+        fontFamily: 'Urbanist-SemiBold',
         marginTop: 2,
     },
     itemRow: {
@@ -221,7 +210,7 @@ const styles = StyleSheet.create({
     },
     totalText: {
         fontSize: 16,
-        fontFamily: 'Urbanist Bold',
+        fontFamily: 'Urbanist-Bold',
     },
 });
 

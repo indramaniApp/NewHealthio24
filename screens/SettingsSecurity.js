@@ -29,7 +29,9 @@ const SettingsSecurity = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header title="Security" />
+        <Header title="Security" 
+        onBackPress={() => navigation.goBack()}
+        />
         <ScrollView style={styles.scrollView}
           showsVerticalScrollIndicator={false}>
           <GlobalSettingsItem
