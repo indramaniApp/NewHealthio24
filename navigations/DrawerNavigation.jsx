@@ -47,13 +47,13 @@ const drawerItems = [
     { name: 'GovtSchemeHospital', icon: 'account-balance', label: 'Govt.Scheme Hospitals' },
     { name: 'Doctors', icon: 'person' },
     { name: 'Clinics', icon: 'local-pharmacy' },
-    { name: 'Pharmacy', icon: 'local-grocery-store' },
+    // { name: 'Pharmacy', icon: 'local-grocery-store' },
     { name: 'Physiotherapy', icon: 'fitness-center' },
   
     { name: 'Dialysis', icon: 'healing' },
-    { name: 'BloodBank', icon: 'bloodtype' },
-    { name: 'PatientMitra', icon: 'person-pin' },
-    { name: 'Ambulance', icon: 'local-taxi' },
+    // { name: 'BloodBank', icon: 'bloodtype' },
+    // { name: 'PatientMitra', icon: 'person-pin' },
+    // { name: 'Ambulance', icon: 'local-taxi' },
     { name: 'AppointmentHistory', icon: 'event', label: 'Appointment History' },
     { name: 'MedicalHistory', icon: 'history', label: 'Medical History' },
     { name: 'CustomerCare', icon: 'support-agent', label: 'Customer Care' },
@@ -89,7 +89,7 @@ const CustomDrawerContent = ({ navigation }) => {
             <StatusBar
                 translucent={false}
                 backgroundColor={isDrawerOpen ? COLORS.primary : '#00b4db'}
-                barStyle={isDrawerOpen ? 'light-content' : (theme === 'dark' ? 'light-content' : 'dark-content')}
+                barStyle={isDrawerOpen ? 'light-content' : (theme === 'dark' ? 'light-content' : 'light-content')}
             />
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 {/* === MODIFICATION START === */}

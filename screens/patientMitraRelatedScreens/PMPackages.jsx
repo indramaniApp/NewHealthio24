@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import Header from '../../components/Header';
 import ApiService from '../../src/api/ApiService';
@@ -12,6 +14,7 @@ import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import { useFocusEffect } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const StylishCardScreen = ({ navigation }) => {
   const [packages, setPackages] = useState([]);
@@ -27,7 +30,6 @@ const StylishCardScreen = ({ navigation }) => {
     try {
       dispatch(showLoader());
       const res = await ApiService.get(ENDPOINTS.pm_package_gets);
-      console.log('Response Data:', res);
       if (res?.status === 'success' && Array.isArray(res.data)) {
         setPackages(res.data);
       } else {
@@ -42,48 +44,65 @@ const StylishCardScreen = ({ navigation }) => {
   };
 
   const handleBook = (item) => {
-    // console.log('Booking Serial:', item.serialNumber);
-     navigation.navigate('PatientMitraSelectSlot', { packageId: item._id });
+    navigation.navigate('PatientMitraSelectSlot', { packageId: item._id });
+    console.log('Selected Package ID:=====', item._id);
   };
 
   return (
-    <View style={styles.container}>
-      <Header title="Mitra Packages" onBackPress={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {packages.map((item) => (
-          <View key={item._id} style={styles.card}>
-            <View style={styles.stripe} />
-            <View style={styles.cardContent}>
-          
-              <View style={styles.detailsRow}>
-                <Text style={styles.detailText}>💰 ₹{item.fee}</Text>
-                <Text style={styles.detailText}>🕒 {item.time}</Text>
+    <LinearGradient
+      colors={['#00b4db', '#f4f4f5', '#f4f4f5']}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+        <Header
+          title="Mitra Packages"
+          onBackPress={() => navigation.goBack()}
+          style={{ backgroundColor: 'transparent', marginTop: 40 }}
+        />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          {packages.map((item) => (
+            <View key={item._id} style={styles.card}>
+              <View style={styles.stripe} />
+              <View style={styles.cardContent}>
+                <View style={styles.detailsRow}>
+                  <Text style={styles.detailText}>💰 ₹{item.fee}</Text>
+                  <Text style={styles.detailText}>🕒 {item.time}</Text>
+                </View>
+
+                {/* 🔥 TouchableOpacity ab LinearGradient ko wrap kar raha hai */}
+                <TouchableOpacity
+                  onPress={() => handleBook(item)}
+                  style={{ alignSelf: 'flex-end' }} // 🔥 Button ko right align karne ke liye
+                >
+                  <LinearGradient
+                    colors={['#00b4db', '#34d399']} // 🔥 Button ke liye gradient colors
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.bookButton}
+                  >
+                    <Text style={styles.bookButtonText}>🚀 Book Now</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
               </View>
-           
-              <TouchableOpacity
-               
-                style={styles.bookButton}
-                onPress={() => handleBook(item)}
-              >
-                <Text style={styles.bookButtonText}>🚀 Book Now</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default StylishCardScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#f9fbfc',
   },
   scroll: {
     padding: 16,
+    paddingTop: 30,
   },
   card: {
     flexDirection: 'row',
@@ -101,22 +120,16 @@ const styles = StyleSheet.create({
   },
   stripe: {
     width: 6,
-    backgroundColor: '#10b981',
+    backgroundColor: '#00b4db',
   },
   cardContent: {
     flex: 1,
     padding: 16,
   },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 10,
-  },
   detailsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 16,
   },
   detailText: {
     fontSize: 15,
@@ -124,17 +137,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bookButton: {
-    backgroundColor: '#10b981',
-    paddingVertical: 5,
+    // 🔥 backgroundColor hata diya gaya hai, ab gradient use ho raha hai
+    paddingVertical: 8, // 🔥 Padding adjust kiya
     borderRadius: 30,
     alignItems: 'center',
-    alignSelf: 'flex-end',
     paddingHorizontal: 20,
     shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   bookButtonText: {
     color: '#ffffff',

@@ -55,7 +55,7 @@ const CancelledBooking = () => {
     };
 
     return (
-        // MODIFICATION: Set the background color to 'transparent'
+      
         <View style={[styles.container, { backgroundColor: 'transparent' }]}>
             <FlatList
                 data={completed}

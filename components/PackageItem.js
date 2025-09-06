@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { COLORS } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
+// 1. Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const PackageItem = ({ checked, onPress, title, subtitle, price, duration, icon }) => {
     const { dark } = useTheme();
@@ -13,13 +15,17 @@ const PackageItem = ({ checked, onPress, title, subtitle, price, duration, icon 
                 backgroundColor: dark ? COLORS.dark2 : COLORS.white
             }]}>
             <View style={styles.rightContainer}>
-                <View style={styles.iconContainer}>
+                {/* 2. Replaced View with LinearGradient */}
+                <LinearGradient
+                    colors={['#0077b6', '#00b4db']}
+                    style={styles.iconContainer}
+                >
                     <Image
                         source={icon}
                         resizeMode='contain'
                         style={styles.icon}
                     />
-                </View>
+                </LinearGradient>
                 <View>
                     <Text style={[styles.title, {
                         color: dark ? COLORS.white : COLORS.black
@@ -34,7 +40,7 @@ const PackageItem = ({ checked, onPress, title, subtitle, price, duration, icon 
                     <Text style={[styles.title, {
                         color: COLORS.primary
                     }]}>{price}</Text>
-                   {/* $ */}
+                    {/* $ */}
                     <Text style={[styles.subtitle, {
                         color: dark ? COLORS.greyscale300 : "gray"
                     }]}>{duration}</Text>
@@ -61,7 +67,6 @@ const PackageItem = ({ checked, onPress, title, subtitle, price, duration, icon 
                         }} />}
                     </View>
                 </TouchableOpacity>
-
             </View>
         </TouchableOpacity>
     )
@@ -85,7 +90,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         height: 60,
         width: 60,
-        backgroundColor: COLORS.tansparentPrimary,
+        // backgroundColor was removed from here
         borderRadius: 999,
         alignItems: "center",
         justifyContent: "center",
@@ -94,7 +99,8 @@ const styles = StyleSheet.create({
     icon: {
         height: 28,
         width: 28,
-        tintColor: COLORS.primary
+        // 3. Changed icon tintColor to white
+        tintColor: COLORS.white
     },
     title: {
         fontSize: 16,
@@ -113,4 +119,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default PackageItem
+export default PackageItem;

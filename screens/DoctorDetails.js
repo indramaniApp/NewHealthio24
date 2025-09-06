@@ -16,13 +16,11 @@ import ReviewCard from '../components/ReviewCard';
 import Button from '../components/Button';
 import { useDispatch } from 'react-redux';
 import { hideLoader, showLoader } from '../src/redux/slices/loaderSlice';
-// 👇 1. YEH IMPORT ADD KAREIN
 import LinearGradient from 'react-native-linear-gradient';
 
 const DoctorDetails = ({ navigation, route }) => {
-    // doctor object safe access
     const doctor = route?.params?.doctor || {};
-
+    console.log('doctor====s===', doctor);
     const dispatch = useDispatch();
     const { dark } = useTheme();
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -37,7 +35,7 @@ const DoctorDetails = ({ navigation, route }) => {
 
     const handleBookOption = (method) => {
         setIsModalVisible(false);
-        navigation.navigate('BookAppointment', { doctorId: doctor.doctorId, method });
+        navigation.navigate('BookAppointment', { doctorId: doctor._id, method });
     };
 
     const renderHeader = () => {
@@ -49,18 +47,10 @@ const DoctorDetails = ({ navigation, route }) => {
                         <Image
                             source={icons.back}
                             resizeMode="contain"
-                            style={[
-                                styles.backIcon,
-                                { tintColor: dark ? COLORS.white : COLORS.black },
-                            ]}
+                            style={[styles.backIcon, { tintColor: COLORS.white }]}
                         />
                     </TouchableOpacity>
-                    <Text
-                        style={[
-                            styles.headerTitle,
-                            { color: dark ? COLORS.white : COLORS.black },
-                        ]}
-                    >
+                    <Text style={[styles.headerTitle, { color: COLORS.white }]}>
                         Doctor Details
                     </Text>
                 </View>
@@ -72,9 +62,7 @@ const DoctorDetails = ({ navigation, route }) => {
                             style={[
                                 styles.heartIcon,
                                 {
-                                    tintColor: isFavourite
-                                        ? COLORS.primary
-                                        : COLORS.greyscale900,
+                                    tintColor: isFavourite ? COLORS.primary : COLORS.white,
                                 },
                             ]}
                         />
@@ -90,8 +78,7 @@ const DoctorDetails = ({ navigation, route }) => {
 
         return (
             <View>
-                <View style={{ backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite }}>
-                    {/* 👇 2. IS VIEW KO LINEAR GRADIENT SE REPLACE KIYA GAYA HAI */}
+                <View style={{ backgroundColor: dark ? COLORS.dark1 : 'transparent' }}>
                     <LinearGradient
                         colors={dark ? [COLORS.dark2, '#2C2F3E'] : ['#E9F0FF', COLORS.white]}
                         start={{ x: 0, y: 0 }}
@@ -117,9 +104,7 @@ const DoctorDetails = ({ navigation, route }) => {
                                 style={[
                                     styles.separateLine,
                                     {
-                                        backgroundColor: dark
-                                            ? COLORS.grayscale700
-                                            : COLORS.grayscale200,
+                                        backgroundColor: dark ? COLORS.grayscale700 : COLORS.grayscale200,
                                     },
                                 ]}
                             />
@@ -170,19 +155,11 @@ const DoctorDetails = ({ navigation, route }) => {
 
                 {/* About Doctor */}
                 <ScrollView>
-                    <Text
-                        style={[
-                            styles.contentTitle,
-                            { color: dark ? COLORS.secondaryWhite : COLORS.greyscale900 },
-                        ]}
-                    >
+                    <Text style={[styles.contentTitle, { color: dark ? COLORS.secondaryWhite : COLORS.greyscale900 }]}>
                         About me
                     </Text>
                     <Text
-                        style={[
-                            styles.description,
-                            { color: dark ? COLORS.grayscale400 : COLORS.grayscale700 },
-                        ]}
+                        style={[styles.description, { color: dark ? COLORS.grayscale400 : COLORS.grayscale700 }]}
                         numberOfLines={expanded ? undefined : 2}
                     >
                         {doctor.about_me || "No details available"}
@@ -192,16 +169,12 @@ const DoctorDetails = ({ navigation, route }) => {
                             {expanded ? 'View Less' : 'View More'}
                         </Text>
                     </TouchableOpacity>
-
                     <Text style={styles.contentTitle1}>Consultation Home Visit Time</Text>
                     <Text style={styles.description}>{doctor.consultationTimeHomeVisit || "N/A"}</Text>
-
                     <Text style={styles.contentTitle1}>Consultation InPerson Time</Text>
                     <Text style={styles.description}>{doctor.consultationTimeInPerson || "N/A"}</Text>
-
                     <Text style={styles.contentTitle1}>Consultation Video Time</Text>
                     <Text style={styles.description}>{doctor.consultationTimeVideo || "N/A"}</Text>
-
                     <View style={styles.reviewTitleContainer}>
                         <Text style={styles.contentTitle}>Reviews</Text>
                         <TouchableOpacity onPress={() => navigation.navigate('DoctorReviews')}>
@@ -231,68 +204,89 @@ const DoctorDetails = ({ navigation, route }) => {
     };
 
     return (
-        <SafeAreaView style={[styles.area, { backgroundColor: dark ? COLORS.dark1 : COLORS.white }]}>
-            <View style={[styles.container, { backgroundColor: dark ? COLORS.dark1 : COLORS.white }]}>
-                {renderHeader()}
-                <ScrollView
-                    style={[styles.scrollView, { backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite }]}
-                    showsVerticalScrollIndicator={false}
+        <LinearGradient
+            colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
+            style={{ flex: 1 }}
+        >
+            <SafeAreaView style={styles.area}>
+                <View style={styles.container}>
+                    {renderHeader()}
+                    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                        {renderContent()}
+                    </ScrollView>
+                </View>
+
+                {/* Bottom Book Button */}
+                <View style={[styles.bottomContainer, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
+                    <Button
+                        title="Book Appointment"
+                        filled
+                        style={styles.btn}
+                        onPress={() => setIsModalVisible(true)}
+                    />
+                </View>
+
+                {/* Booking Modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isModalVisible}
+                    onRequestClose={() => setIsModalVisible(false)}
                 >
-                    {renderContent()}
-                </ScrollView>
-            </View>
+                    <TouchableOpacity
+                        activeOpacity={1}
+                        onPressOut={() => setIsModalVisible(false)}
+                        style={styles.modalOverlay}
+                    >
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Choose Booking Method</Text>
 
-            {/* Bottom Book Button */}
-            <View style={[styles.bottomContainer, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
-                <Button
-                    title="Book Appointment"
-                    filled
-                    style={styles.btn}
-                    onPress={() => setIsModalVisible(true)}
-                />
-            </View>
+                            {/* 👇 1. पहला ग्रेडिएंट बटन */}
+                            <TouchableOpacity
+                                style={{ width: '100%' }}
+                                onPress={() => handleBookOption('wallet')}
+                            >
+                                <LinearGradient
+                                    colors={['#0077b6', '#00b4db']}
+                                    style={styles.modalGradientButton}
+                                >
+                                    <Text style={styles.modalButtonText}>Book by Wallet</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
 
-            {/* Booking Modal */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={() => setIsModalVisible(false)}
-            >
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onPressOut={() => setIsModalVisible(false)}
-                    style={styles.modalOverlay}
-                >
-                    <View style={styles.modalContainer}>
-                        <Text style={styles.modalTitle}>Choose Booking Method</Text>
+                            {/* 👇 2. दूसरा ग्रेडिएंट बटन */}
+                            <TouchableOpacity
+                                style={{ width: '100%' }}
+                                onPress={() => handleBookOption('payment')}
+                            >
+                                <LinearGradient
+                                    colors={['#0077b6', '#00b4db']}
+                                    style={styles.modalGradientButton}
+                                >
+                                    <Text style={styles.modalButtonText}>Book by Payment</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.modalButton} onPress={() => handleBookOption('wallet')}>
-                            <Text style={styles.modalButtonText}>Book by Wallet</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.modalButton} onPress={() => handleBookOption('payment')}>
-                            <Text style={styles.modalButtonText}>Book by Payment</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.modalButton, { backgroundColor: COLORS.grayscale200, marginTop: 20 }]}
-                            onPress={() => setIsModalVisible(false)}
-                        >
-                            <Text style={[styles.modalButtonText, { color: COLORS.greyscale900 }]}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
-        </SafeAreaView>
+                            {/* Cancel बटन पहले जैसा ही रहेगा */}
+                            <TouchableOpacity
+                                style={[styles.modalButton, { backgroundColor: COLORS.grayscale200, marginTop: 20 }]}
+                                onPress={() => setIsModalVisible(false)}
+                            >
+                                <Text style={[styles.modalButtonText, { color: COLORS.greyscale900 }]}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </Modal>
+            </SafeAreaView>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
-    area: { flex: 1, backgroundColor: COLORS.white },
-    container: { flex: 1, backgroundColor: COLORS.white, padding: 16 },
+    area: { flex: 1 },
+    container: { flex: 1, padding: 16 },
     headerContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 16 },
-    scrollView: { backgroundColor: COLORS.tertiaryWhite },
+    scrollView: { backgroundColor: 'transparent' },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
     backIcon: { height: 24, width: 24, marginRight: 16 },
     headerTitle: { fontSize: 24, fontFamily: 'Urbanist Bold' },
@@ -302,7 +296,6 @@ const styles = StyleSheet.create({
         height: 142,
         width: SIZES.width - 32,
         borderRadius: 32,
-        // 👇 3. YAHAN SE 'backgroundColor' HATA DIYA GAYA HAI
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -359,6 +352,15 @@ const styles = StyleSheet.create({
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
     modalContainer: { width: '80%', backgroundColor: 'white', borderRadius: 20, padding: 20, alignItems: 'center' },
     modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+    // 👇 3. ग्रेडिएंट बटन के लिए नई स्टाइल
+    modalGradientButton: {
+        paddingVertical: 12,
+        borderRadius: 12,
+        marginTop: 10,
+        width: '100%',
+        alignItems: 'center',
+    },
+    // यह स्टाइल Cancel बटन के लिए है
     modalButton: {
         backgroundColor: COLORS.primary,
         paddingVertical: 12,

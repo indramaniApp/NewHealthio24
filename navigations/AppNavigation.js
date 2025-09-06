@@ -95,6 +95,7 @@ import CompletedMoreDetail from '../screens/patientMitraRelatedScreens/Completed
 import ScheduleReceipt from '../screens/patientMitraRelatedScreens/ScheduleReceipt';
 import CompletedReceipt from '../screens/patientMitraRelatedScreens/CompletedReceipt';
 import Physiotherapy from '../src/screens/DrawerRelatedScreens/Physiotherapy';
+import Dialysis from '../src/screens/DrawerRelatedScreens/Dialysis';
 
 
 
@@ -303,6 +304,10 @@ const MyTheme = {
         <Stack.Screen name="ScheduleReceipt" component={ScheduleReceipt} />
         <Stack.Screen name="CompletedReceipt" component={CompletedReceipt} />
          <Stack.Screen name="Physiotherapy" component={Physiotherapy} />
+                  <Stack.Screen name="Dialysis" component={Dialysis} />
+           
+
+
 
       </Stack.Navigator>
     </NavigationContainer>

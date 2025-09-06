@@ -7,32 +7,36 @@ import { ScrollView } from 'react-native-virtualized-view';
 import { friends } from '../data';
 import InviteFriendCard from '../components/InviteFriendCard';
 import { useTheme } from '../theme/ThemeProvider';
+import LinearGradient from 'react-native-linear-gradient';
 
 const InviteFriends = ({navigation}) => {
-  const { colors } = useTheme()
-
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header title="Invite Friends"
-        onBackPress={() => navigation.goBack()}
-        />
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}>
-          <FlatList
-            data={friends}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <InviteFriendCard
-                name={item.name}
-                phoneNumber={item.phoneNumber}
-                avatar={item.avatar}
-              />
-            )}
+    <SafeAreaView style={styles.area}>
+      <LinearGradient
+        colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+        style={styles.gradientContainer}
+      >
+        <View style={styles.container}>
+          <Header title="Invite Friends"
+          onBackPress={() => navigation.goBack()}
           />
-        </ScrollView>
-      </View>
+          <ScrollView
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}>
+            <FlatList
+              data={friends}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => (
+                <InviteFriendCard
+                  name={item.name}
+                  phoneNumber={item.phoneNumber}
+                  avatar={item.avatar}
+                />
+              )}
+            />
+          </ScrollView>
+        </View>
+      </LinearGradient>
     </SafeAreaView>
   )
 };
@@ -40,11 +44,12 @@ const InviteFriends = ({navigation}) => {
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white
+  },
+  gradientContainer: {
+    flex: 1,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
     padding: 16,
   },
   scrollView: {
@@ -52,4 +57,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default InviteFriends
+export default InviteFriends;

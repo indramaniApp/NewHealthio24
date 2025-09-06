@@ -18,7 +18,7 @@ const Appointment = ({ navigation }) => {
         }
     }
 
-    // MODIFICATION: Updated tab colors to be visible on the new gradient background
+  
     const fixedColors = {
         tabActive: '#FFFFFF',
         tabInactive: 'rgba(255, 255, 255, 0.7)',
@@ -26,9 +26,9 @@ const Appointment = ({ navigation }) => {
     };
 
     return (
-        // MODIFICATION: Removed background color from SafeAreaView
+
         <SafeAreaView style={styles.safeArea}>
-            {/* MODIFICATION: LinearGradient now wraps the entire screen content */}
+         
             <LinearGradient
                 colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
                 style={styles.gradientContainer}
@@ -54,7 +54,7 @@ const Appointment = ({ navigation }) => {
                             position: 'absolute',
                             width: underlineWidth,
                             height: 2,
-                            // MODIFICATION: Active underline is now solid white
+                    
                             backgroundColor: fixedColors.tabActive,
                             left: selectedTab === 'upcoming' ? 0 : selectedTab === 'uploaded' ? underlineWidth : 2 * underlineWidth
                         }} />

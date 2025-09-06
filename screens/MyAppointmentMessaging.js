@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeProvider';
 import { COLORS, SIZES, icons } from '../constants';
 import { ScrollView } from 'react-native-virtualized-view';
-// MODIFICATION: Import LinearGradient
+
 import LinearGradient from 'react-native-linear-gradient';
 
 const MyAppointmentMessaging = ({ navigation, route }) => {
@@ -23,11 +23,11 @@ const MyAppointmentMessaging = ({ navigation, route }) => {
                     <Image
                         source={icons.back}
                         resizeMode='contain'
-                        // MODIFICATION: Set tintColor to white to be visible on the gradient
+                    
                         style={[styles.backIcon, { tintColor: COLORS.white }]}
                     />
                 </TouchableOpacity>
-                {/* MODIFICATION: Set color to white to be visible on the gradient */}
+       
                 <Text style={[styles.headerTitle, { color: COLORS.white }]}>
                     My Appointment
                 </Text>
@@ -36,7 +36,7 @@ const MyAppointmentMessaging = ({ navigation, route }) => {
                 <Image
                     source={icons.moreCircle}
                     resizeMode='contain'
-                     // MODIFICATION: Set tintColor to white for consistency
+                   
                     style={[styles.moreIcon, { tintColor: COLORS.white }]}
                 />
             </TouchableOpacity>
@@ -45,7 +45,7 @@ const MyAppointmentMessaging = ({ navigation, route }) => {
 
     const renderContent = () => (
         <View>
-            {/* The background of this container is now transparent to show the gradient */}
+      
             <View> 
                 <View style={[styles.doctorCard, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
                     <Image
@@ -125,7 +125,7 @@ const MyAppointmentMessaging = ({ navigation, route }) => {
 
             <Text style={[styles.subtitle, { color: dark ? COLORS.grayscale200 : COLORS.greyscale900 }]}>Your Package</Text>
 
-             {/* The background of this container is now transparent to show the gradient */}
+        
             <View>
                 <View style={[styles.pkgContainer, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
                     <View style={styles.pkgLeftContainer}>
@@ -153,9 +153,9 @@ const MyAppointmentMessaging = ({ navigation, route }) => {
     );
 
     return (
-        // MODIFICATION: Removed background color
+      
         <SafeAreaView style={styles.area}>
-            {/* MODIFICATION: Wrapped entire screen content in LinearGradient */}
+          
             <LinearGradient
                 colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
                 style={styles.gradientContainer}
@@ -175,11 +175,11 @@ const styles = StyleSheet.create({
     area: { 
         flex: 1 
     },
-    // MODIFICATION: Added gradientContainer style
+ 
     gradientContainer: {
         flex: 1,
     },
-    // MODIFICATION: Removed background color
+    
     container: { 
         flex: 1, 
         padding: 16 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         width: 24 
     },
     doctorCard: {
-        minHeight: 142, // Use minHeight to allow text to wrap
+        minHeight: 142, 
         width: SIZES.width - 32, 
         borderRadius: 16, 
         flexDirection: "row", 
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     },
     separateLine: { 
         height: 1, 
-        // Adjust width to account for padding and image size
+     
         width: SIZES.width - 32 - 110 - 32 - 16, 
         marginVertical: 12 
     },
@@ -276,14 +276,14 @@ const styles = StyleSheet.create({
         borderRadius: 999, 
         alignItems: "center", 
         justifyContent: "center",
-        backgroundColor: COLORS.tansparentPrimary, // Added a background color
+        backgroundColor: COLORS.tansparentPrimary, 
         marginLeft: 12, 
         marginRight: 12
     },
     pkgIcon: { 
         height: 24, 
         width: 24,
-        tintColor: COLORS.primary, // Added a tint color
+        tintColor: COLORS.primary, 
     },
     pkgTitle: { 
         fontSize: 16, 

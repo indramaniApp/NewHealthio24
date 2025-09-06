@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-nati
 import React, { useState } from 'react';
 import Header from '../../components/Header';
 import { COLORS } from '../../constants';
+import LinearGradient from 'react-native-linear-gradient';
 
 // 👉 Import your 3 components
 import ScheduledAppointment from './ScheduledAppointment';
@@ -10,7 +11,7 @@ import CompletedAppointment from './CompletedAppointment';
 
 const { width } = Dimensions.get('window');
 
-const PatientMitraBookingList = ({navigation}) => {
+const PatientMitraBookingList = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState('Scheduled');
 
   const tabs = ['Scheduled', 'Accepted', 'Completed'];
@@ -30,35 +31,45 @@ const PatientMitraBookingList = ({navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Header title="Patient Mitra Bookings"  onBackPress={() => navigation.goBack()}  />
+    <LinearGradient
+      colors={['#00b4db', '#ffffff']}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.container}>
+        {/* Custom Header */}
+        <Header
+          title="Patient Mitra Bookings"
+          onBackPress={() => navigation.goBack()}
+          style={{ backgroundColor: 'transparent', marginTop: 40 }}
+        />
 
-      {/* Tabs with underline */}
-      <View style={styles.tabContainer}>
-        {tabs.map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => setSelectedTab(tab)}
-            style={styles.tabButton}
-          >
-            <Text style={[styles.tabText, selectedTab === tab && styles.selectedTabText]}>
-              {tab}
-            </Text>
-            <View
-              style={[
-                styles.underline,
-                selectedTab === tab && styles.activeUnderline,
-              ]}
-            />
-          </TouchableOpacity>
-        ))}
-      </View>
+        {/* Tabs with underline */}
+        <View style={styles.tabContainer}>
+          {tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setSelectedTab(tab)}
+              style={styles.tabButton}
+            >
+              <Text style={[styles.tabText, selectedTab === tab && styles.selectedTabText]}>
+                {tab}
+              </Text>
+              <View
+                style={[
+                  styles.underline,
+                  selectedTab === tab && styles.activeUnderline,
+                ]}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Dynamic Content */}
-      <View style={styles.content}>
-        {renderTabContent()}
+        {/* Dynamic Content */}
+        <View style={styles.content}>
+          {renderTabContent()}
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -67,12 +78,12 @@ export default PatientMitraBookingList;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS?.white || '#fff',
   },
   tabContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    marginTop: 10,
   },
   tabButton: {
     flex: 1,
@@ -82,10 +93,10 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 16,
-    color: '#666',
+    color: '#444',
   },
   selectedTabText: {
-    color: COLORS?.primary || '#007bff',
+    color: '#fff' || '#007bff',
     fontWeight: 'bold',
   },
   underline: {
@@ -96,7 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   activeUnderline: {
-    backgroundColor: COLORS?.primary || '#007bff',
+    backgroundColor: "#fff" || '#007bff',
   },
   content: {
     flex: 1,

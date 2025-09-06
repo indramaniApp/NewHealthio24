@@ -168,7 +168,7 @@ const Profile = ({ navigation }) => {
                             backgroundColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
                             borderRadius: 32
                         }}
-                        textColor={dark ? COLORS.white : COLORS.primary}
+                        textColor={dark ? COLORS.white : COLORS.white}
                         onPress={() => refRBSheet.current.close()}
                     />
                     <Button
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         flexGrow: 1,
-        paddingBottom: 100, // <-- बस यह लाइन जोड़ी गई है
+        paddingBottom: 100,
     },
     container: {
         flex: 1,

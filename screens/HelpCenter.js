@@ -8,6 +8,7 @@ import { faqKeywords, faqs } from '../data';
 import { useTheme } from '../theme/ThemeProvider';
 import { ScrollView } from 'react-native-virtualized-view';
 import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient'; // <-- ग्रेडिएंट के लिए इम्पोर्ट करें
 
 const faqsRoute = () => {
     const [selectedKeywords, setSelectedKeywords] = useState([]);
@@ -60,7 +61,7 @@ const faqsRoute = () => {
     };
 
     return (
-        <View>
+        <View style={{flex: 1}}>
             <View style={{ marginVertical: 16 }}>
                 <FlatList
                     data={faqKeywords}
@@ -164,12 +165,9 @@ const faqsRoute = () => {
 
 const contactUsRoute = () => {
     const navigation = useNavigation();
-    const { dark } = useTheme();
-
     return (
-        <View style={[styles.routeContainer, {
-            backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite
-        }]}>
+        // <-- यहाँ से backgroundColor हटा दिया गया
+        <View style={styles.routeContainer}>
             <HelpCenterItem
                 icon={icons.headset}
                 title="Customer Service"
@@ -210,7 +208,7 @@ const renderScene = SceneMap({
 
 const HelpCenter = ({ navigation }) => {
     const layout = useWindowDimensions();
-    const { dark, colors } = useTheme();
+    const { dark } = useTheme();
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
@@ -225,7 +223,8 @@ const HelpCenter = ({ navigation }) => {
                 backgroundColor: COLORS.primary,
             }}
             style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                backgroundColor: 'transparent', // <-- टैब बार को ट्रांसपेरेंट किया
+                elevation: 0, // <-- एंड्रॉइड के लिए शैडो हटाया
             }}
             renderLabel={({ route, focused, color }) => (
                 <Text style={[{
@@ -271,17 +270,22 @@ const HelpCenter = ({ navigation }) => {
         )
     }
     return (
-        <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
-                {renderHeader()}
-                <TabView
-                    navigationState={{ index, routes }}
-                    renderScene={renderScene}
-                    onIndexChange={setIndex}
-                    initialLayout={{ width: layout.width }}
-                    renderTabBar={renderTabBar}
-                />
-            </View>
+        <SafeAreaView style={styles.area}>
+            <LinearGradient
+                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                style={styles.gradientContainer}
+            >
+                <View style={styles.container}>
+                    {renderHeader()}
+                    <TabView
+                        navigationState={{ index, routes }}
+                        renderScene={renderScene}
+                        onIndexChange={setIndex}
+                        initialLayout={{ width: layout.width }}
+                        renderTabBar={renderTabBar}
+                    />
+                </View>
+            </LinearGradient>
         </SafeAreaView>
     )
 };
@@ -289,11 +293,12 @@ const HelpCenter = ({ navigation }) => {
 const styles = StyleSheet.create({
     area: {
         flex: 1,
-        backgroundColor: COLORS.white
+    },
+    gradientContainer: { // <-- ग्रेडिएंट के लिए स्टाइल
+        flex: 1,
     },
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
         padding: 16
     },
     headerContainer: {
@@ -323,7 +328,6 @@ const styles = StyleSheet.create({
     },
     routeContainer: {
         flex: 1,
-        backgroundColor: COLORS.white,
         paddingVertical: 22
     },
     searchBar: {
@@ -382,4 +386,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default HelpCenter
+export default HelpCenter;

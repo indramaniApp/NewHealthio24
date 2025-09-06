@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     },
     primaryBtn: {
       flex: 1,
-      backgroundColor: COLORS.primary,
+      backgroundColor:"#00b4db",
       paddingVertical: 8,
       borderRadius: 20,
       flexDirection: 'row',

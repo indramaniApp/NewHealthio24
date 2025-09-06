@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Header from '../../components/Header';
@@ -18,6 +19,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
+import LinearGradient from 'react-native-linear-gradient';
 
 // const RAZORPAY_KEY_ID = 'rzp_test_GvwPgZcP2tn6O2';
 const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
@@ -29,7 +31,7 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
   const [patientGender, setPatientGender] = useState('');
   const [patientAge, setPatientAge] = useState('');
   const [location, setLocation] = useState('');
-  const [referralId, setReferralId] = useState(''); 
+  const [referralId, setReferralId] = useState('');
 
   const dispatch = useDispatch();
 
@@ -49,7 +51,7 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
         patient_age: patientAge,
         patient_name: patientName,
         patient_gender: patientGender,
-        referral_id: referralId, // Include referral ID in payload
+        referral_id: referralId,
       };
 
       const finalUrl = `${ENDPOINTS.book_pm_package}/${packageId}`;
@@ -120,89 +122,105 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F3F4F6" />
-      <Header title="Book Package by Payment" onBackPress={() => navigation.goBack()} />
+    <LinearGradient
+      colors={['#00b4db', '#f4f4f5', '#f4f4f5']}
+      style={styles.container}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+        <Header
+          title="Book Package by Payment"
+          onBackPress={() => navigation.goBack()}
+          style={{ backgroundColor: 'transparent', marginTop: 40 }}
+        />
 
-      <ScrollView contentContainerStyle={styles.form}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Selected Package Details</Text>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Date:</Text>
-            <Text style={styles.cardValue}>{startedDate || 'N/A'}</Text>
+        <ScrollView contentContainerStyle={styles.form}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Selected Package Details</Text>
+            <View style={styles.cardRow}>
+              <Text style={styles.cardLabel}>Date:</Text>
+              <Text style={styles.cardValue}>{startedDate || 'N/A'}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.cardLabel}>Time:</Text>
+              <Text style={styles.cardValue}>{selectedHour || 'N/A'}</Text>
+            </View>
           </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Time:</Text>
-            <Text style={styles.cardValue}>{selectedHour || 'N/A'}</Text>
+
+          <Text style={styles.label}>Patient Name</Text>
+          <TextInput
+            style={styles.input}
+            value={patientName}
+            onChangeText={setPatientName}
+            placeholder="Enter Patient Name"
+            placeholderTextColor="#9CA3AF"
+          />
+
+          <Text style={styles.label}>Patient Gender</Text>
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={patientGender}
+              onValueChange={setPatientGender}
+              style={styles.picker}
+              dropdownIconColor="#4B5563"
+            >
+              <Picker.Item label="Select Gender" value="" color="#9CA3AF" />
+              <Picker.Item label="Male" value="Male" />
+              <Picker.Item label="Female" value="Female" />
+              <Picker.Item label="Other" value="Other" />
+            </Picker>
           </View>
-        </View>
 
-        <Text style={styles.label}>Patient Name</Text>
-        <TextInput
-          style={styles.input}
-          value={patientName}
-          onChangeText={setPatientName}
-          placeholder="Enter Patient Name"
-          placeholderTextColor="#9CA3AF"
-        />
+          <Text style={styles.label}>Patient Age</Text>
+          <TextInput
+            style={styles.input}
+            value={patientAge}
+            onChangeText={setPatientAge}
+            placeholder="Enter Age"
+            keyboardType="numeric"
+            placeholderTextColor="#9CA3AF"
+          />
 
-        <Text style={styles.label}>Patient Gender</Text>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={patientGender}
-            onValueChange={setPatientGender}
-            style={styles.picker}
-            dropdownIconColor="#4B5563"
-          >
-            <Picker.Item label="Select Gender" value="" color="#9CA3AF" />
-            <Picker.Item label="Male" value="Male" />
-            <Picker.Item label="Female" value="Female" />
-            <Picker.Item label="Other" value="Other" />
-          </Picker>
-        </View>
+          <Text style={styles.label}>Location</Text>
+          <TextInput
+            style={styles.input}
+            value={location}
+            onChangeText={setLocation}
+            placeholder="Enter Address / Location"
+            placeholderTextColor="#9CA3AF"
+          />
 
-        <Text style={styles.label}>Patient Age</Text>
-        <TextInput
-          style={styles.input}
-          value={patientAge}
-          onChangeText={setPatientAge}
-          placeholder="Enter Age"
-          keyboardType="numeric"
-          placeholderTextColor="#9CA3AF"
-        />
+          <Text style={styles.label}>Referral ID (Optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={referralId}
+            onChangeText={setReferralId}
+            placeholder="Enter Referral ID"
+            placeholderTextColor="#9CA3AF"
+          />
 
-        <Text style={styles.label}>Location</Text>
-        <TextInput
-          style={styles.input}
-          value={location}
-          onChangeText={setLocation}
-          placeholder="Enter Address / Location"
-          placeholderTextColor="#9CA3AF"
-        />
+          <TouchableOpacity onPress={handleSubmit} style={{ marginTop: 10 }}>
+            <LinearGradient
+              colors={['#2196F3', '#0D47A1']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Proceed to Payment</Text>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        {/* Referral ID Input */}
-        <Text style={styles.label}>Referral ID (Optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={referralId}
-          onChangeText={setReferralId}
-          placeholder="Enter Referral ID"
-          placeholderTextColor="#9CA3AF"
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Proceed to Payment</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default PatientMitraBookByPayment;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F3F4F6' },
-  form: { padding: 20 },
+  container: { flex: 1 },
+  form: { padding: 20, paddingTop: 10 },
   card: {
     backgroundColor: '#ffffff',
     padding: 20,
@@ -240,12 +258,15 @@ const styles = StyleSheet.create({
   },
   picker: { height: 48, color: '#111827', paddingHorizontal: 16 },
   button: {
-    backgroundColor: COLORS.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 10,
     elevation: 4,
+    shadowColor: '#0D47A1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   buttonText: { color: '#ffffff', fontSize: 16, fontWeight: '600' },
 });
+

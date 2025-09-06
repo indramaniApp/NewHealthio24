@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import ApiService from '../../src/api/ApiService';
@@ -63,25 +64,31 @@ const PmPackageMoreDetail = () => {
       <Text style={styles.value}>{value}</Text>
     </View>
   );
+const renderHeader = () => (
+  <View style={styles.screenHeader}>
+    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <Ionicons name="arrow-back" size={20} color="#fff" />
+    </TouchableOpacity>
+    <Text style={styles.screenTitle}>PM Package Details</Text>
+  </View>
+);
 
-  const renderHeader = () => (
-    <View style={styles.screenHeader}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#000" />
-      </TouchableOpacity>
-      <Text style={styles.screenTitle}>PM Package Details</Text>
-    </View>
-  );
 
   const renderCard = ({ item }) => (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
+      {/* Gradient Card Header */}
+      <LinearGradient
+        colors={['#00b4db', '#0083b0']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.cardHeader}
+      >
         <MaterialIcons name="local-hospital" size={20} color="#fff" />
         <Text style={styles.cardHeaderText}>PM Package Booking</Text>
         <View style={styles.cardHeaderRight}>
           <Text style={styles.serial}>#{item?.serialNumber}</Text>
         </View>
-      </View>
+      </LinearGradient>
 
       <View style={styles.row}>
         <Image source={{ uri: item?.booked_by_image }} style={styles.avatar} />
@@ -91,13 +98,10 @@ const PmPackageMoreDetail = () => {
       </View>
 
       <View style={styles.section}>
-    
         <InfoLabel label="Patient Name" value={item?.patient_name} />
         <InfoLabel label="Age / Gender" value={`${item?.patient_age} / ${item?.patient_gender}`} />
-      
         <InfoLabel label="Booking Date" value={item?.booking_request_date} />
         <InfoLabel label="Approve Date" value={item?.booking_approve_date} />
-
         <InfoLabel label="Booking Mode" value={item?.booking_mode} />
         <InfoLabel label="Status" value={item?.status} />
       </View>
@@ -119,17 +123,19 @@ const PmPackageMoreDetail = () => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f4f6f9' }}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {renderHeader()}
-        <FlatList
-          data={data}
-          renderItem={renderCard}
-          keyExtractor={(item, index) => index.toString()}
-          scrollEnabled={false}
-        />
-      </ScrollView>
-    </SafeAreaView>
+    <LinearGradient colors={['#00b4db', '#ffffff','#fff']} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ padding: 16 }}>
+          {renderHeader()}
+          <FlatList
+            data={data}
+            renderItem={renderCard}
+            keyExtractor={(item, index) => index.toString()}
+            scrollEnabled={false}
+          />
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -140,6 +146,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 18,
+    marginTop: 40,
   },
   screenTitle: {
     fontSize: 20,
@@ -159,7 +166,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   cardHeader: {
-    backgroundColor: '#4caf50',
     borderRadius: 10,
     paddingVertical: 6,
     paddingHorizontal: 10,
@@ -226,4 +232,18 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'right',
   },
+  backButton: {
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: '#00b4db', // gradient bhi use kar sakte ho
+  justifyContent: 'center',
+  alignItems: 'center',
+  elevation: 3, // shadow for Android
+  shadowColor: '#000', // shadow for iOS
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 2,
+},
+
 });

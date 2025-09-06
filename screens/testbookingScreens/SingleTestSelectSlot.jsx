@@ -15,8 +15,10 @@ import { COLORS, SIZES } from '../../constants';
 import { useTheme } from '../../theme/ThemeProvider';
 import { hoursData } from '../../data';
 
+// 1. Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
-const SingleTestSelectSlot = ({ navigation,route }) => {
+const SingleTestSelectSlot = ({ navigation, route }) => {
     const { testId } = route.params || {};
     const { colors, dark } = useTheme();
     const [selectedDate, setSelectedDate] = useState(null);
@@ -30,8 +32,6 @@ const SingleTestSelectSlot = ({ navigation,route }) => {
             alert('Please select a date and time slot');
             return;
         }
-
-        // Show modal instead of direct navigation
         setShowPaymentModal(true);
     };
 
@@ -40,7 +40,7 @@ const SingleTestSelectSlot = ({ navigation,route }) => {
         navigation.navigate('SingleTestBookByWallet', {
             startedDate: selectedDate,
             selectedHour,
-            testId:testId
+            testId: testId
         });
     };
 
@@ -49,98 +49,108 @@ const SingleTestSelectSlot = ({ navigation,route }) => {
         navigation.navigate('SingleTestBookyByPayment', {
             startedDate: selectedDate,
             selectedHour,
-            testId:testId
+            testId: testId
         });
     };
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <Header title="Select Appointment Slot" onBackPress={() => navigation.goBack()} />
+        <SafeAreaView style={styles.safeArea}>
+            {/* 2. Wrap the main screen content in LinearGradient */}
+            <LinearGradient
+                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
+                style={{ flex: 1 }}
+            >
+                <Header
+                    title="Select Appointment Slot"
+                    onBackPress={() => navigation.goBack()}
+                    // Make the header background transparent to show the gradient
+                    style={{ backgroundColor: 'transparent',marginTop:40 }}
+                />
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
-                <View style={styles.container}>
-                    <Text style={[styles.label, { color: colors.text }]}>Select Date</Text>
+                <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+                    <View style={styles.container}>
+                        <Text style={[styles.label, { color: colors.text }]}>Select Date</Text>
 
-                    <View style={styles.calendarCard}>
-                        <Calendar
-                            onDayPress={(day) => setSelectedDate(day.dateString)}
-                            minDate={new Date().toISOString().split('T')[0]}
-                            markedDates={{
-                                [selectedDate]: {
-                                    selected: true,
-                                    selectedColor: COLORS.primary,
-                                },
-                            }}
-                            theme={{
-                                backgroundColor: '#F2F6FD',
-                                calendarBackground: '#F2F6FD',
-                                textSectionTitleColor: colors.text,
-                                selectedDayTextColor: '#fff',
-                                todayTextColor: COLORS.primary,
-                                dayTextColor: colors.text,
-                                arrowColor: COLORS.primary,
-                                monthTextColor: COLORS.primary,
-                            }}
-                            style={{
-                                borderRadius: 12,
-                                backgroundColor: '#F2F6FD',
-                                padding: 5,
-                            }}
-                        />
+                        <View style={styles.calendarCard}>
+                            <Calendar
+                                onDayPress={(day) => setSelectedDate(day.dateString)}
+                                minDate={new Date().toISOString().split('T')[0]}
+                                markedDates={{
+                                    [selectedDate]: {
+                                        selected: true,
+                                        selectedColor:'#00b4db',
+                                    },
+                                }}
+                                theme={{
+                                    backgroundColor: '#F2F6FD',
+                                    calendarBackground: '#F2F6FD',
+                                    textSectionTitleColor: colors.text,
+                                    selectedDayTextColor: '#fff',
+                                    todayTextColor: COLORS.primary,
+                                    dayTextColor: colors.text,
+                                    arrowColor: COLORS.primary,
+                                    monthTextColor: COLORS.primary,
+                                }}
+                                style={{
+                                    borderRadius: 12,
+                                    backgroundColor: '#F2F6FD',
+                                    padding: 5,
+                                }}
+                            />
+                        </View>
+
+                        {selectedDate && (
+                            <Text style={[styles.selectedDateText, { color: COLORS.primary }]}>
+                                Selected: {selectedDate}
+                            </Text>
+                        )}
+
+                        <Text style={[styles.label, { color: colors.text }]}>Select Time Slot</Text>
+
+                        <View style={styles.slotGrid}>
+                            {hoursData.map((item) => {
+                                const isSelected = selectedHour === item.hour;
+                                return (
+                                    <TouchableOpacity
+                                        key={item.id}
+                                        style={[styles.hourBox, isSelected && styles.selectedHourBox]}
+                                        onPress={() => handleHourSelect(item.hour)}
+                                    >
+                                        <Text style={[styles.hourText, isSelected && styles.selectedHourText]}>
+                                            {item.hour}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
                     </View>
+                </ScrollView>
 
-                    {selectedDate && (
-                        <Text style={[styles.selectedDateText, { color: COLORS.primary }]}>
-                            Selected: {selectedDate}
-                        </Text>
-                    )}
+                <View style={[styles.bottomBar, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
+                    <Button title="Next" filled style={styles.btn} onPress={handleNext} />
+                </View>
+            </LinearGradient>
 
-                    <Text style={[styles.label, { color: colors.text }]}>Select Time Slot</Text>
+            {/* Modal remains a direct child of SafeAreaView to overlay the entire screen */}
+            <Modal
+                visible={showPaymentModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowPaymentModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContainer, { backgroundColor: COLORS.white }]}>
+                        <Text style={[styles.modalTitle, { color: COLORS.text }]}>Choose Payment Method</Text>
 
-                    <View style={styles.slotGrid}>
-                        {hoursData.map((item) => {
-                            const isSelected = selectedHour === item.hour;
-                            return (
-                                <TouchableOpacity
-                                    key={item.id}
-                                    style={[styles.hourBox, isSelected && styles.selectedHourBox]}
-                                    onPress={() => handleHourSelect(item.hour)}
-                                >
-                                    <Text style={[styles.hourText, isSelected && styles.selectedHourText]}>
-                                        {item.hour}
-                                    </Text>
-                                </TouchableOpacity>
-                            );
-                        })}
+                        <Button title="Book by Wallet" filled style={styles.modalButton} onPress={handleBookByWallet} />
+                        <Button title="Book by Payment" outlined style={styles.modalButton} onPress={handleBookByPayment} />
+
+                        <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
+                            <Text style={styles.modalCancel}>Cancel</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>
-
-            <View style={[styles.bottomBar, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
-                <Button title="Next" filled style={styles.btn} onPress={handleNext} />
-            </View>
-
-            {/* Modal for Payment Method */}
-            <Modal
-    visible={showPaymentModal}
-    transparent
-    animationType="fade"
-    onRequestClose={() => setShowPaymentModal(false)}
->
-    <View style={styles.modalOverlay}>
-        <View style={[styles.modalContainer, { backgroundColor: COLORS.white }]}>
-            <Text style={[styles.modalTitle, { color: COLORS.text }]}>Choose Payment Method</Text>
-
-            <Button title="Book by Wallet" filled style={styles.modalButton} onPress={handleBookByWallet} />
-            <Button title="Book by Payment" outlined style={styles.modalButton} onPress={handleBookByPayment} />
-
-            <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
-                <Text style={styles.modalCancel}>Cancel</Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-</Modal>
-
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -150,6 +160,7 @@ export default SingleTestSelectSlot;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        // 3. Removed backgroundColor to allow the gradient to be visible
     },
     container: {
         padding: 16,
@@ -193,7 +204,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     selectedHourBox: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: '#00b4db',
     },
     hourText: {
         fontSize: 15,

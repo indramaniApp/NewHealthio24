@@ -148,6 +148,7 @@ const PatientMitra = ({ navigation }) => {
           style={styles.bookButton}
           onPress={() => navigation.navigate('PatientMitraSelectSlot', { patientMitraId: patient._id })}
         >
+          {console.log('Navigating with patientMitraId:', patient._id)}
           <Text style={styles.bookButtonText}>Book Patient-Mitra for Help</Text>
         </TouchableOpacity>
       </TouchableOpacity>

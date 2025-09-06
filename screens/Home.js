@@ -72,7 +72,7 @@ const originalCategories = [
 const categories = originalCategories.map(category => ({
     ...category,
     gradientColors: [category.iconColor, lightenColor(category.iconColor)],
-    iconColor: '#fff' // Set icon color to white for all categories
+    iconColor: '#fff' 
 }));
 
 const Home = ({ navigation }) => {

@@ -11,11 +11,11 @@ import {
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import { COLORS } from '../../constants';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ScheduledAppointment = () => {
   const [appointments, setAppointments] = useState([]);
@@ -100,26 +100,42 @@ const ScheduledAppointment = () => {
         <Text style={styles.bookedByText}>Booked by {item.booked_by}</Text>
       </View>
 
-      {/* Optional buttons */}
-      
+      {/* Buttons */}
       <View style={styles.actions}>
+        {/* Gradient Primary Button */}
         <TouchableOpacity
-          style={styles.primaryBtn}
+          style={{ flex: 1 }}
           onPress={() => navigation.navigate('PmPackageMoreDetail', { id: item._id })}
         >
-          <MaterialCommunityIcons name="information-outline" size={18} color="#fff" />
-          <Text style={styles.btnText}>More Details</Text>
+          <LinearGradient
+            colors={['#00b4db', '#0083b0']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.primaryBtn}
+          >
+            <MaterialCommunityIcons name="information-outline" size={18} color="#fff" />
+            <Text style={styles.btnText}>More Details</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
+        {/* Gradient Border Button */}
         <TouchableOpacity
-          style={styles.outlineBtn}
+          style={{ flex: 1 }}
           onPress={() => navigation.navigate('ScheduleReceipt', { id: item._id })}
         >
-          <MaterialCommunityIcons name="file-document-outline" size={18} color={COLORS.primary} />
-          <Text style={[styles.btnText, { color: COLORS.primary }]}>Receipt</Text>
+          <LinearGradient
+            colors={['#00b4db', '#0083b0']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.outlineBtnWrapper}
+          >
+            <View style={styles.outlineBtn}>
+              <MaterialCommunityIcons name="file-document-outline" size={18} color="#0083b0" />
+              <Text style={[styles.btnText, { color: '#0083b0' }]}>Receipt</Text>
+            </View>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
-     
     </View>
   );
 
@@ -133,6 +149,7 @@ const ScheduledAppointment = () => {
         ListEmptyComponent={
           <Text style={styles.empty}>No PM Package appointments scheduled.</Text>
         }
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
@@ -237,29 +254,29 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   primaryBtn: {
-    flex: 1,
-    backgroundColor: COLORS.primary,
     paddingVertical: 8,
     borderRadius: 20,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 6,
-    shadowColor: COLORS.primary,
+    shadowColor: '#00b4db',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.15,
     shadowRadius: 2,
   },
-  outlineBtn: {
-    flex: 1,
-    borderWidth: 1.2,
-    borderColor: COLORS.primary,
-    paddingVertical: 8,
+  outlineBtnWrapper: {
     borderRadius: 20,
+    padding: 1.5, // border thickness
+  },
+  outlineBtn: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 6,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    paddingVertical: 8,
   },
   btnText: {
     fontSize: 13,

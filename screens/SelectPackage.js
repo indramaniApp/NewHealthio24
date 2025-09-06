@@ -3,53 +3,49 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import { COLORS, SIZES, icons } from "../constants";
-
 import PackageItem from '../components/PackageItem';
 import { useTheme } from '../theme/ThemeProvider';
 import Header from '../components/Header';
 import Button from '../components/Button';
+// 1. Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
-const SelectPackage = ({ navigation,route }) => {
+const SelectPackage = ({ navigation, route }) => {
     const { colors, dark } = useTheme();
-let {startedDate,selectedHour,doctorId,method} = route?.params
-console.log('=========method=========',method)
-const [selectedItem, setSelectedItem] = useState(null);
-    const renderContent = () => {
-      
+    let { startedDate, selectedHour, doctorId, method } = route?.params;
+    console.log('=========method=========', method);
+    console.log('=========doctorId=========', doctorId);
+    const [selectedItem, setSelectedItem] = useState(null);
 
+    const renderContent = () => {
         const handleCheckboxPress = (itemTitle) => {
             if (selectedItem === itemTitle) {
-              
                 setSelectedItem(null);
             } else {
-              
                 setSelectedItem(itemTitle);
             }
         };
 
         return (
             <View>
-               
                 <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>Select Package</Text>
                 <View style={{
-                    backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite,
+                    // 5. Set background to transparent to see the gradient
+                    backgroundColor: 'transparent',
                     paddingTop: 12
                 }}>
                     <PackageItem
-                        checked={selectedItem === 'home-visit'} 
+                        checked={selectedItem === 'home-visit'}
                         onPress={() => handleCheckboxPress('home-visit')}
                         title="Home Visit"
                         subtitle="Talk with Doctor"
-                        
                         icon={icons.home}
                     />
-                   
                     <PackageItem
                         checked={selectedItem === 'video'}
                         onPress={() => handleCheckboxPress('video')}
                         title="Video call"
                         subtitle="Video call with Doctor"
-                     
                         icon={icons.videoCamera}
                     />
                     <PackageItem
@@ -57,66 +53,68 @@ const [selectedItem, setSelectedItem] = useState(null);
                         onPress={() => handleCheckboxPress('in-person')}
                         title="In Person"
                         subtitle="In person visit with Doctor"
-                      
                         icon={icons.user}
                     />
                 </View>
             </View>
-        )
-    }
+        );
+    };
 
     return (
-        <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Header
-        title="Select Package"
-        onBackPress={() => navigation.goBack()}
-      />
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {renderContent()}
-                </ScrollView>
-            </View>
-            <View style={[styles.bottomContainer, {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.white
-            }]}>
-                <Button
-  title="Next"
-  filled
-  style={styles.btn}
-  onPress={() => {
-    if (method === 'wallet') {
-      navigation.navigate('WalletPatientDetailScreen', {
-        startedDate,
-        selectedHour,
-        selectedItem,
-        doctorId,
-
-      });
-    } else {
-      navigation.navigate('PatientDetails', {
-        startedDate,
-        selectedHour,
-        selectedItem,
-        doctorId,
-       
-      });
-    }
-  }}
-/>
-
-            </View>
-        </SafeAreaView>
-    )
-}
+        // 2. Wrap the entire screen in LinearGradient
+        <LinearGradient
+            colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
+            style={{ flex: 1 }}
+        >
+            <SafeAreaView style={styles.area}>
+                <View style={styles.container}>
+                    {/* Note: You might need to change the header's icon and title color to white for better visibility */}
+                    <Header
+                        title="Select Package"
+                        onBackPress={() => navigation.goBack()}
+                    />
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        {renderContent()}
+                    </ScrollView>
+                </View>
+                <View style={[styles.bottomContainer, {
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.white
+                }]}>
+                    <Button
+                        title="Next"
+                        filled
+                        style={styles.btn}
+                        onPress={() => {
+                            if (method === 'wallet') {
+                                navigation.navigate('WalletPatientDetailScreen', {
+                                    startedDate,
+                                    selectedHour,
+                                    selectedItem,
+                                    doctorId,
+                                });
+                            } else {
+                                navigation.navigate('PatientDetails', {
+                                    startedDate,
+                                    selectedHour,
+                                    selectedItem,
+                                    doctorId,
+                                });
+                            }
+                        }}
+                    />
+                </View>
+            </SafeAreaView>
+        </LinearGradient>
+    );
+};
 
 const styles = StyleSheet.create({
+    // 3. Removed backgroundColor from styles
     area: {
         flex: 1,
-        backgroundColor: COLORS.white
     },
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
         padding: 12
     },
     headerContainer: {
@@ -211,7 +209,6 @@ const styles = StyleSheet.create({
         paddingVertical: 2,
         height: 52,
         backgroundColor: COLORS.tertiaryWhite,
-
     },
     icon: {
         marginRight: 10,
@@ -238,7 +235,7 @@ const styles = StyleSheet.create({
         fontFamily: "Urbanist Bold",
         color: COLORS.black,
         marginVertical: 12,
-        marginTop:80
+   
     },
     bottomContainer: {
         position: "absolute",
@@ -250,5 +247,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center"
     }
-})
-export default SelectPackage
+});
+export default SelectPackage;

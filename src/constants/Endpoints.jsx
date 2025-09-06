@@ -202,12 +202,4 @@ patient_book_appointment_through_wallet: 'api/user/patients/patient_book_appoint
   debit_transaction_pm_package_book:'api/user/patients/debit_transaction_pm_package_book',
   button_pm_package_accepted_appointment_completed:'api/user/patients/button_pm_package_accepted_appointment_completed'
   
-
-
-
-  
-
-  
-
-
 }

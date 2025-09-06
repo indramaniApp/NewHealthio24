@@ -7,6 +7,8 @@ import {
     ScrollView,
     SafeAreaView,
     Modal,
+    Platform,
+    StatusBar,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Header from '../../components/Header';
@@ -15,6 +17,8 @@ import { COLORS, SIZES } from '../../constants';
 import { useTheme } from '../../theme/ThemeProvider';
 import { hoursData } from '../../data';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// 🔥 LinearGradient import karein
+import LinearGradient from 'react-native-linear-gradient';
 
 const PatientMitraSelectSlot = ({ navigation, route }) => {
     const { packageId } = route.params || {};
@@ -30,7 +34,6 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
             alert('Please select a date and time slot');
             return;
         }
-
         setShowPaymentModal(true);
     };
 
@@ -41,6 +44,7 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
             selectedHour,
             packageId,
         });
+        console.log('Navigating with packageId:===========s====', packageId);
     };
 
     const handleBookByPayment = () => {
@@ -53,134 +57,150 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
     };
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <Header title="Select Appointment Slot" onBackPress={() => navigation.goBack()} />
+        // 🔥 LinearGradient wrap
+        <LinearGradient
+            colors={dark ? ['#1A202C', '#2D3748'] : ['#00b4db', '#f4f4f5', '#f4f4f5']}
+            style={{ flex: 1 }}
+        >
+            <SafeAreaView style={[styles.safeArea, { backgroundColor: 'transparent' }]}>
+                <Header 
+                    title="Select Appointment Slot" 
+                    onBackPress={() => navigation.goBack()} 
+                    style={{ backgroundColor: 'transparent' }}
+                />
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
-                <View style={styles.container}>
-                    <Text style={[styles.label, { color: colors.text }]}>Select Date</Text>
+                <ScrollView 
+                    contentContainerStyle={{ paddingBottom: 120 }}
+                    showsVerticalScrollIndicator={false}
+                    style={{ backgroundColor: 'transparent' }}
+                >
+                    <View style={styles.container}>
+                        <Text style={[styles.label, { color: colors.text }]}>Select Date</Text>
 
-                    <View style={styles.calendarCard}>
-                        <Calendar
-                            onDayPress={(day) => setSelectedDate(day.dateString)}
-                            minDate={new Date().toISOString().split('T')[0]}
-                            markedDates={{
-                                [selectedDate]: {
-                                    selected: true,
-                                    selectedColor: COLORS.primary,
-                                },
-                            }}
-                            theme={{
-                                backgroundColor: '#F2F6FD',
-                                calendarBackground: '#F2F6FD',
-                                textSectionTitleColor: colors.text,
-                                selectedDayTextColor: '#fff',
-                                todayTextColor: COLORS.primary,
-                                dayTextColor: colors.text,
-                                arrowColor: COLORS.primary,
-                                monthTextColor: COLORS.primary,
-                            }}
-                            style={{
-                                borderRadius: 12,
-                                backgroundColor: '#F2F6FD',
-                                padding: 5,
-                            }}
-                        />
-                    </View>
+                        <View style={styles.calendarCard}>
+                            <Calendar
+                                onDayPress={(day) => setSelectedDate(day.dateString)}
+                                minDate={new Date().toISOString().split('T')[0]}
+                                markedDates={{
+                                    [selectedDate]: {
+                                        selected: true,
+                                        selectedColor: COLORS.primary,
+                                    },
+                                }}
+                                theme={{
+                                    backgroundColor: '#F2F6FD',
+                                    calendarBackground: '#F2F6FD',
+                                    textSectionTitleColor: colors.text,
+                                    selectedDayTextColor: '#fff',
+                                    todayTextColor: COLORS.primary,
+                                    dayTextColor: colors.text,
+                                    arrowColor: COLORS.primary,
+                                    monthTextColor: COLORS.primary,
+                                }}
+                                style={{
+                                    borderRadius: 12,
+                                    backgroundColor: '#F2F6FD',
+                                    padding: 5,
+                                }}
+                            />
+                        </View>
 
-                    {selectedDate && (
-                        <Text style={[styles.selectedDateText, { color: COLORS.primary }]}>
-                            Selected: {selectedDate}
-                        </Text>
-                    )}
+                        {selectedDate && (
+                            <Text style={[styles.selectedDateText, { color: COLORS.primary }]}>
+                                Selected: {selectedDate}
+                            </Text>
+                        )}
 
-                    <Text style={[styles.label, { color: colors.text }]}>Select Time Slot</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>Select Time Slot</Text>
 
-                    <View style={styles.slotGrid}>
-                        {hoursData.map((item) => {
-                            const isSelected = selectedHour === item.hour;
+                        <View style={styles.slotGrid}>
+                            {hoursData.map((item) => {
+                                const isSelected = selectedHour === item.hour;
 
-                            const now = new Date();
-                            const todayDate = now.toISOString().split('T')[0];
-                            const isToday = selectedDate === todayDate;
+                                const now = new Date();
+                                const todayDate = now.toISOString().split('T')[0];
+                                const isToday = selectedDate === todayDate;
 
-                            const [hourPart, modifier] = item.hour.split(' ');
-                            let [hrs, mins] = hourPart.split(':');
-                            hrs = parseInt(hrs, 10);
-                            mins = parseInt(mins || '0', 10);
+                                const [hourPart, modifier] = item.hour.split(' ');
+                                let [hrs, mins] = hourPart.split(':');
+                                hrs = parseInt(hrs, 10);
+                                mins = parseInt(mins || '0', 10);
 
-                            if (modifier === 'PM' && hrs !== 12) hrs += 12;
-                            if (modifier === 'AM' && hrs === 12) hrs = 0;
+                                if (modifier === 'PM' && hrs !== 12) hrs += 12;
+                                if (modifier === 'AM' && hrs === 12) hrs = 0;
 
-                            const slotTime = new Date();
-                            slotTime.setHours(hrs, mins, 0, 0);
+                                const slotTime = new Date();
+                                slotTime.setHours(hrs, mins, 0, 0);
 
-                            const isDisabled = isToday && slotTime.getTime() <= now.getTime();
+                                const isDisabled = isToday && slotTime.getTime() <= now.getTime();
 
-                            return (
-                                <TouchableOpacity
-                                    key={item.id}
-                                    style={[
-                                        styles.hourBox,
-                                        isSelected && styles.selectedHourBox,
-                                        isDisabled && styles.disabledHourBox,
-                                    ]}
-                                    onPress={() => {
-                                        if (!isDisabled) {
-                                            handleHourSelect(item.hour);
-                                        }
-                                    }}
-                                    disabled={isDisabled}
-                                >
-                                    <Text
+                                return (
+                                    <TouchableOpacity
+                                        key={item.id}
                                         style={[
-                                            styles.hourText,
-                                            isSelected && styles.selectedHourText,
-                                            isDisabled && { textDecorationLine: 'line-through', color: 'gray' },
+                                            styles.hourBox,
+                                            isSelected && styles.selectedHourBox,
+                                            isDisabled && styles.disabledHourBox,
                                         ]}
+                                        onPress={() => {
+                                            if (!isDisabled) {
+                                                handleHourSelect(item.hour);
+                                            }
+                                        }}
+                                        disabled={isDisabled}
                                     >
-                                        {item.hour}
-                                    </Text>
-                                    {isSelected && (
-                                        <MaterialCommunityIcons
-                                            name="check-circle"
-                                            size={18}
-                                            color="#fff"
-                                            style={{ position: 'absolute', top: 5, right: 5 }}
-                                        />
-                                    )}
-                                </TouchableOpacity>
-                            );
-                        })}
+                                        <Text
+                                            style={[
+                                                styles.hourText,
+                                                isSelected && styles.selectedHourText,
+                                                isDisabled && { textDecorationLine: 'line-through', color: 'gray' },
+                                            ]}
+                                        >
+                                            {item.hour}
+                                        </Text>
+                                        {isSelected && (
+                                            <MaterialCommunityIcons
+                                                name="check-circle"
+                                                size={18}
+                                                color="#fff"
+                                                style={{ position: 'absolute', top: 5, right: 5 }}
+                                            />
+                                        )}
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
                     </View>
+                </ScrollView>
+
+                <View style={[styles.bottomBar, { backgroundColor: 'transparent' }]}>
+                    <Button title="Next" filled style={styles.btn} onPress={handleNext} />
                 </View>
-            </ScrollView>
 
-            <View style={[styles.bottomBar, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
-                <Button title="Next" filled style={styles.btn} onPress={handleNext} />
-            </View>
+                {/* Modal for Payment Method */}
+                <Modal
+                    visible={showPaymentModal}
+                    transparent
+                    animationType="fade"
+                    onRequestClose={() => setShowPaymentModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={[styles.modalContainer, { backgroundColor: COLORS.white }]}>
+                            <Text style={[styles.modalTitle, { color: COLORS.text }]}>
+                                Choose Payment Method
+                            </Text>
 
-            {/* Modal for Payment Method */}
-            <Modal
-                visible={showPaymentModal}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setShowPaymentModal(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContainer, { backgroundColor: COLORS.white }]}>
-                        <Text style={[styles.modalTitle, { color: COLORS.text }]}>Choose Payment Method</Text>
+                            <Button title="Book by Wallet" filled style={styles.modalButton} onPress={handleBookByWallet} />
+                            <Button title="Book by Payment" outlined style={styles.modalButton} onPress={handleBookByPayment} />
 
-                        <Button title="Book by Wallet" filled style={styles.modalButton} onPress={handleBookByWallet} />
-                        <Button title="Book by Payment" outlined style={styles.modalButton} onPress={handleBookByPayment} />
-
-                        <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
-                            <Text style={styles.modalCancel}>Cancel</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
+                                <Text style={styles.modalCancel}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-            </Modal>
-        </SafeAreaView>
+                </Modal>
+            </SafeAreaView>
+        </LinearGradient>
     );
 };
 
@@ -189,6 +209,7 @@ export default PatientMitraSelectSlot;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     container: {
         padding: 16,
@@ -262,10 +283,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        elevation: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowOffset: { width: 0, height: -2 },
+    
     },
     btn: {
         width: SIZES.width - 32,

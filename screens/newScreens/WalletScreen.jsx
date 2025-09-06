@@ -167,11 +167,11 @@ const WalletScreen = ({ navigation }) => {
     );
 
     return (
-       
+
         <SafeAreaView style={styles.container}>
-           
+
             <LinearGradient
-                 colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#00b4db', '#fff', '#fff', '#fff',]}
                 style={styles.gradientContainer}
             >
                 <View style={styles.walletCard}>
@@ -253,7 +253,7 @@ export default WalletScreen;
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    // 3. ग्रेडिएंट के लिए नया स्टाइल जोड़ा गया
+
     gradientContainer: {
         flex: 1,
     },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowOffset: { width: 0, height: 4 },
         shadowRadius: 12,
-        backgroundColor: '#ffffff', // कार्ड का बैकग्राउंड सफेद ही रहेगा
+        backgroundColor: '#ffffff',
     },
     walletStripe: { width: 10, backgroundColor: '#0077b6' },
     walletContent: { flex: 1, padding: 24, position: 'relative' },
