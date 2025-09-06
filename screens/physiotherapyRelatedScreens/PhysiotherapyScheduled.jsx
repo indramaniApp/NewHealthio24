@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
       fontSize: 13,
       fontFamily: 'Urbanist-SemiBold',
       color: '#1F2937',
+       
     },
     actions: {
       flexDirection: 'row',
