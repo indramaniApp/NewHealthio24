@@ -18,6 +18,9 @@ import { useDispatch } from 'react-redux';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import ApiService from '../../src/api/ApiService';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
+// Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
+import Header from '../../components/Header';
 
 const SelectTestMode = ({ route }) => {
   const navigation = useNavigation();
@@ -90,147 +93,151 @@ const SelectTestMode = ({ route }) => {
     selectedMode;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.card, shadowColor: colors.border }]}>
-        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Fill Test Details</Text>
-        <View style={{ width: 40 }} />
-      </View>
+    <LinearGradient colors={['#caeefc', '#ffffff']} style={styles.flexContainer}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} backgroundColor={'transparent'} translucent />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={[styles.text, { color: colors.text }]}>
-            📅 Date: {appointmentDetails.appointment_request_date || 'Not selected'}
-          </Text>
-          <Text style={[styles.text, { color: colors.text }]}>
-            ⏰ Time: {appointmentDetails.appointment_time || 'Not selected'}
-          </Text>
-        </View>
+        {/* Header */}
+      <Header title="Patient Details" onBackPress={() => navigation.goBack()} 
+                titleStyle={{ color: colors.text }}
+                style={{ backgroundColor: 'transparent', marginTop: 40 }}/>
 
-        {/* Patient Name */}
-        <Text style={[styles.label, { color: colors.text }]}>Patient Name</Text>
-        <TextInput
-          placeholder="Enter patient name"
-          placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
-          style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-          value={appointmentDetails.patient_name}
-          onChangeText={text => handleChange('patient_name', text)}
-        />
-
-        {/* Age */}
-        <Text style={[styles.label, { color: colors.text }]}>Patient Age</Text>
-        <TextInput
-          placeholder="Enter age"
-          placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
-          keyboardType="number-pad"
-          style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-          value={appointmentDetails.patient_age}
-          onChangeText={text => handleChange('patient_age', text)}
-        />
-
-        {/* Gender */}
-        <Text style={[styles.label, { color: colors.text }]}>Gender</Text>
-        <View style={[styles.pickerContainer, { backgroundColor: colors.card }]}>
-          <Picker
-            selectedValue={appointmentDetails.patient_gender}
-            onValueChange={value => handleChange('patient_gender', value)}
-            style={{ color: colors.text }}
-            dropdownIconColor={colors.text}
-          >
-            <Picker.Item label="Select Gender" value="" />
-            <Picker.Item label="Male" value="Male" />
-            <Picker.Item label="Female" value="Female" />
-            <Picker.Item label="Other" value="Other" />
-          </Picker>
-        </View>
-
-        {/* Mode */}
-        <Text style={[styles.label, { color: colors.text }]}>Choose Mode</Text>
-        <TouchableOpacity
-          style={[styles.pickerBox, { backgroundColor: colors.card }]}
-          onPress={() => setModeModalVisible(true)}
-        >
-          <Text style={{ fontSize: 16, color: selectedMode ? colors.text : colors.placeholder || '#999' }}>
-            {selectedModeLabel}
-          </Text>
-          <Icon name="chevron-down" size={20} color={colors.text} />
-        </TouchableOpacity>
-
-        {/* Proceed to Pay */}
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: isFormValid ? '#007BFF' : '#ccc' },
-          ]}
-          onPress={handleSubmit}
-          disabled={!isFormValid}
-        >
-          <Text style={styles.buttonText}>Proceed to Pay</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Modal */}
-      <Modal visible={modeModalVisible} transparent animationType="fade" onRequestClose={() => setModeModalVisible(false)}>
-        <TouchableOpacity activeOpacity={1} onPress={() => setModeModalVisible(false)} style={styles.modalOverlay}>
-          <View style={[styles.modalBox, { backgroundColor: colors.card }]}>
-            {modeOptions.map(option => (
-              <TouchableOpacity
-                key={option.value}
-                disabled={option.disabled}
-                onPress={() => {
-                  if (!option.disabled) {
-                    setSelectedMode(option.value);
-                    setModeModalVisible(false);
-                  }
-                }}
-                style={styles.modalItem}
-              >
-                <Text
-                  style={[
-                    styles.modalItemText,
-                    {
-                      color: option.disabled ? (colors.placeholder || '#999') : colors.text,
-                    },
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              onPress={() => setModeModalVisible(false)}
-              style={[styles.modalItem, { borderTopWidth: 1, borderTopColor: '#ccc' }]}
-            >
-              <Text style={[styles.modalItemText, { color: 'red' }]}>Cancel</Text>
-            </TouchableOpacity>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+          <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <Text style={[styles.text, { color: colors.text }]}>
+              📅 Date: {appointmentDetails.appointment_request_date || 'Not selected'}
+            </Text>
+            <Text style={[styles.text, { color: colors.text }]}>
+              ⏰ Time: {appointmentDetails.appointment_time || 'Not selected'}
+            </Text>
           </View>
-        </TouchableOpacity>
-      </Modal>
-    </SafeAreaView>
+
+          {/* Patient Name */}
+          <Text style={[styles.label, { color: colors.text }]}>Patient Name</Text>
+          <TextInput
+            placeholder="Enter patient name"
+            placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
+            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+            value={appointmentDetails.patient_name}
+            onChangeText={text => handleChange('patient_name', text)}
+          />
+
+          {/* Age */}
+          <Text style={[styles.label, { color: colors.text }]}>Patient Age</Text>
+          <TextInput
+            placeholder="Enter age"
+            placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
+            keyboardType="number-pad"
+            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+            value={appointmentDetails.patient_age}
+            onChangeText={text => handleChange('patient_age', text)}
+          />
+
+          {/* Gender */}
+          <Text style={[styles.label, { color: colors.text }]}>Gender</Text>
+          <View style={[styles.pickerContainer, { backgroundColor: colors.card }]}>
+            <Picker
+              selectedValue={appointmentDetails.patient_gender}
+              onValueChange={value => handleChange('patient_gender', value)}
+              style={{ color: colors.text }}
+              dropdownIconColor={colors.text}
+            >
+              <Picker.Item label="Select Gender" value="" />
+              <Picker.Item label="Male" value="Male" />
+              <Picker.Item label="Female" value="Female" />
+              <Picker.Item label="Other" value="Other" />
+            </Picker>
+          </View>
+
+          {/* Mode */}
+          <Text style={[styles.label, { color: colors.text }]}>Choose Mode</Text>
+          <TouchableOpacity
+            style={[styles.pickerBox, { backgroundColor: colors.card }]}
+            onPress={() => setModeModalVisible(true)}
+          >
+            <Text style={{ fontSize: 16, color: selectedMode ? colors.text : colors.placeholder || '#999' }}>
+              {selectedModeLabel}
+            </Text>
+            <Icon name="chevron-down" size={20} color={colors.text} />
+          </TouchableOpacity>
+
+          {/* Proceed to Pay Button with LinearGradient */}
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={!isFormValid}
+            style={styles.buttonWrapper}
+          >
+            <LinearGradient
+              colors={isFormValid ? ['#0077b6', '#00b4db'] : ['#B0B0B0', '#9E9E9E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Proceed to Pay</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* Modal */}
+        <Modal visible={modeModalVisible} transparent animationType="fade" onRequestClose={() => setModeModalVisible(false)}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setModeModalVisible(false)} style={styles.modalOverlay}>
+            <View style={[styles.modalBox, { backgroundColor: colors.card }]}>
+              {modeOptions.map(option => (
+                <TouchableOpacity
+                  key={option.value}
+                  disabled={option.disabled}
+                  onPress={() => {
+                    if (!option.disabled) {
+                      setSelectedMode(option.value);
+                      setModeModalVisible(false);
+                    }
+                  }}
+                  style={styles.modalItem}
+                >
+                  <Text
+                    style={[
+                      styles.modalItemText,
+                      {
+                        color: option.disabled ? (colors.placeholder || '#999') : colors.text,
+                      },
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                onPress={() => setModeModalVisible(false)}
+                style={[styles.modalItem, { borderTopWidth: 1, borderTopColor: '#ccc' }]}
+              >
+                <Text style={[styles.modalItemText, { color: 'red' }]}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default SelectTestMode;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  flexContainer: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: StatusBar.currentHeight, // Adjust for translucent status bar
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 10,
     marginBottom: 16,
-    elevation: 4,
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
   },
   backButton: {
     width: 36,
@@ -247,17 +254,21 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   text: { fontSize: 16, marginBottom: 6 },
-  label: { fontSize: 16, marginBottom: 6, fontWeight: '600' },
+  label: { fontSize: 16, marginBottom: 6, fontWeight: '600', marginLeft: 4 },
   input: {
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd'
   },
   pickerContainer: {
     borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#ddd'
   },
   pickerBox: {
     borderRadius: 8,
@@ -266,12 +277,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd'
+  },
+  buttonWrapper: {
+    borderRadius: 8,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   button: {
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   modalOverlay: {

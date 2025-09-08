@@ -145,8 +145,7 @@ const PathologyScreen = () => {
                     cartCount={cartCount}
                     onBackPress={() => navigation.goBack()}
                     onCartPress={() => navigation.navigate('CartScreen')}
-               
-                    style={{ backgroundColor: 'transparent' }} 
+                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
                 />
 
                 <View style={styles.searchBarWrapper}>

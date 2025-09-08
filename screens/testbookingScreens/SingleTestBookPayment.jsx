@@ -17,7 +17,7 @@ import LinearGradient from 'react-native-linear-gradient';
 const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
 
 const SingleTestBookPayment = ({ route, navigation }) => {
-    const { testId, selectedHour, startedDate } = route.params || {};
+    const { testId, selectedHour, startedDate, referralId: passedReferralId } = route.params || {};
     const { colors, dark } = useTheme();
     const dispatch = useDispatch();
 
@@ -26,6 +26,7 @@ const SingleTestBookPayment = ({ route, navigation }) => {
     const [gender, setGender] = useState('');
     const [selectedMode, setSelectedMode] = useState('');
     const [modeModalVisible, setModeModalVisible] = useState(false);
+    const [referralId, setReferralId] = useState(passedReferralId || '');
 
     const isFormValid = patientName && patientAge && gender && selectedMode;
 
@@ -45,6 +46,10 @@ const SingleTestBookPayment = ({ route, navigation }) => {
             patient_age: patientAge,
             patient_gender: gender,
         };
+
+        if (referralId.trim()) {
+            payload.referral_id = referralId.trim();
+        }
 
         try {
             const response = await ApiService.post(`${ENDPOINTS.book_test}/${testId}`, payload, true, false);
@@ -173,10 +178,19 @@ const SingleTestBookPayment = ({ route, navigation }) => {
                             <Text style={{ fontSize: 16, color: selectedMode ? colors.text : '#999' }}>{selectedModeLabel}</Text>
                         </TouchableOpacity>
 
+                        <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+                        <TextInput
+                            value={referralId}
+                            onChangeText={setReferralId}
+                            placeholder="Enter referral ID"
+                            placeholderTextColor={dark ? '#888' : '#aaa'}
+                            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: dark ? '#2a2a2a' : '#fff' }]}
+                        />
+
                         {/* 4. Apply LinearGradient to the button */}
                         <TouchableOpacity disabled={!isFormValid} style={{ opacity: isFormValid ? 1 : 0.6 }} onPress={handleSubmit}>
                             <LinearGradient
-                                colors={isFormValid ? ['#00b4db', '#0077b6'] : ['#00b4db', '#808080']}
+                                colors={isFormValid ? ['#00b4db', '#0077b6'] : ['#a9a9a9', '#808080']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
                                 style={styles.button}

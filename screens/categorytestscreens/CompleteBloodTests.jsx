@@ -108,7 +108,7 @@ const CompleteBloodTests = () => {
                     cartCount={cartCount}
                     onBackPress={() => navigation.goBack()}
                     onCartPress={() => navigation.navigate('CartScreen')}
-                    style={{ backgroundColor: 'transparent' }}
+                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
                 />
 
                 <ScrollView

@@ -18,6 +18,8 @@ import { ENDPOINTS } from '../../src/constants/Endpoints';
 import ApiService from '../../src/api/ApiService';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
+// 1. LinearGradient ko import karein
+import LinearGradient from 'react-native-linear-gradient';
 
 const KidneyFunctionTest = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -95,80 +97,93 @@ const KidneyFunctionTest = ({ navigation }) => {
   const groupedLabs = groupTestsByLabId(testData);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        title="Kidney Function Test"
-        showCart
-        cartCount={cartCount}
-        onBackPress={() => navigation.goBack()}
-        onCartPress={() => navigation.navigate('CartScreen')}
-      />
+    // 2. Screen background ke liye LinearGradient ka use karein
+    <LinearGradient colors={['#00b4db', '#FFFFFF','#fff']} style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
+        <Header
+          title="Kidney Function Test"
+          showCart
+          cartCount={cartCount}
+          onBackPress={() => navigation.goBack()}
+          onCartPress={() => navigation.navigate('CartScreen')}
+          style={{marginTop:40}}
+        />
+        <ScrollView contentContainerStyle={{ padding: 16 }}>
+          {groupedLabs.map(({ labDetails, tests }) => (
+            // 3. Lab Card ke liye LinearGradient ka use karein
+            <LinearGradient
+                key={labDetails._id}
+                colors={['#FFFFFF', '#FAFCFF']}
+                style={styles.labCard}
+            >
+              <Text style={styles.labName}>{labDetails.labName}</Text>
+              <Text style={styles.labDetail}>📧 {labDetails.email}</Text>
+              <Text style={styles.labDetail}>
+                📍 {labDetails.streetAddress}, {labDetails.city}, {labDetails.state} - {labDetails.postalCode}
+              </Text>
 
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {groupedLabs.map(({ labDetails, tests }) => (
-          <View key={labDetails._id} style={styles.labCard}>
-            <Text style={styles.labName}>{labDetails.labName}</Text>
-            <Text style={styles.labDetail}>📧 {labDetails.email}</Text>
-            <Text style={styles.labDetail}>
-              📍 {labDetails.streetAddress}, {labDetails.city}, {labDetails.state} - {labDetails.postalCode}
-            </Text>
-
-            {tests.map((item) => (
-              <View key={item._id} style={styles.testCard}>
-                <View style={styles.accentStrip} />
-                <View style={styles.cardContent}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.testName}>
-                      <Icon name="flask-outline" size={16} color={COLORS.primary} /> {item.testDescription?.testName}
-                    </Text>
-                    {item.testDescription?.description ? (
-                      <Text style={styles.testDescription}>
-                        <Icon name="text" size={13} color="#6b7280" /> {item.testDescription.description}
+              {tests.map((item) => (
+                <View key={item._id} style={styles.testCard}>
+                  <View style={styles.accentStrip} />
+                  <View style={styles.cardContent}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.testName}>
+                        <Icon name="flask-outline" size={16} color={COLORS.primary} /> {item.testDescription?.testName}
                       </Text>
-                    ) : null}
-
-                    {/* 💸 Discounted price row */}
-                    <View style={styles.priceRow}>
-                      {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
-                        <Text style={styles.cutPrice}>₹{item.testDescription?.higherTestFee}</Text>
-                      )}
-                      <Text style={styles.priceTagText}>₹{item.testDescription?.testFee}</Text>
-                      {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
-                        <Text style={styles.discountText}>
-                          {Math.round(
-                            ((item.testDescription?.higherTestFee - item.testDescription?.testFee) /
-                              item.testDescription?.higherTestFee) * 100
-                          )}
-                          % OFF
+                      {item.testDescription?.description ? (
+                        <Text style={styles.testDescription}>
+                          <Icon name="text" size={13} color="#6b7280" /> {item.testDescription.description}
                         </Text>
-                      )}
-                    </View>
-                  </View>
+                      ) : null}
 
-                  <View style={styles.buttonColumn}>
-                    <TouchableOpacity
-                      style={styles.cartBtn}
-                      onPress={() => handleAddToCart(item._id)}
-                    >
-                      <Icon name="cart-plus" size={16} color={COLORS.primary} />
-                      <Text style={styles.cartText}>Add</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.bookBtn}
+                      <View style={styles.priceRow}>
+                        {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
+                          <Text style={styles.cutPrice}>₹{item.testDescription?.higherTestFee}</Text>
+                        )}
+                        <Text style={styles.priceTagText}>₹{item.testDescription?.testFee}</Text>
+                        {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
+                          <Text style={styles.discountText}>
+                            {Math.round(
+                              ((item.testDescription?.higherTestFee - item.testDescription?.testFee) /
+                                item.testDescription?.higherTestFee) * 100
+                            )}
+                            % OFF
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+
+                    <View style={styles.buttonColumn}>
+                      <TouchableOpacity
+                        style={styles.cartBtn}
+                        onPress={() => handleAddToCart(item._id)}
+                      >
+                        <Icon name="cart-plus" size={16} color={COLORS.primary} />
+                        <Text style={styles.cartText}>Add</Text>
+                      </TouchableOpacity>
+                      {/* 4. Book button ko gradient button se replace karein */}
+                      <TouchableOpacity
                         onPress={() => navigation.navigate('SingleTestSelectSlot', {
                           testId: item._id,
                         })}
-                    >
-                      <Icon name="calendar-check" size={16} color="#fff" />
-                      <Text style={styles.bookText}>Book</Text>
-                    </TouchableOpacity>
+                      >
+                        <LinearGradient
+                          colors={['#0077b6', '#00b4db']}
+                          style={styles.bookBtn}
+                        >
+                          <Icon name="calendar-check" size={16} color="#fff" />
+                          <Text style={styles.bookText}>Book</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              </View>
-            ))}
-          </View>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+              ))}
+            </LinearGradient>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -177,15 +192,21 @@ export default KidneyFunctionTest;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // Background color yahan se hata dein
+    // backgroundColor: '#fff', 
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   labCard: {
     marginBottom: 24,
-    backgroundColor: '#FAFCFF',
+    // backgroundColor yahan se hata dein
+    // backgroundColor: '#FAFCFF',
     borderRadius: 12,
     padding: 14,
-    elevation: 2,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
   },
   labName: {
     fontSize: 18,
@@ -233,8 +254,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 6,
   },
-
-  // 🆕 New styles for price section
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -262,7 +281,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 6,
   },
-
   buttonColumn: {
     justifyContent: 'space-between',
     alignItems: 'flex-end',
@@ -286,7 +304,8 @@ const styles = StyleSheet.create({
   bookBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    // backgroundColor yahan se hata dein
+    // backgroundColor: COLORS.primary,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,

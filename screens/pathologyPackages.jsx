@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  SafeAreaView, // SafeAreaView for better handling of notches
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch } from 'react-redux';
@@ -17,11 +18,11 @@ import ApiService from '../src/api/ApiService';
 import { hideLoader, showLoader } from '../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '../theme/ThemeProvider';
+// 1. LinearGradient component ko import karein
+import LinearGradient from 'react-native-linear-gradient';
 
 const ICON_COLOR = 'rgba(36, 107, 253, 1)';
 const CIRCLE_BG = 'rgba(36, 107, 253, .12)';
-const CARD_BG_LIGHT = 'rgba(36, 107, 253, .08)';
-const CARD_BG_DARK = 'rgba(36, 107, 253, .18)';
 
 const PathologyPackagesScreen = ({ navigation }) => {
   const { dark, colors } = useTheme();
@@ -93,28 +94,30 @@ const PathologyPackagesScreen = ({ navigation }) => {
     const lab = item.pathologyId;
 
     return (
-      <View style={[styles.card, { backgroundColor: dark ? CARD_BG_DARK : CARD_BG_LIGHT }]}>
+      // Card ke liye LinearGradient
+      <LinearGradient
+        colors={['#FFFFFF', '#F9FAFB']}
+        style={styles.card}
+      >
         <View style={styles.cardTopRow}>
           <View style={{ flex: 1 }}>
             <Text style={[styles.labName, { color: colors.text }]}>{lab.labName}</Text>
-
-            <View style={[styles.labDetailsCard, {  backgroundColor: '#fff', borderColor: colors.border }]}>
+            <View style={[styles.labDetailsCard, { borderColor: colors.border }]}>
               <View style={styles.labDetailRow}>
                 <MaterialCommunityIcons name="email-outline" size={16} color={ICON_COLOR} />
                 <Text style={[styles.labDetailText, { color: colors.text }]}>{lab.email}</Text>
               </View>
               <View style={styles.labDetailRow}>
                 <MaterialCommunityIcons name="map-marker" size={16} color={ICON_COLOR} />
-                <Text style={[styles.labDetailText, { color: colors.text }]}>
+                <Text style={[styles.labDetailText, { color: colors.text }]}
+                >
                   {lab.streetAddress}, {lab.city}, {lab.state} - {lab.postalCode}
                 </Text>
               </View>
             </View>
-
             <Text style={[styles.packageName, { color: colors.text }]}>{item.packageName}</Text>
             <Text style={[styles.testCount, { color: COLORS.primary }]}>{item.no_of_tests} Tests</Text>
           </View>
-
           <TouchableOpacity style={styles.detailsIcon}>
             <MaterialCommunityIcons name="eye-outline" size={20} color={COLORS.primary} />
           </TouchableOpacity>
@@ -134,87 +137,98 @@ const PathologyPackagesScreen = ({ navigation }) => {
             </View>
           ))}
         </View>
-        <View style={styles.priceRow}>
-  {item.packageHigherFee > item.packageFee && (
-    <Text style={styles.cutPrice}>₹{item.packageHigherFee}</Text>
-  )}
-  <Text style={[styles.priceTagText, { color: colors.text }]}>₹{item.packageFee}</Text>
-  {item.packageHigherFee > item.packageFee && (
-    <Text style={styles.discountText}>
-      {Math.round(
-        ((item.packageHigherFee - item.packageFee) / item.packageHigherFee) * 100
-      )}% OFF
-    </Text>
-  )}
-</View>
 
+        <View style={styles.priceRow}>
+          {item.packageHigherFee > item.packageFee && (
+            <Text style={styles.cutPrice}>₹{item.packageHigherFee}</Text>
+          )}
+          <Text style={[styles.priceTagText, { color: colors.text }]}>₹{item.packageFee}</Text>
+          {item.packageHigherFee > item.packageFee && (
+            <Text style={styles.discountText}>
+              {Math.round(
+                ((item.packageHigherFee - item.packageFee) / item.packageHigherFee) * 100
+              )}% OFF
+            </Text>
+          )}
+        </View>
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity
-            onPress={() => handleAddToCart(item._id)}
-            style={styles.viewButton}
-          >
-            <Text style={styles.viewButtonText}>Add to Cart</Text>
+          <TouchableOpacity onPress={() => handleAddToCart(item._id)}>
+            <LinearGradient
+              colors={['#E9F0FF', '#DFE8FF']}
+              style={styles.viewButton}
+            >
+              <Text style={[styles.viewButtonText, { color: COLORS.primary }]}>Add to Cart</Text>
+            </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => navigation.navigate('PackagesTestSelectSlot', {
-              packageId: item._id,})}
-            style={[styles.viewButton, styles.bookButton]}
+              packageId: item._id,
+            })}
           >
-            <Text style={styles.viewButtonText}>Book Package</Text>
+            <LinearGradient
+              colors={['#0077b6', '#00b4db']}
+              style={[styles.viewButton, styles.bookButton]}
+            >
+              <Text style={styles.viewButtonText}>Book Package</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
     );
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <Header
-        title="Packages List"
-        onBackPress={() => navigation.goBack()}
-        showCart
-        cartCount={cartCount}
-        onCartPress={() => navigation.navigate('CartScreen')}
-      />
-
-      <View
-        style={[
-          styles.searchBarContainer,
-          {
-            backgroundColor: dark ? '#1E293B' : '#F3F4F6',
-            shadowColor: dark ? '#000' : '#999',
-          },
-        ]}
-      >
-        <MaterialCommunityIcons
-          name="magnify"
-          size={24}
-          color={dark ? '#93C5FD' : '#3B82F6'}
-          style={{ marginLeft: 12 }}
+    // 2. Screen ke background ke liye LinearGradient
+    <LinearGradient colors={['#00b4db', '#FFFFFF', "#ffff"]} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header
+          title="Packages List"
+          onBackPress={() => navigation.goBack()}
+          showCart
+          cartCount={cartCount}
+          onCartPress={() => navigation.navigate('CartScreen')}
+          style={{marginTop:40}}
         />
-        <TextInput
-          style={[styles.searchInput, { color: colors.text, paddingVertical: 10 }]}
-          placeholder="Search packages or lab name..."
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor={dark ? '#9CA3AF' : '#6B7280'}
-        />
-      </View>
+        <View
+          style={[
+            styles.searchBarContainer,
+            {
+              backgroundColor: dark ? '#1E293B' : '#F3F4F6',
+              shadowColor: dark ? '#000' : '#999',
+            },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name="magnify"
+            size={24}
+            color={dark ? '#93C5FD' : '#3B82F6'}
+            style={{ marginLeft: 12 }}
+          />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text, paddingVertical: 10 }]}
+            placeholder="Search packages or lab name..."
+            value={search}
+            onChangeText={setSearch}
+            placeholderTextColor={dark ? '#9CA3AF' : '#6B7280'}
+          />
+        </View>
 
-      <FlatList
-        data={filteredData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id?.toString()}
-        contentContainerStyle={{ padding: 16 }}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+        <FlatList
+          data={filteredData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id?.toString()}
+          contentContainerStyle={{ padding: 16 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default PathologyPackagesScreen;
+
 
 const styles = StyleSheet.create({
   searchBarContainer: {
@@ -225,7 +239,6 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     paddingHorizontal: 16,
     height: 50,
-    
     elevation: 2,
   },
   searchInput: {
@@ -235,11 +248,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     borderWidth: 0,
   },
-
   card: {
     borderRadius: 14,
     padding: 16,
     marginBottom: 16,
+    elevation: 2, // Added for shadow effect on Android
+    shadowColor: '#000', // Shadow for iOS
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -251,6 +268,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 6,
     borderRadius: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   labName: {
     fontSize: 17,
@@ -264,6 +285,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderWidth: 0.5,
+    backgroundColor: '#fff',
   },
   labDetailRow: {
     flexDirection: 'row',
@@ -328,7 +350,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
-  
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -336,8 +357,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   viewButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 8,
+    paddingVertical: 10, // Adjusted padding for better look
     paddingHorizontal: 16,
     borderRadius: 20,
     alignItems: 'center',
@@ -345,17 +365,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bookButton: {
-    backgroundColor: '#1a73e8',
+    // backgroundColor is now handled by LinearGradient
   },
   viewButtonText: {
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
-  },
-  cutFeeText: {
-    fontSize: 14,
-    color: 'gray',
-    textDecorationLine: 'line-through',
-    marginRight: 8,
   },
 });

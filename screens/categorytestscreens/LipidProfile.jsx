@@ -18,6 +18,8 @@ import { ENDPOINTS } from '../../src/constants/Endpoints';
 import ApiService from '../../src/api/ApiService';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
+// 1. LinearGradient ko import karein
+import LinearGradient from 'react-native-linear-gradient';
 
 const LipidProfile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -95,83 +97,88 @@ const LipidProfile = ({ navigation }) => {
   const groupedLabs = groupTestsByLabId(testData);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        title="Lipid Profile Test"
-        showCart
-        cartCount={cartCount}
-        onBackPress={() => navigation.goBack()}
-        onCartPress={() => navigation.navigate('CartScreen')}
-      />
-
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {groupedLabs.map(({ labDetails, tests }) => (
-          <View key={labDetails._id} style={styles.labCard}>
-            <Text style={styles.labName}>{labDetails.labName}</Text>
-            <Text style={styles.labDetail}>📧 {labDetails.email}</Text>
-            <Text style={styles.labDetail}>
-              📍 {labDetails.streetAddress}, {labDetails.city}, {labDetails.state} - {labDetails.postalCode}
-            </Text>
-
-            {tests.map((item) => {
-              const { testFee, higherTestFee } = item.testDescription || {};
-              const hasDiscount = higherTestFee > testFee;
-              const discount = hasDiscount
-                ? Math.round(((higherTestFee - testFee) / higherTestFee) * 100)
-                : 0;
-
-              return (
-                <View key={item._id} style={styles.testCard}>
-                  <View style={styles.accentStrip} />
-                  <View style={styles.cardContent}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.testName}>
-                        <Icon name="flask-outline" size={16} color={COLORS.primary} />{' '}
-                        {item.testDescription?.testName}
-                      </Text>
-                      {item.testDescription?.description ? (
-                        <Text style={styles.testDescription}>
-                          <Icon name="text" size={13} color="#6b7280" />{' '}
-                          {item.testDescription.description}
-                        </Text>
-                      ) : null}
-                      <View style={styles.priceRow}>
-                        {hasDiscount && (
-                          <Text style={styles.cutPrice}>₹{higherTestFee}</Text>
-                        )}
-                        <Text style={styles.priceTagText}>₹{testFee}</Text>
-                        {hasDiscount && (
-                          <Text style={styles.discountText}>{discount}% OFF</Text>
-                        )}
-                      </View>
+ 
+    <LinearGradient colors={['#00b4db', '#fff','#fff','#fff']} style={{flex: 1}}>
+        <SafeAreaView style={styles.container}>
+            <Header
+                title="Lipid Profile Test"
+                showCart
+                cartCount={cartCount}
+                onBackPress={() => navigation.goBack()}
+                onCartPress={() => navigation.navigate('CartScreen')}
+                style={{marginTop:40}}
+            />
+            <ScrollView contentContainerStyle={{ padding: 16 }}>
+            {groupedLabs.map(({ labDetails, tests }) => (
+                <View key={labDetails._id} style={styles.labCard}>
+                <Text style={styles.labName}>{labDetails.labName}</Text>
+                <Text style={styles.labDetail}>📧 {labDetails.email}</Text>
+                <Text style={styles.labDetail}>
+                    📍 {labDetails.streetAddress}, {labDetails.city}, {labDetails.state} - {labDetails.postalCode}
+                </Text>
+                {tests.map((item) => {
+                    const { testFee, higherTestFee } = item.testDescription || {};
+                    const hasDiscount = higherTestFee > testFee;
+                    const discount = hasDiscount
+                    ? Math.round(((higherTestFee - testFee) / higherTestFee) * 100)
+                    : 0;
+                    return (
+                    <View key={item._id} style={styles.testCard}>
+                        <View style={styles.accentStrip} />
+                        <View style={styles.cardContent}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.testName}>
+                            <Icon name="flask-outline" size={16} color={COLORS.primary} />{' '}
+                            {item.testDescription?.testName}
+                            </Text>
+                            {item.testDescription?.description ? (
+                            <Text style={styles.testDescription}>
+                                <Icon name="text" size={13} color="#6b7280" />{' '}
+                                {item.testDescription.description}
+                            </Text>
+                            ) : null}
+                            <View style={styles.priceRow}>
+                            {hasDiscount && (
+                                <Text style={styles.cutPrice}>₹{higherTestFee}</Text>
+                            )}
+                            <Text style={styles.priceTagText}>₹{testFee}</Text>
+                            {hasDiscount && (
+                                <Text style={styles.discountText}>{discount}% OFF</Text>
+                            )}
+                            </View>
+                        </View>
+                        <View style={styles.buttonColumn}>
+                            <TouchableOpacity
+                            style={styles.cartBtn}
+                            onPress={() => handleAddToCart(item._id)}
+                            >
+                            <Icon name="cart-plus" size={16} color={COLORS.primary} />
+                            <Text style={styles.cartText}>Add</Text>
+                            </TouchableOpacity>
+                            {/* 3. Book button ko gradient button se replace karein */}
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('SingleTestSelectSlot', {
+                                    testId: item._id,
+                                })}
+                            >
+                                <LinearGradient
+                                    colors={['#0077b6', '#00b4db']}
+                                    style={styles.bookBtn}
+                                >
+                                    <Icon name="calendar-check" size={16} color="#fff" />
+                                    <Text style={styles.bookText}>Book</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                        </View>
                     </View>
-
-                    <View style={styles.buttonColumn}>
-                      <TouchableOpacity
-                        style={styles.cartBtn}
-                        onPress={() => handleAddToCart(item._id)}
-                      >
-                        <Icon name="cart-plus" size={16} color={COLORS.primary} />
-                        <Text style={styles.cartText}>Add</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.bookBtn}
-                       onPress={() => navigation.navigate('SingleTestSelectSlot', {
-                        testId: item._id,
-                      })}
-                      
-                      >
-                        <Icon name="calendar-check" size={16} color="#fff" />
-                        <Text style={styles.bookText}>Book</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                    );
+                })}
                 </View>
-              );
-            })}
-          </View>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+            ))}
+            </ScrollView>
+        </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -180,7 +187,8 @@ export default LipidProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // Background color yahan se hata dein kyunki ab gradient use ho raha hai
+    // backgroundColor: '#fff', 
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   labCard: {
@@ -189,6 +197,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   labName: {
     fontSize: 18,
@@ -286,7 +298,7 @@ const styles = StyleSheet.create({
   bookBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    // backgroundColor yahan se hata dein
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,

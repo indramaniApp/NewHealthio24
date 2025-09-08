@@ -131,9 +131,10 @@ const TestBookingScreen = ({ navigation }) => {
                 <Header 
                     title="Test Bookings" 
                     onBackPress={() => navigation.goBack()}
-                    style={{ backgroundColor: 'transparent' }}
-                    titleStyle={{ color: COLORS.white }}
+                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
+                    titleStyle={{ color: COLORS.black }}
                     tintColor={COLORS.white}
+                  
                 />
 
                 {/* Ad Carousel */}

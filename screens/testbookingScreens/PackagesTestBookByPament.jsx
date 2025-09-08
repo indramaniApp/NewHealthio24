@@ -9,7 +9,6 @@ import {
   ScrollView,
   Alert,
   Modal,
-  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -22,32 +21,31 @@ import { ENDPOINTS } from '../../src/constants/Endpoints';
 import ApiService from '../../src/api/ApiService';
 import { useTheme } from '@react-navigation/native';
 
+import LinearGradient from 'react-native-linear-gradient';
+import Header from '../../components/Header';
+
 const RAZORPAY_KEY_ID = 'rzp_test_GvwPgZcP2tn6O2';
 
 const PackagesTestBookByPament = ({ route }) => {
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
   const { startedDate, selectedHour, packageId } = route.params || {};
 
   const [selectedMode, setSelectedMode] = useState('');
   const [modeModalVisible, setModeModalVisible] = useState(false);
+  const [referralId, setReferralId] = useState(''); 
 
   const [appointmentDetails, setAppointmentDetails] = useState({
     appointment_request_date: startedDate || '',
     appointment_time: selectedHour || '',
-    appointment_type: '',
     patient_name: '',
     patient_age: '',
     patient_gender: '',
   });
 
   const handleChange = (key, value) => {
-    setAppointmentDetails(prev => ({
-      ...prev,
-      [key]: value,
-    }));
+    setAppointmentDetails(prev => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
@@ -67,12 +65,16 @@ const PackagesTestBookByPament = ({ route }) => {
       ...appointmentDetails,
       appointment_type: selectedMode,
     };
+  
+    if (referralId.trim()) {
+      payload.referral_id = referralId.trim();
+    }
 
     try {
       const response = await ApiService.post(`${ENDPOINTS.book_package}/${packageId}`, payload, true, false);
       if (response?.status === 'success') {
         const razorpayOrderId = response?.data?.razorpay_order_id;
-        handlePayment(razorpayOrderId);
+        handlePayment(razorpayOrderId, response?.data?.amount);
       } else {
         Toast.show(response?.message || 'Booking failed');
       }
@@ -83,13 +85,13 @@ const PackagesTestBookByPament = ({ route }) => {
     }
   };
 
-  const handlePayment = (orderId) => {
+  const handlePayment = (orderId, amount) => {
     const options = {
       description: 'Package Booking Payment',
       image: 'https://i.imgur.com/3g7nmJC.jpg',
       currency: 'INR',
       key: RAZORPAY_KEY_ID,
-      amount: 100,
+      amount: amount,
       name: 'Helthio24',
       order_id: orderId,
       prefill: {
@@ -113,13 +115,7 @@ const PackagesTestBookByPament = ({ route }) => {
 
   const verifyPayment = async (payment_id, signature, order_id) => {
     dispatch(showLoader());
-
-    const payload = {
-      payment_id,
-      signature,
-      order_id,
-    };
-
+    const payload = { payment_id, signature, order_id };
     try {
       const response = await ApiService.post(`${ENDPOINTS.payment_package_verify}`, payload, true, false);
       if (response?.status === 'success') {
@@ -147,175 +143,161 @@ const PackagesTestBookByPament = ({ route }) => {
     { label: 'Home Visit', value: 'home-visit' },
   ];
 
-  const selectedModeLabel =
-    modeOptions.find(opt => opt.value === selectedMode)?.label || 'Select Mode';
+  const selectedModeLabel = modeOptions.find(opt => opt.value === selectedMode)?.label || 'Select Mode';
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
-
-      <View style={[styles.header, { backgroundColor: colors.card }]}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Book Package Test</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={[styles.text, { color: colors.text }]}>📅 Date: {appointmentDetails.appointment_request_date}</Text>
-          <Text style={[styles.text, { color: colors.text }]}>⏰ Time: {appointmentDetails.appointment_time}</Text>
-        </View>
-
-        <Text style={[styles.label, { color: colors.text }]}>Patient Name</Text>
-        <TextInput
-          placeholder="Enter patient name"
-          placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
-          style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-          value={appointmentDetails.patient_name}
-          onChangeText={text => handleChange('patient_name', text)}
+    <LinearGradient colors={['#00b4db', '#FFFFFF', "#ffff"]} style={{ flex: 1 }}>
+      <SafeAreaView style={styles.safeArea}>
+        <Header
+          title="Book Package Test"
+          onBackPress={() => navigation.goBack()}
+          style={{ marginTop: 40 }}
         />
 
-        <Text style={[styles.label, { color: colors.text }]}>Patient Age</Text>
-        <TextInput
-          placeholder="Enter age"
-          placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
-          keyboardType="number-pad"
-          style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-          value={appointmentDetails.patient_age}
-          onChangeText={text => handleChange('patient_age', text)}
-        />
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <LinearGradient colors={['#FFFFFF', '#F9FAFB']} style={styles.card}>
+            <Text style={[styles.text, { color: colors.text }]}>📅 Date: {appointmentDetails.appointment_request_date}</Text>
+            <Text style={[styles.text, { color: colors.text }]}>⏰ Time: {appointmentDetails.appointment_time}</Text>
+          </LinearGradient>
 
-        <Text style={[styles.label, { color: colors.text }]}>Gender</Text>
-        <View style={[styles.pickerContainer, { backgroundColor: colors.card }]}>
-          <Picker
-            selectedValue={appointmentDetails.patient_gender}
-            onValueChange={value => handleChange('patient_gender', value)}
-            style={{ color: colors.text }}
-            dropdownIconColor={colors.text}
-          >
-            <Picker.Item label="Select Gender" value="" />
-            <Picker.Item label="Male" value="Male" />
-            <Picker.Item label="Female" value="Female" />
-            <Picker.Item label="Other" value="Other" />
-          </Picker>
-        </View>
+          <Text style={[styles.label, { color: colors.text }]}>Patient Name</Text>
+          <TextInput
+            placeholder="Enter patient name"
+            placeholderTextColor={dark ? '#aaa' : '#666'}
+            style={[styles.input, { backgroundColor: '#F9FAFB', color: colors.text }]}
+            value={appointmentDetails.patient_name}
+            onChangeText={text => handleChange('patient_name', text)}
+          />
 
-        <Text style={[styles.label, { color: colors.text }]}>Choose Mode</Text>
-        <TouchableOpacity
-          style={[styles.pickerBox, { backgroundColor: colors.card }]}
-          onPress={() => setModeModalVisible(true)}
-        >
-          <Text style={{ fontSize: 16, color: selectedMode ? colors.text : colors.placeholder || '#999' }}>
-            {selectedModeLabel}
-          </Text>
-          <Icon name="chevron-down" size={20} color={colors.text} />
-        </TouchableOpacity>
+          <Text style={[styles.label, { color: colors.text }]}>Patient Age</Text>
+          <TextInput
+            placeholder="Enter age"
+            placeholderTextColor={dark ? '#aaa' : '#666'}
+            keyboardType="number-pad"
+            style={[styles.input, { backgroundColor: '#F9FAFB', color: colors.text }]}
+            value={appointmentDetails.patient_age}
+            onChangeText={text => handleChange('patient_age', text)}
+          />
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: isFormValid ? '#007BFF' : '#ccc' }]}
-          onPress={handleSubmit}
-          disabled={!isFormValid}
-        >
-          <Text style={styles.buttonText}>Proceed to Payment</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Mode Picker Modal */}
-      <Modal
-        visible={modeModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModeModalVisible(false)}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setModeModalVisible(false)}
-          style={styles.modalOverlay}
-        >
-          <View style={[styles.modalBox, { backgroundColor: colors.card }]}>
-            {modeOptions.map(option => (
-              <TouchableOpacity
-                key={option.value}
-                disabled={option.disabled}
-                onPress={() => {
-                  if (!option.disabled) {
-                    setSelectedMode(option.value);
-                    setModeModalVisible(false);
-                  }
-                }}
-                style={styles.modalItem}
-              >
-                <Text
-                  style={[
-                    styles.modalItemText,
-                    { color: option.disabled ? '#999' : colors.text },
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              onPress={() => setModeModalVisible(false)}
-              style={[styles.modalItem, { borderTopWidth: 1, borderTopColor: '#ccc' }]}
+          <Text style={[styles.label, { color: colors.text }]}>Gender</Text>
+          <View style={[styles.pickerContainer, { backgroundColor: '#F9FAFB' }]}>
+            <Picker
+              selectedValue={appointmentDetails.patient_gender}
+              onValueChange={value => handleChange('patient_gender', value)}
+              style={{ color: colors.text }}
+              dropdownIconColor={colors.text}
             >
-              <Text style={[styles.modalItemText, { color: 'red' }]}>Cancel</Text>
-            </TouchableOpacity>
+              <Picker.Item label="Select Gender" value="" />
+              <Picker.Item label="Male" value="Male" />
+              <Picker.Item label="Female" value="Female" />
+              <Picker.Item label="Other" value="Other" />
+            </Picker>
           </View>
-        </TouchableOpacity>
-      </Modal>
-    </SafeAreaView>
+
+          <Text style={[styles.label, { color: colors.text }]}>Choose Mode</Text>
+          <TouchableOpacity
+            style={[styles.pickerBox, { backgroundColor: '#F9FAFB' }]}
+            onPress={() => setModeModalVisible(true)}
+          >
+            <Text style={{ fontSize: 16, color: selectedMode ? colors.text : (dark ? '#aaa' : '#666') }}>
+              {selectedModeLabel}
+            </Text>
+            <Icon name="chevron-down" size={20} color={colors.text} />
+          </TouchableOpacity>
+          
+          <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+          <TextInput
+            placeholder="Enter referral ID"
+            placeholderTextColor={dark ? '#aaa' : '#666'}
+            style={[styles.input, { backgroundColor: '#F9FAFB', color: colors.text }]}
+            value={referralId}
+            onChangeText={setReferralId}
+          />
+
+          <TouchableOpacity onPress={handleSubmit} disabled={!isFormValid}>
+            <LinearGradient
+              colors={isFormValid ? ['#0077b6', '#00b4db'] : ['#A9A9A9', '#D3D3D3']}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Proceed to Payment</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </ScrollView>
+
+        <Modal
+          visible={modeModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setModeModalVisible(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setModeModalVisible(false)}
+            style={styles.modalOverlay}
+          >
+            <LinearGradient
+              colors={['#FFFFFF', '#FAFCFF']}
+              style={styles.modalBox}
+            >
+              {modeOptions.map(option => (
+                <TouchableOpacity
+                  key={option.value}
+                  disabled={option.disabled}
+                  onPress={() => {
+                    if (!option.disabled) {
+                      setSelectedMode(option.value);
+                      setModeModalVisible(false);
+                    }
+                  }}
+                  style={styles.modalItem}
+                >
+                  <Text style={[styles.modalItemText, { color: option.disabled ? '#999' : colors.text }]}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                onPress={() => setModeModalVisible(false)}
+                style={[styles.modalItem, { borderTopWidth: 1, borderTopColor: '#eee' }]}
+              >
+                <Text style={[styles.modalItemText, { color: 'red' }]}>Cancel</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Modal>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default PackagesTestBookByPament;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+  },
+  scrollContainer: {
     padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginBottom: 16,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    paddingBottom: 40,
   },
   card: {
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
     elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   text: {
     fontSize: 16,
     marginBottom: 6,
+    fontWeight: '500',
   },
   label: {
     fontSize: 16,
-    marginBottom: 6,
+    marginBottom: 8,
     fontWeight: '600',
   },
   input: {
@@ -323,11 +305,15 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   pickerContainer: {
     borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   pickerBox: {
     borderRadius: 8,
@@ -336,17 +322,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   button: {
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 16,
+    elevation: 3,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
@@ -366,5 +355,6 @@ const styles = StyleSheet.create({
   },
   modalItemText: {
     fontSize: 16,
+    textAlign: 'center',
   },
 });

@@ -18,11 +18,11 @@ import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
-// 1. Import LinearGradient
 import LinearGradient from 'react-native-linear-gradient';
 
 const SingleTestBookByWallet = ({ navigation, route }) => {
-    const { testId, startedDate, selectedHour } = route.params || {};
+    // Pichli screen se referralId bhi le rahe hain
+    const { testId, startedDate, selectedHour, referralId: passedReferralId } = route.params || {};
     const { colors } = useTheme();
     const dispatch = useDispatch();
 
@@ -30,6 +30,8 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
     const [patientAge, setPatientAge] = useState('');
     const [gender, setGender] = useState('');
     const [appointmentType, setAppointmentType] = useState('');
+    // referralId ke liye state bana di
+    const [referralId, setReferralId] = useState(passedReferralId || '');
 
     const handleSubmit = async () => {
         if (!patientName || !patientAge || !gender || !appointmentType) {
@@ -48,6 +50,11 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                 patient_age: patientAge,
                 patient_gender: gender,
             };
+
+            // Agar referralId hai, to use payload me add kar do
+            if (referralId.trim()) {
+                payload.referral_id = referralId.trim();
+            }
 
             const finalUrl = `${ENDPOINTS.book_test_wallet}/${testId}`;
             const response = await ApiService.post(finalUrl, payload, true, false);
@@ -70,7 +77,6 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* 2. Wrap the entire screen in LinearGradient */}
             <LinearGradient
                 colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
                 style={{ flex: 1 }}
@@ -78,11 +84,10 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                 <Header
                     title="Complete Blood Test"
                     onBackPress={() => navigation.goBack()}
-                    style={{ backgroundColor: 'transparent',marginTop:40 }}
+                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
                 />
 
                 <ScrollView contentContainerStyle={styles.scrollContent}>
-                    {/* 3. Apply LinearGradient to the appointment info card */}
                     <LinearGradient
                         colors={['#F7FBFF', '#FFFFFF']}
                         style={styles.card}
@@ -145,7 +150,16 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                             </Picker>
                         </View>
 
-                        {/* 4. Apply LinearGradient to the submit button */}
+                        {/* Referral ID Input Box */}
+                        <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+                        <TextInput
+                            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: '#FFFFFF' }]}
+                            value={referralId}
+                            onChangeText={setReferralId}
+                            placeholder="Enter referral ID"
+                            placeholderTextColor={colors.text + '88'}
+                        />
+
                         <TouchableOpacity
                             onPress={handleSubmit}
                             disabled={!patientName || !patientAge || !gender || !appointmentType}
@@ -172,13 +186,11 @@ export default SingleTestBookByWallet;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // Removed background color from the main container
     },
     scrollContent: {
         padding: 16,
     },
     card: {
-        // borderWidth is no longer needed with gradient
         borderRadius: 12,
         padding: 16,
         marginBottom: 20,
@@ -216,7 +228,6 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     button: {
-        // Removed backgroundColor, as it's handled by LinearGradient
         padding: 14,
         borderRadius: 10,
         alignItems: 'center',
@@ -224,7 +235,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     buttonText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: 'bold',
     },

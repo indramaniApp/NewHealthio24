@@ -66,7 +66,7 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
                 <Header 
                     title="Select Appointment Slot" 
                     onBackPress={() => navigation.goBack()} 
-                    style={{ backgroundColor: 'transparent' }}
+                    style={{ backgroundColor: 'transparent',marginTop:40 }}
                 />
 
                 <ScrollView 

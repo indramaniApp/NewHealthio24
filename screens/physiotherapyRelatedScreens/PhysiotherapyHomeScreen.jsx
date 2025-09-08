@@ -63,8 +63,7 @@ const PhysiotherapyHomeScreen = () => {
             <Header
                 title="Physiotherapy Booking"
                 onBackPress={() => navigation.goBack()}
- 
-                style={{ backgroundColor: 'transparent' }} 
+                style={{ backgroundColor: 'transparent', marginTop: 40 }} 
             />
 
             {/* Book Appointment */}

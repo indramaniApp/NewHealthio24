@@ -51,7 +51,10 @@ const SelectSlot = ({ navigation }) => {
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <Header title="Select Appointment Slot" onBackPress={() => navigation.goBack()} />
+            <Header title="Select Appointment Slot" onBackPress={() => navigation.goBack()} 
+                titleStyle={{ color: colors.text }}
+                style={{ backgroundColor: 'transparent', marginTop: 40 }}
+            />
 
             <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
                 <View style={styles.container}>

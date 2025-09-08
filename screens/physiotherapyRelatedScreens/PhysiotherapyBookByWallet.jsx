@@ -75,7 +75,7 @@ const PhysiotherapyBookByWallet = ({ route, navigation }) => {
             <Header 
                 title="Book Physiotherapy" 
                 onBackPress={() => navigation.goBack()}
-                style={{ backgroundColor: 'transparent', paddingTop: StatusBar.currentHeight || 20 }}
+                style={{ backgroundColor: 'transparent', marginTop: StatusBar.currentHeight || 40 }}
             />
 
             <ScrollView contentContainerStyle={styles.form}>

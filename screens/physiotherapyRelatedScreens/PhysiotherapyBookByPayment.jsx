@@ -117,17 +117,17 @@ const PhysiotherapyBookByPayment = ({ route, navigation }) => {
     };
 
     return (
-        // 2. मुख्य View को LinearGradient से बदलें
+
         <LinearGradient
             colors={['#00b4db', '#f5fcff', '#fff']}
             style={styles.container}
         >
-            {/* 3. StatusBar को ग्रेडिएंट के अनुसार एडजस्ट करें */}
+        
             <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
             <Header
                 title="Book Physiotherapy"
                 onBackPress={() => navigation.goBack()}
-                style={{ backgroundColor: 'transparent', paddingTop: StatusBar.currentHeight || 20 }}
+                style={{ backgroundColor: 'transparent', marginTop: StatusBar.currentHeight || 40 }}
             />
 
             <ScrollView contentContainerStyle={styles.form}>

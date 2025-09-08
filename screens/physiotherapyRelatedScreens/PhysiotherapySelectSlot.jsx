@@ -14,7 +14,7 @@ import Button from '../../components/Button';
 import { COLORS, SIZES } from '../../constants';
 import { useTheme } from '../../theme/ThemeProvider';
 import { hoursData } from '../../data';
-import LinearGradient from 'react-native-linear-gradient'; // 1. ग्रेडिएंट इम्पोर्ट करें
+import LinearGradient from 'react-native-linear-gradient';
 
 const PhysiotherapySelectSlot = ({ navigation, route }) => {
     const { centreId } = route.params || {};
@@ -62,7 +62,7 @@ const PhysiotherapySelectSlot = ({ navigation, route }) => {
                     title="Select Appointment Slot"
                     onBackPress={() => navigation.goBack()}
                     // 3. हेडर को ट्रांसपेरेंट करें
-                    style={{ backgroundColor: 'transparent' }}
+                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
                 />
 
                 <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
@@ -158,7 +158,7 @@ export default PhysiotherapySelectSlot;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: 'transparent', // 4. SafeAreaView को ट्रांसपेरेंट करें
+        backgroundColor: 'transparent', 
     },
     container: {
         padding: 16,
