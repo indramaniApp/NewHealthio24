@@ -314,7 +314,7 @@ const Home = ({ navigation }) => {
             </View>
         );
     };
-    // === MODIFICATION END ===
+  
 
     const renderTopDoctors = () => (
         <View style={{ paddingHorizontal: 0.5, paddingTop: 12 }}>

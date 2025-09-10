@@ -19,6 +19,7 @@ import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { useDispatch } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
+import LinearGradient from 'react-native-linear-gradient'; 
 
 const ICON_COLOR = 'rgba(36, 107, 253, 1)';
 const CIRCLE_BG = 'rgba(36, 107, 253, .12)';
@@ -146,32 +147,32 @@ const CombinedTestScreen = () => {
 
     const filterLabs = async (query) => {
         setSearchQuery(query);
-    
+
         if (!query) {
             setFilteredLabs(labsData);
             return;
         }
-    
+
         try {
             dispatch(showLoader());
             const url = `${ENDPOINTS.search_test_package}?q=${encodeURIComponent(query)}`;
             console.log('Request URL:', url);
-    
+
             const response = await ApiService.get(url, true);
             dispatch(hideLoader());
-    
+
             console.log('Response:', JSON.stringify(response, null, 2));
-    
+
             if (response?.status === 'success' && response?.data) {
                 const testPackages = response.data?.packages || [];
                 const individualTests = response.data?.tests || [];
-    
+
                 const labsMap = new Map();
-    
+
                 individualTests.forEach((item) => {
                     const lab = item.pathologyId;
                     const labId = lab?._id;
-    
+
                     if (!labsMap.has(labId)) {
                         labsMap.set(labId, {
                             labId,
@@ -184,7 +185,7 @@ const CombinedTestScreen = () => {
                             tests: [],
                         });
                     }
-    
+
                     labsMap.get(labId).tests.push({
                         id: item._id,
                         name: (item.testName === 'Other' && item.testOtherName) ? item.testOtherName : item.testName || 'Unnamed Test',
@@ -194,11 +195,11 @@ const CombinedTestScreen = () => {
                         tests: null,
                     });
                 });
-    
+
                 testPackages.forEach((pkg) => {
                     const lab = pkg.pathologyId;
                     const labId = lab?._id;
-    
+
                     if (!labsMap.has(labId)) {
                         labsMap.set(labId, {
                             labId,
@@ -211,7 +212,7 @@ const CombinedTestScreen = () => {
                             tests: [],
                         });
                     }
-    
+
                     labsMap.get(labId).tests.push({
                         id: pkg._id,
                         name: pkg.packageName,
@@ -226,7 +227,7 @@ const CombinedTestScreen = () => {
                         ),
                     });
                 });
-    
+
                 const labsArray = Array.from(labsMap.values());
                 setFilteredLabs(labsArray);
             } else {
@@ -239,8 +240,7 @@ const CombinedTestScreen = () => {
             Toast.show('Failed to search. Please try again.');
         }
     };
-    
-    
+
 
     useFocusEffect(
         useCallback(() => {
@@ -323,68 +323,73 @@ const CombinedTestScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar backgroundColor="#f2f2f2" barStyle="dark-content" />
-            <Header
-                key={cartRefreshKey}
-                title="Tests & Packages"
-                showCart
-                cartCount={cartCount}
-                onBackPress={() => navigation.goBack()}
-                onCartPress={() => navigation.navigate('CartScreen')}
-            />
-
-            <View style={styles.searchWrapper}>
-                <MaterialCommunityIcons name="magnify" size={20} color={COLORS.primary} />
-                <TextInput
-                    placeholder="Search test or package"
-                    placeholderTextColor="#999"
-                    value={searchQuery}
-                    onChangeText={filterLabs}
-                    style={styles.searchInput}
+        // 2. Wrapped the entire screen in LinearGradient
+        <LinearGradient
+            colors={['#00b4db', '#fff', '#fff']}
+            style={{ flex: 1 }}
+        >
+            <SafeAreaView style={styles.container}>
+                {/* 5. Set StatusBar to be transparent */}
+                <StatusBar backgroundColor="transparent" barStyle="dark-content" translucent={true} />
+                <Header
+                    key={cartRefreshKey}
+                    title="Tests & Packages"
+                    showCart
+                    cartCount={cartCount}
+                    onBackPress={() => navigation.goBack()}
+                    onCartPress={() => navigation.navigate('CartScreen')}
                 />
-            </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {filteredLabs.map((lab, index) => (
-                    <View key={lab.labId} style={{ marginBottom: 1, marginTop: index === 0 ? 16 : 0 }}>
-                        <Text style={[styles.labTitle, { marginBottom: 5 }]}>{lab.labName}</Text>
+                <View style={styles.searchWrapper}>
+                    <MaterialCommunityIcons name="magnify" size={20} color={COLORS.primary} />
+                    <TextInput
+                        placeholder="Search test or package"
+                        placeholderTextColor="#999"
+                        value={searchQuery}
+                        onChangeText={filterLabs}
+                        style={styles.searchInput}
+                    />
+                </View>
 
-                        <View style={styles.labAddressWrapper}>
-                            <MaterialCommunityIcons name="map-marker" size={16} color={COLORS.primary} />
-                            <Text style={styles.labAddressText}>
-                                {lab.address}, {lab.city} - {lab.pincode}
-                            </Text>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {filteredLabs.map((lab, index) => (
+                        <View key={lab.labId} style={{ marginBottom: 1, marginTop: index === 0 ? 16 : 0 }}>
+                            <Text style={[styles.labTitle, { marginBottom: 5 }]}>{lab.labName}</Text>
+
+                            <View style={styles.labAddressWrapper}>
+                                <MaterialCommunityIcons name="map-marker" size={16} color={COLORS.primary} />
+                                <Text style={styles.labAddressText}>
+                                    {lab.address}, {lab.city} - {lab.pincode}
+                                </Text>
+                            </View>
+
+                            <View style={styles.labAddressWrapper}>
+                                <MaterialCommunityIcons name="clock-outline" size={16} color={COLORS.primary} />
+                                <Text style={styles.labAddressText}>{lab.timing}</Text>
+                            </View>
+
+                            <FlatList
+                                data={lab.tests}
+                                renderItem={renderCard}
+                                keyExtractor={(item) => item.id}
+                                scrollEnabled={false}
+                                contentContainerStyle={styles.list}
+                            />
                         </View>
-
-                        <View style={styles.labAddressWrapper}>
-                            <MaterialCommunityIcons name="clock-outline" size={16} color={COLORS.primary} />
-                            <Text style={styles.labAddressText}>{lab.timing}</Text>
-                        </View>
-
-                        <FlatList
-                            data={lab.tests}
-                            renderItem={renderCard}
-                            keyExtractor={(item) => item.id}
-                            scrollEnabled={false}
-                            contentContainerStyle={styles.list}
-                        />
-                    </View>
-                ))}
-            </ScrollView>
-        </SafeAreaView>
+                    ))}
+                </ScrollView>
+            </SafeAreaView>
+        </LinearGradient>
     );
 };
 
 export default CombinedTestScreen;
 
-
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fefefe',
+        backgroundColor: 'transparent', 
+        paddingTop: StatusBar.currentHeight,
     },
     searchWrapper: {
         flexDirection: 'row',
@@ -416,7 +421,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         paddingHorizontal: 16,
-        color: COLORS.primary,
+        color: COLORS.black,
     },
     labAddressWrapper: {
         flexDirection: 'row',
@@ -475,19 +480,16 @@ const styles = StyleSheet.create({
         marginTop: 4,
         flexWrap: 'wrap',
     },
-
     discountedPrice: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#1f2937', // dark gray
+        color: '#1f2937',
     },
-
     cutPrice: {
         fontSize: 14,
         color: '#9ca3af',
         textDecorationLine: 'line-through',
     },
-
     discountBadge: {
         backgroundColor: '#d1fae5',
         borderRadius: 6,
@@ -495,14 +497,11 @@ const styles = StyleSheet.create({
         paddingVertical: 2,
         marginLeft: 4,
     },
-
     discountText: {
         fontSize: 12,
         fontWeight: '700',
         color: '#059669',
     },
-
-
     strikedPrice: {
         fontSize: 12,
         color: '#999',
@@ -531,7 +530,7 @@ const styles = StyleSheet.create({
     bookBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.primary,
+        backgroundColor: '#00b4db',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 20,

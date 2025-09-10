@@ -16,6 +16,8 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
+import LinearGradient from 'react-native-linear-gradient'; // 1. Import LinearGradient
+import Header from '../../components/Header';
 
 const formatDateTime = (dateString) => {
   if (!dateString) return '';
@@ -134,24 +136,34 @@ const GetBookingMoreDetail = () => {
   const renderHeader = () => (
     <View style={styles.screenHeader}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#000" />
+     
+        <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <Text style={styles.screenTitle}>Approved Appointments</Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f4f6f9' }}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {renderHeader()}
-        <FlatList
-          data={appointments}
-          renderItem={renderCard}
-          keyExtractor={(item) => item._id}
-          scrollEnabled={false}
-        />
-      </ScrollView>
-    </SafeAreaView>
+    
+    <LinearGradient
+      colors={['#00b4db', '#ffff','#fff']}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <ScrollView contentContainerStyle={{ padding: 16 }}>
+          {/* {renderHeader()} */}
+          <Header title="Approved Appointments" onBackPress={() => navigation.goBack()} 
+          style={{ backgroundColor: 'transparent',marginTop:40 }}
+          />
+          <FlatList
+            data={appointments}
+            renderItem={renderCard}
+            keyExtractor={(item) => item._id}
+            scrollEnabled={false}
+          />
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -165,7 +177,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginLeft: 12,
-    color: '#333',
+    color: '#fff', // 4. Changed text color to white
   },
   card: {
     backgroundColor: '#fff',

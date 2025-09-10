@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../constants';
+import LinearGradient from 'react-native-linear-gradient';
 
 const UpcomingAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -120,18 +121,24 @@ const UpcomingAppointments = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={appointments}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No upcoming appointments.</Text>
-        }
-      />
-    </SafeAreaView>
+  
+    <LinearGradient
+      colors={['#00b4db', '#FFFFFF', '#FFFFFF']}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={appointments}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No upcoming appointments.</Text>
+          }
+        />
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -140,7 +147,7 @@ export default UpcomingAppointments;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent', 
   },
   list: {
     paddingHorizontal: 16,
@@ -228,7 +235,7 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    backgroundColor:'#00b4db',
     paddingVertical: 8,
     borderRadius: 20,
     flexDirection: 'row',

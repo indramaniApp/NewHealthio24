@@ -13,7 +13,7 @@ import {
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch } from 'react-redux';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient'; // Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient'; 
 
 import { COLORS } from '../../../../constants';
 import Header from '../../../../components/Header';
@@ -164,7 +164,7 @@ export default HospitalDetailScreen;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: 'transparent', // Changed from COLORS.white
+        backgroundColor: 'transparent', 
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     container: {
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#005a8d', // Darker shade for better visibility
+        color: '#005a8d', 
         marginBottom: 16,
     },
     deptCard: {
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -4,
         right: -4,
-        backgroundColor: '#d9534f', // A slightly different red
+        backgroundColor: '#d9534f', 
         borderRadius: 10,
         paddingHorizontal: 5,
         paddingVertical: 1,

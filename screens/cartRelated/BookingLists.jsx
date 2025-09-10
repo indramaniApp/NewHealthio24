@@ -11,6 +11,7 @@ import {
 import Header from '../../components/Header';
 import UpcomingAppointments from './UpcomingAppointments';
 import CompletedAppointments from './CompletedAppointments';
+import LinearGradient from 'react-native-linear-gradient'; // 1. Import LinearGradient
 
 const { width } = Dimensions.get('window');
 const tabWidth = width / 2;
@@ -29,47 +30,57 @@ const BookingList = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header title="Booked Appointments" onBackPress={() => navigation.goBack()} />
-
-      {/* Tab Header with underline */}
-      <View style={styles.tabHeader}>
-        {['Scheduled', 'Completed'].map((tab, index) => (
-          <TouchableOpacity
-            key={tab}
-            style={styles.tabItem}
-            onPress={() => handleTabPress(tab, index)}
-          >
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
-
-        {/* Animated Underline */}
-        <Animated.View
-          style={[
-            styles.underline,
-            {
-              width: underlineWidth,
-              transform: [
-                {
-                  translateX: Animated.add(
-                    underlineX,
-                    new Animated.Value((tabWidth - underlineWidth) / 2)
-                  ),
-                },
-              ],
-            },
-          ]}
+  
+    <LinearGradient
+      colors={['#00b4db', '#FFFFFF','#FFFFFF']}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+  
+        <Header 
+            title="Booked Appointments" 
+            onBackPress={() => navigation.goBack()}
+            style={{ backgroundColor: 'transparent',marginTop:40 }} 
         />
-      </View>
 
+   
+        <View style={styles.tabHeader}>
+          {['Scheduled', 'Completed'].map((tab, index) => (
+            <TouchableOpacity
+              key={tab}
+              style={styles.tabItem}
+              onPress={() => handleTabPress(tab, index)}
+            >
+              <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
 
-      <View style={{ flex: 1 }}>
-        {activeTab === 'Scheduled' ? <UpcomingAppointments /> : <CompletedAppointments />}
-      </View>
-    </SafeAreaView>
+          {/* Animated Underline */}
+          <Animated.View
+            style={[
+              styles.underline,
+              {
+                width: underlineWidth,
+                transform: [
+                  {
+                    translateX: Animated.add(
+                      underlineX,
+                      new Animated.Value((tabWidth - underlineWidth) / 2)
+                    ),
+                  },
+                ],
+              },
+            ]}
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          {activeTab === 'Scheduled' ? <UpcomingAppointments /> : <CompletedAppointments />}
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -78,7 +89,7 @@ export default BookingList;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent', // 4. Set background to transparent
   },
   tabHeader: {
     flexDirection: 'row',
@@ -95,10 +106,11 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 16,
     color: '#777',
+    fontFamily: 'Urbanist-SemiBold',
   },
   activeTabText: {
-    color: '#4A90E2',
-    fontWeight: 'bold',
+    color: '#fff' || '#007bff',
+    fontFamily: 'Urbanist-Bold',
   },
   underline: {
     position: 'absolute',

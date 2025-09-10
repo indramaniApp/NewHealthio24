@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient'; // 1. Import karein
+import LinearGradient from 'react-native-linear-gradient'; 
 
 import Header from '../../../../components/Header';
 import { COLORS } from '../../../../constants';
@@ -83,7 +83,7 @@ const SurgicalDepartment = ({ route }) => {
     };
 
     return (
-        // 2. Component ko LinearGradient se wrap karein
+    
         <LinearGradient
             colors={['#00b4db', '#ffff', '#ffff']}
             style={{ flex: 1 }}
@@ -113,12 +113,12 @@ export default SurgicalDepartment;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        // backgroundColor: COLORS.white, // 3. Style ko update karein (ise hata dein)
+    
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: 'transparent', // 3. Style ko update karein (ise transparent kar dein)
+        backgroundColor: 'transparent', 
     },
 });

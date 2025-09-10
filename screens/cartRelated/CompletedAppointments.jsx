@@ -15,6 +15,8 @@ import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../constants';
+// 1. Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const CompletedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -95,13 +97,12 @@ const CompletedAppointments = () => {
           <Text style={styles.value}>{item.report_count}</Text>
         </View>
         <View style={styles.infoBox}>
-  <Text style={styles.label}>Status</Text>
-  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 1 }}>
-    <Text style={[styles.value, { color: 'green', marginRight: 4 }]}>Completed</Text>
-    <MaterialCommunityIcons name="check-circle" size={16} color="green" />
-  </View>
-</View>
-
+          <Text style={styles.label}>Status</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 1 }}>
+            <Text style={[styles.value, { color: 'green', marginRight: 4 }]}>Completed</Text>
+            <MaterialCommunityIcons name="check-circle" size={16} color="green" />
+          </View>
+        </View>
       </View>
 
       <View style={styles.bookedByRow}>
@@ -115,7 +116,6 @@ const CompletedAppointments = () => {
           onPress={() => navigation.navigate('ReportScreen', { id: item._id })}
         >
           <MaterialCommunityIcons name="information-outline" size={18} color="#fff" />
-
           <Text style={styles.btnText}>Check Reports</Text>
           {item.report_count > 0 && (
             <View style={styles.badge}>
@@ -129,7 +129,6 @@ const CompletedAppointments = () => {
           onPress={() => navigation.navigate('ReciptScreen', { id: item._id })}
         >
           <MaterialCommunityIcons name="file-document-outline" size={18} color={COLORS.primary} />
-
           <Text style={[styles.btnText, { color: COLORS.primary }]}>Get Receipt</Text>
         </TouchableOpacity>
       </View>
@@ -137,17 +136,23 @@ const CompletedAppointments = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={appointments}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No completed appointments.</Text>
-        }
-      />
-    </SafeAreaView>
+
+    <LinearGradient
+      colors={['#00b4db', '#FFFFFF','#fff']} 
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={appointments}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No completed appointments.</Text>
+          }
+        />
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -156,7 +161,8 @@ export default CompletedAppointments;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+
+    backgroundColor: 'transparent',
   },
   list: {
     padding: 16,

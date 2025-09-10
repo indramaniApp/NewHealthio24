@@ -12,7 +12,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient'; 
 
 import Header from '../../../../components/Header';
-import { COLORS } from '../../../../constants';
+
 import { showLoader, hideLoader } from '../../../redux/slices/loaderSlice';
 import ApiService from '../../../api/ApiService';
 import { ENDPOINTS } from '../../../constants/Endpoints';
