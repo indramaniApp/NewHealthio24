@@ -14,7 +14,7 @@ import Button from '../../components/Button';
 import { COLORS, SIZES } from '../../constants';
 import { useTheme } from '../../theme/ThemeProvider';
 import { hoursData } from '../../data';
-import LinearGradient from 'react-native-linear-gradient'; // 👈 1. Imported LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const SelectSlotDirectBook = ({ navigation, route }) => {
   const { testType, testId, packageId } = route?.params || {};
@@ -164,7 +164,7 @@ const SelectSlotDirectBook = ({ navigation, route }) => {
 export default SelectSlotDirectBook;
 
 const styles = StyleSheet.create({
-  // 3. Made SafeAreaView background transparent
+
   safeArea: { flex: 1, backgroundColor: 'transparent' },
   container: { padding: 16 },
   label: {

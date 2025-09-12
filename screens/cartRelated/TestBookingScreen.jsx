@@ -179,8 +179,7 @@ const TestBookingScreen = ({ navigation }) => {
                 </View>
 
                 <ScrollView contentContainerStyle={styles.container}>
-                    {/* Your cards and other content... */}
-                     {/* Book Single Tests */}
+               
                      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('PathologyScreen')}>
                         <View style={styles.iconWrapper}>
                             <View style={styles.iconBox}>

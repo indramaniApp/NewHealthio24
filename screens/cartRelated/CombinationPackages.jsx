@@ -323,13 +323,13 @@ const CombinedTestScreen = () => {
     };
 
     return (
-        // 2. Wrapped the entire screen in LinearGradient
+   
         <LinearGradient
             colors={['#00b4db', '#fff', '#fff']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={styles.container}>
-                {/* 5. Set StatusBar to be transparent */}
+          
                 <StatusBar backgroundColor="transparent" barStyle="dark-content" translucent={true} />
                 <Header
                     key={cartRefreshKey}

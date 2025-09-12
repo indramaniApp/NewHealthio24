@@ -72,7 +72,7 @@ const originalCategories = [
 const categories = originalCategories.map(category => ({
     ...category,
     gradientColors: [category.iconColor, lightenColor(category.iconColor)],
-    iconColor: '#fff' 
+    iconColor: '#fff'
 }));
 
 const Home = ({ navigation }) => {
@@ -142,19 +142,19 @@ const Home = ({ navigation }) => {
             </View>
             <View style={styles.viewRight}>
                 <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-                 
-                    <MaterialCommunityIcons 
-                        name="bell-outline" 
-                        size={24} 
+
+                    <MaterialCommunityIcons
+                        name="bell-outline"
+                        size={24}
                         color={dark ? COLORS.white : COLORS.white}
-                        style={{ marginRight: 12 }} 
+                        style={{ marginRight: 12 }}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate("Favourite")}>
-                 
-                    <MaterialCommunityIcons 
-                        name="heart-outline" 
-                        size={24} 
+
+                    <MaterialCommunityIcons
+                        name="heart-outline"
+                        size={24}
                         color={dark ? COLORS.white : COLORS.white}
                     />
                 </TouchableOpacity>
@@ -191,8 +191,8 @@ const Home = ({ navigation }) => {
 
     const renderBanner = () => {
         const renderBannerItem = ({ item }) => (
-            <LinearGradient 
-                colors={['#0077b6','#00b4db']}
+            <LinearGradient
+                colors={['#0077b6', '#00b4db']}
                 style={styles.bannerContainer}>
                 <View style={styles.bannerTopContainer}>
                     <View>
@@ -270,7 +270,7 @@ const Home = ({ navigation }) => {
         <View style={styles.serviceCardsGridContainer}>
             <TouchableOpacity
                 onPress={() => navigation.navigate('TestBookingScreen')}
-                style={[styles.gridCard, { backgroundColor:"#00b4db", marginRight: 8 }]}>
+                style={[styles.gridCard, { backgroundColor: "#00b4db", marginRight: 8 }]}>
                 <View style={[styles.gridCardIconContainer, { backgroundColor: '#fff' }]}>
                     <MaterialCommunityIcons name="test-tube" size={24} color={'#0077b6'} />
                 </View>
@@ -314,7 +314,7 @@ const Home = ({ navigation }) => {
             </View>
         );
     };
-  
+
 
     const renderTopDoctors = () => (
         <View style={{ paddingHorizontal: 0.5, paddingTop: 12 }}>
@@ -367,7 +367,7 @@ const Home = ({ navigation }) => {
 
     return (
         <LinearGradient
-            colors={['#00b4db', '#fff','#fff','#fff','#ffff','#ffff']}
+            colors={['#00b4db', '#fff', '#fff', '#fff', '#ffff', '#ffff']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={styles.area}>
@@ -412,8 +412,8 @@ const styles = StyleSheet.create({
         height: 42,
         width: 42,
         backgroundColor: "#fff",
-        borderRadius:21,
-            flexDirection: "row",
+        borderRadius: 21,
+        flexDirection: "row",
         alignItems: "center",
     },
     viewRight: {
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Urbanist-Medium',
         textAlign: 'center',
         width: '95%',
-        color: COLORS.white, 
+        color: COLORS.white,
     },
     serviceCardsGridContainer: {
         flexDirection: 'row',
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 12,
     },
-   
+
     gridCard: {
         borderRadius: 20,
         padding: 15,
@@ -645,14 +645,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 2,
     },
-     headerContainer: {
+    headerContainer: {
         flexDirection: "row",
         width: SIZES.width - 32,
         justifyContent: "space-between",
         alignItems: "center"
     },
-  
-   
+
+
 });
 
 export default Home;

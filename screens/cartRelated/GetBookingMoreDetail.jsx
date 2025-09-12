@@ -16,7 +16,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
-import LinearGradient from 'react-native-linear-gradient'; // 1. Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient'; 
 import Header from '../../components/Header';
 
 const formatDateTime = (dateString) => {
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginLeft: 12,
-    color: '#fff', // 4. Changed text color to white
+    color: '#fff',
   },
   card: {
     backgroundColor: '#fff',
