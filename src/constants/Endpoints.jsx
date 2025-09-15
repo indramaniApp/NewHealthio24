@@ -5,6 +5,7 @@ export const ENDPOINTS = {
   LOGIN: 'api/user/authentication/login',
   patient_get_doctors: 'api/user/patients/patient_get_doctors',
   patient_get_all_doctors: 'api/user/patients/patient_get_all_doctors',
+  fcm_token: 'api/user/patients/fcm-token',
 
   patient_profile: 'api/user/patients/patient_profile',
   patient_book_appointment: 'api/user/patients/patient_book_appointment',

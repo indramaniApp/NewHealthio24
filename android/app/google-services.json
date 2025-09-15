@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "228283253528",
+    "project_id": "healthio24",
+    "storage_bucket": "healthio24.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228283253528:android:b0c583334104a74dd2546d",
+        "android_client_info": {
+          "package_name": "org.meditechhealthcare.healthio24"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB107q6LZ4NADQ6vtR_dr6LSKUFoLUIwb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

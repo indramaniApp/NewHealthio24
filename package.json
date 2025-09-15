@@ -21,6 +21,8 @@
     "@react-native-community/checkbox": "^0.5.20",
     "@react-native-community/geolocation": "^3.4.0",
     "@react-native-documents/picker": "^10.1.5",
+    "@react-native-firebase/app": "^23.3.1",
+    "@react-native-firebase/messaging": "^23.3.1",
     "@react-native-masked-view/masked-view": "github:react-native-masked-view/masked-view",
     "@react-native-picker/picker": "^2.11.1",
     "@react-native/new-app-screen": "0.81.0",
