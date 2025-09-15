@@ -1,4 +1,5 @@
-package com.healthio24
+package org.meditechhealthcare.healthio24;
+
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

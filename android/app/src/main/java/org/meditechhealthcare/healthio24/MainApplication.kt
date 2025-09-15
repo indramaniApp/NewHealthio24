@@ -1,4 +1,5 @@
-package com.healthio24
+package org.meditechhealthcare.healthio24;
+
 
 import android.app.Application
 import com.facebook.react.PackageList
