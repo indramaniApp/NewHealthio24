@@ -17,34 +17,22 @@ import Loader from './components/Loader';
 import { useSelector } from 'react-redux';
 import Orientation from 'react-native-orientation-locker';
 import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-reanimated';
-import ApiService from './src/api/ApiService';
-import { ENDPOINTS } from './src/constants/Endpoints';
-
-// ✅  your API helpers
-
 
 LogBox.ignoreAllLogs();
 
-/* ---------- Send FCM token to backend ---------- */
-const sendFcmToken = async (token) => {
-  try {
-    // true = need auth header (USER_TOKEN already stored)
-    await ApiService.post(ENDPOINTS.fcm_token, { fcmToken: token }, true, false);
-    console.log('📨 FCM token sent to backend');
-  } catch (err) {
-    console.error('❌ Failed to send FCM token:', err);
-  }
-};
+const FCM_STORAGE_KEY = 'FCM_TOKEN';
 
 const App = () => {
   const loading = useSelector((state) => state.loader.isLoading);
 
   useEffect(() => {
+    console.log('🔵 App mounted – starting FCM setup');
     Orientation.lockToPortrait();
 
-    /* ---- Android 13+ notification permission ---- */
     const requestAndroidPermission = async () => {
+      console.log('🔵 Checking Android POST_NOTIFICATIONS permission…');
       if (Platform.OS === 'android' && Platform.Version >= 33) {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
@@ -53,40 +41,82 @@ const App = () => {
       }
     };
 
-    /* ---- Ask FCM permission & send token ---- */
-    const requestUserPermission = async () => {
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    const getAndStoreFcmToken = async () => {
+      try {
+        console.log('🔵 Requesting messaging permission…');
+        const authStatus = await messaging().requestPermission();
+        console.log('🔵 messaging.requestPermission status:', authStatus);
 
-      if (enabled) {
-        const fcmToken = await messaging().getToken();
-        console.log('✅ FCM Token:', fcmToken);
-        // 🔹 Send to backend
-        sendFcmToken(fcmToken);
-      } else {
-        console.log('❌ Push notification permission not granted');
+        const enabled =
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+        if (!enabled) {
+          console.log('❌ Push notification permission not granted');
+          return;
+        }
+
+        console.log('🔵 Getting FCM token (device) …');
+        const token = await messaging().getToken();
+        console.log('🔵 messaging().getToken() result:', token);
+
+        if (token) {
+          await AsyncStorage.setItem(FCM_STORAGE_KEY, token);
+          console.log('✅ FCM token stored locally (AsyncStorage).');
+          // NOTE: Do NOT send to backend here. Send after successful login.
+        } else {
+          console.log('⚠️ messaging().getToken() returned null/empty.');
+        }
+      } catch (err) {
+        console.error('❌ Error getting/storing FCM token:', err);
       }
     };
 
-    requestAndroidPermission();
-    requestUserPermission();
+    getAndStoreFcmToken();
 
-    /* ---- Foreground message listener ---- */
+    // onTokenRefresh -> update local storage (so latest device token is available at login time)
+    const unsubscribeTokenRefresh = messaging().onTokenRefresh(async (newToken) => {
+      console.log('🔄 onTokenRefresh received new token:', newToken);
+      try {
+        await AsyncStorage.setItem(FCM_STORAGE_KEY, newToken);
+        console.log('✅ Refreshed token stored locally.');
+      } catch (e) {
+        console.error('❌ Failed to store refreshed token locally:', e);
+      }
+    });
+
+    // Foreground message handler
     const unsubscribeForeground = messaging().onMessage(async (remoteMessage) => {
-      Alert.alert('New FCM Message!', JSON.stringify(remoteMessage.notification));
+      console.log('🔔 Foreground message received:', remoteMessage);
+      Alert.alert(
+        remoteMessage.notification?.title || 'Notification',
+        remoteMessage.notification?.body || ''
+      );
     });
 
-    /* ---- Triggered when app opened from notification ---- */
+    // Background (when user taps a notification and app was in background)
     const unsubscribeOpened = messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log('Notification caused app to open:', remoteMessage);
+      console.log('📩 Notification opened from background:', remoteMessage);
+      // you can navigate based on remoteMessage.data here
     });
+
+    // Quit / Kill state (app opened by tapping notification)
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        if (remoteMessage) {
+          console.log('🚀 App opened from quit/kill state with message:', remoteMessage);
+          // handle initial notification
+        }
+      })
+      .catch((e) => console.error('❌ getInitialNotification error:', e));
 
     return () => {
-      Orientation.unlockAllOrientations();
+      console.log('🔵 Cleaning up FCM listeners in App.js');
       unsubscribeForeground();
       unsubscribeOpened();
+      unsubscribeTokenRefresh();
+      Orientation.unlockAllOrientations();
     };
   }, []);
 
