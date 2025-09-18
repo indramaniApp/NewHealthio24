@@ -1,4 +1,4 @@
-// App.js
+
 globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 
 import React, { useEffect } from 'react';
@@ -45,8 +45,7 @@ const App = () => {
       }
     };
 
-    requestAndroidPermission(); // 👈 MUST be called on launch
-
+    requestAndroidPermission(); 
     /* ✅ 2. Ask Firebase messaging permission & store token */
     const getAndStoreFcmToken = async () => {
       try {
@@ -118,7 +117,7 @@ const App = () => {
       .catch((e) => console.error('❌ getInitialNotification error:', e));
 
     return () => {
-      console.log('🔵 Cleaning up listeners');
+      console.log('🔵 Cleaning up listeners========');
       unsubscribeForeground();
       unsubscribeOpened();
       unsubscribeTokenRefresh();
