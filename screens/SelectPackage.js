@@ -14,7 +14,7 @@ const SelectPackage = ({ navigation, route }) => {
     const { colors, dark } = useTheme();
     let { startedDate, selectedHour, doctorId, method } = route?.params;
     console.log('=========method=========', method);
-    console.log('=========doctorId=========', doctorId);
+    console.log('=========doctorId=========id', doctorId);
     const [selectedItem, setSelectedItem] = useState(null);
 
     const renderContent = () => {
@@ -30,7 +30,7 @@ const SelectPackage = ({ navigation, route }) => {
             <View>
                 <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>Select Package</Text>
                 <View style={{
-                    // 5. Set background to transparent to see the gradient
+             
                     backgroundColor: 'transparent',
                     paddingTop: 12
                 }}>
@@ -61,7 +61,7 @@ const SelectPackage = ({ navigation, route }) => {
     };
 
     return (
-        // 2. Wrap the entire screen in LinearGradient
+ 
         <LinearGradient
             colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
             style={{ flex: 1 }}

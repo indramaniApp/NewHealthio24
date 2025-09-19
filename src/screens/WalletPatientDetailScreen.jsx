@@ -25,7 +25,7 @@ const WalletPatientDetailScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
   const { startedDate, selectedHour, selectedItem, doctorId } = route?.params;
-
+console.log('doctorId=======', doctorId);
   const [patient_age, setPatient_Age] = useState('');
   const [patient_gender, setPatient_Gender] = useState(null);
   const [patient_name, setPatient_Name] = useState('');

@@ -1,3 +1,4 @@
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,18 +8,17 @@ import {
   FlatList,
   TextInput,
 } from 'react-native';
-import React, { useState, useCallback } from 'react';
-import { useTheme } from '../theme/ThemeProvider';
-import { COLORS, SIZES, icons } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
+import { useTheme } from '../theme/ThemeProvider';
+import { COLORS, SIZES, icons } from '../constants';
 import { useFocusEffect } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import ApiService from './api/ApiService';
 import { ENDPOINTS } from './constants/Endpoints';
 import { hideLoader, showLoader } from './redux/slices/loaderSlice';
 import HorizontalDoctorCard from '../components/HorizontalDoctorCard';
-import Header from '../components/Header'; 
+import Header from '../components/Header';
 
 const SeeAllDoctorList = ({ navigation }) => {
   const { colors, dark } = useTheme();
@@ -50,10 +50,12 @@ const SeeAllDoctorList = ({ navigation }) => {
   );
 
   const renderSearchBar = () => (
-    <View style={[
-      styles.searchWrapper,
-      { backgroundColor: dark ? '#2A2A2A' : '#F5F7FA' },
-    ]}>
+    <View
+      style={[
+        styles.searchWrapper,
+        { backgroundColor: dark ? '#2A2A2A' : '#F5F7FA' },
+      ]}
+    >
       <Image source={icons.search} style={styles.searchIcon} />
       <TextInput
         placeholder="Search doctors, hospitals..."
@@ -69,7 +71,7 @@ const SeeAllDoctorList = ({ navigation }) => {
     <View style={{ marginTop: 12 }}>
       <FlatList
         data={filteredDoctors}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id?.toString()}
         renderItem={({ item }) => (
           <HorizontalDoctorCard
             name={item.fullName}
@@ -82,27 +84,8 @@ const SeeAllDoctorList = ({ navigation }) => {
             rating={item.average_rating}
             numReviews={item.rating_total_count}
             isAvailable={item.isAvailable}
-            onPress={() =>
-              navigation.navigate('DoctorDetails', {
-                fullName: item.fullName,
-                yearsOfExperience: item.yearsOfExperience,
-                specialization: item.specialization,
-                doctorRating: item.doctorRating,
-                doctorId: item._id,
-                streetAddress: item.streetAddress,
-                average_rating: item.average_rating,
-                rating_total_count: item.rating_total_count,
-                about_me: item.about_me,
-                consultationDate: item.consultationDate,
-                consultationTime: item.consultationTime,
-                previous_OPD_Number: item.previous_OPD_Number,
-                reviews: item.reviews,
-                consultationTimeVideo: item.consultationTimeVideo,
-                consultationTimeAudio: item.consultationTimeAudio,
-                consultationTimeHomeVisit: item.consultationTimeHomeVisit,
-                profilePhoto: item.profilePhoto,
-              })
-            }
+            // ✅ pura doctor object params me send
+            onPress={() => navigation.navigate('DoctorDetails', { doctor: item })}
           />
         )}
       />

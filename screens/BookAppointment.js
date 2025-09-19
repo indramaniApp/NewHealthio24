@@ -157,7 +157,7 @@ console.log('doctorId====',doctorId);
 };
 
 const styles = StyleSheet.create({
-    // 👇 4. Styles में से बैकग्राउंड कलर हटा दिया गया
+   
     area: { flex: 1 },
     container: { flex: 1, padding: 16 },
     title: {
