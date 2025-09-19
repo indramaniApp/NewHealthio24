@@ -21,6 +21,7 @@ const CategoriesScreen = ({ route }) => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { categoryName } = route.params;
+    console.log('categoryName=========', categoryName);
 
     const getEndpointByCategory = () => {
     
@@ -32,7 +33,7 @@ const CategoriesScreen = ({ route }) => {
             case 'Neurologist': return ENDPOINTS.patient_get_doctors_neuro_surgeon;
             case 'Child Specialist': return ENDPOINTS.patient_get_doctors_child_specialist;
             case 'ENT Surgeon': return ENDPOINTS.patient_get_doctors_ent_surgeon;
-            case 'Stomatch Specilist': return ENDPOINTS.patient_get_doctors_stomach_specialist;
+            case 'Stomach Specialist': return ENDPOINTS.patient_get_doctors_stomach_specialist;
             case 'Women Health': return ENDPOINTS.patient_get_doctors_women_health;
             case 'Skin & Hair': return ENDPOINTS.patient_get_doctors_skin_hair;
             case 'Kidney Specilist': return ENDPOINTS.patient_get_doctors_kidney_specialist;
