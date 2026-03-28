@@ -19,6 +19,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.graphics.Color;
+import androidx.core.app.NotificationCompat;
 
 public class CallForegroundService extends Service {
 
@@ -67,26 +68,26 @@ public class CallForegroundService extends Service {
                 this, 2, declineIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
+        // Use Spannable text to explicitly set Green/Red text colors natively on the standard UI
         Spannable declineText = new SpannableString("Decline");
-        declineText.setSpan(new ForegroundColorSpan(Color.parseColor("#ff4444")), 0, declineText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        declineText.setSpan(new ForegroundColorSpan(Color.parseColor("#ff3333")), 0, declineText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         Spannable acceptText = new SpannableString("Accept");
         acceptText.setSpan(new ForegroundColorSpan(Color.parseColor("#00C851")), 0, acceptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        Notification.Builder builder = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? 
-                new Notification.Builder(this, "call_channel") : new Notification.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "call_channel");
 
         Notification notification = builder
                 .setContentTitle("Incoming Video Call")
                 .setContentText(doctorName + " is calling...")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setFullScreenIntent(fullScreenPendingIntent, true)
-                .setCategory(Notification.CATEGORY_CALL)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setPriority(Notification.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
-                .addAction(new Notification.Action.Builder(null, declineText, declinePendingIntent).build())
-                .addAction(new Notification.Action.Builder(null, acceptText, acceptPendingIntent).build())
+                .addAction(new NotificationCompat.Action.Builder(0, declineText, declinePendingIntent).build())
+                .addAction(new NotificationCompat.Action.Builder(0, acceptText, acceptPendingIntent).build())
                 .build();
 
         // 🛡️ Start Foreground for Android 14+ support using SHORT_SERVICE
