@@ -120,7 +120,7 @@ const DialysisBookByPayment = ({ route, navigation }) => {
     return (
      
         <LinearGradient
-            colors={['#00b4db', '#fff', '#fff']}
+            colors={['#fff', '#fff', '#fff']}
             style={styles.container}
         >
             <SafeAreaView style={{ flex: 1 }}>
@@ -188,19 +188,19 @@ const DialysisBookByPayment = ({ route, navigation }) => {
                         placeholderTextColor="#9CA3AF"
                     />
 
-                    <Text style={styles.label}>Referral ID (Optional)</Text>
+                    {/* <Text style={styles.label}>Referral ID (Optional)</Text>
                     <TextInput
                         style={styles.input}
                         value={referralId}
                         onChangeText={setReferralId}
                         placeholder="Enter Referral ID"
                         placeholderTextColor="#9CA3AF"
-                    />
+                    /> */}
 
                 
                     <TouchableOpacity onPress={handleSubmit}>
                         <LinearGradient
-                            colors={[COLORS.primary, '#0077b6']}
+                            colors={[COLORS.primary, '#28aff8']}
                             style={styles.button}
                         >
                             <Text style={styles.buttonText}>Proceed to Payment</Text>

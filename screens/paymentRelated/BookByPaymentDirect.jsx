@@ -24,7 +24,7 @@ import { useTheme } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Header from '../../components/Header'; 
 
-const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
+const RAZORPAY_KEY_ID = 'rzp_live_RQTJU3bg9xBPn0';
 
 const BookByPaymentDirect = ({ route }) => {
   const { colors, dark } = useTheme();
@@ -237,14 +237,14 @@ const BookByPaymentDirect = ({ route }) => {
           </TouchableOpacity>
 
           {/* 6. Added Referral ID Input Field */}
-          <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+          {/* <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
           <TextInput
             placeholder="Enter referral ID"
             placeholderTextColor={placeholderColor}
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
             value={appointmentDetails.referral_id}
             onChangeText={text => handleChange('referral_id', text)}
-          />
+          /> */}
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: isFormValid ? '#00b4db' : '#ccc' }]}

@@ -7,7 +7,6 @@ import {
     SafeAreaView,
     Platform,
     StatusBar,
-    useColorScheme,
     ScrollView,
     TouchableOpacity,
 } from 'react-native';
@@ -16,19 +15,85 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-
-// 1. LinearGradient को इम्पोर्ट करें
 import LinearGradient from 'react-native-linear-gradient';
 
-import Header from '../../../components/Header';
 import { COLORS } from '../../../constants/theme';
 import ApiService from '../../../src/api/ApiService';
 import { ENDPOINTS } from '../../../src/constants/Endpoints';
 
-const ICON_COLOR = '#246BFD';
-const CIRCLE_BG = 'rgba(36, 107, 253, 0.08)';
-const CARD_BG = '#fff';
+const ICON_COLOR = '#6A1B9A'; // Dark purple
+const CARD_BG = '#F3E5F5'; // Light lilac background
 
+// Gradient-enabled Header with circular back & cart icons
+const Header = ({ title, showCart, cartCount, onBackPress, onCartPress, titleColor }) => {
+    return (
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 40 }}>
+            {/* Back button in circle */}
+            <TouchableOpacity onPress={onBackPress}>
+                <LinearGradient
+                    colors={['#F06292', '#6A1B9A']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Icon name="arrow-left" size={18} color="#fff" />
+                </LinearGradient>
+            </TouchableOpacity>
+
+            <Text style={{ flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 'bold', color: titleColor || '#000' }}>
+                {title}
+            </Text>
+
+            {/* Cart icon with gradient */}
+            {showCart && (
+                <TouchableOpacity onPress={onCartPress}>
+                    <LinearGradient
+                        colors={['#F06292', '#6A1B9A']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 18,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Icon name="shopping-cart" size={20} color="#fff" />
+                        {cartCount > 0 && (
+                            <View
+                                style={{
+                                    position: 'absolute',
+                                    top: -4,
+                                    right: -4,
+                                    backgroundColor: '#FFD700',
+                                    borderRadius: 8,
+                                    paddingHorizontal: 4,
+                                    minWidth: 16,
+                                    height: 16,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Text style={{ color: '#000', fontSize: 10, fontWeight: 'bold' }}>
+                                    {cartCount}
+                                </Text>
+                            </View>
+                        )}
+                    </LinearGradient>
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+};
+
+// Test types & categories (same as before)
 const testTypes = [
     { id: '1', name: 'CBC', icon: 'clipboard-list' },
     { id: '2', name: 'ESR', icon: 'speedometer' },
@@ -115,7 +180,6 @@ const getScreenNameFromCategory = (category) => {
 };
 
 const PathologyScreen = () => {
-    const isDarkMode = useColorScheme() === 'dark';
     const [searchQuery, setSearchQuery] = useState('');
     const [cartCount, setCartCount] = useState(0);
     const navigation = useNavigation();
@@ -134,9 +198,11 @@ const PathologyScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-         
+            
             <LinearGradient
-                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
+                colors={['#fff', '#fff', '#fff']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
                 style={{ flex: 1 }}
             >
                 <Header
@@ -145,11 +211,11 @@ const PathologyScreen = () => {
                     cartCount={cartCount}
                     onBackPress={() => navigation.goBack()}
                     onCartPress={() => navigation.navigate('CartScreen')}
-                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
+                    titleColor="#6A1B9A"
                 />
 
                 <View style={styles.searchBarWrapper}>
-                    <Icon name="search" size={16} style={styles.searchIcon} />
+                    <Icon name="search" size={16} style={[styles.searchIcon, { color: ICON_COLOR }]} />
                     <TextInput
                         placeholder="Search tests..."
                         placeholderTextColor="#999"
@@ -172,27 +238,36 @@ const PathologyScreen = () => {
                         return (
                             <TouchableOpacity
                                 key={category}
-                                style={styles.card}
+                                style={[styles.card, { backgroundColor: CARD_BG }]}
                                 onPress={() => navigation.navigate(getScreenNameFromCategory(category))}
                             >
-                                <Text style={styles.cardTitle}>{category} ({filteredTests.length})</Text>
+                                <Text style={[styles.cardTitle, { color: ICON_COLOR }]}>{category} ({filteredTests.length})</Text>
                                 <View style={styles.testGrid}>
                                     {filteredTests.map(test => (
                                         <View key={test.id} style={styles.testItem}>
-                                            <View style={styles.iconCircle}>
+                                            <LinearGradient
+                                                colors={['#E1BEE7', '#CE93D8']}
+                                                style={styles.iconCircle}
+                                            >
                                                 {renderIcon(test.icon, test.library, ICON_COLOR, 20)}
-                                            </View>
-                                            <Text style={styles.testLabel} numberOfLines={2}>
+                                            </LinearGradient>
+                                            <Text style={[styles.testLabel, { color: '#4A148C' }]} numberOfLines={2}>
                                                 {test.name}
                                             </Text>
                                         </View>
                                     ))}
                                 </View>
                                 <TouchableOpacity
-                                    style={styles.cardButton}
                                     onPress={() => navigation.navigate(getScreenNameFromCategory(category))}
                                 >
-                                    <Text style={styles.cardButtonText}>Check Details & Book tests</Text>
+                                    <LinearGradient
+                                        colors={['#F06292', '#6A1B9A']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                        style={styles.cardButton}
+                                    >
+                                        <Text style={[styles.cardButtonText, { color: '#fff' }]}>Check Details & Book tests</Text>
+                                    </LinearGradient>
                                 </TouchableOpacity>
                             </TouchableOpacity>
                         );
@@ -221,71 +296,23 @@ const styles = StyleSheet.create({
         backgroundColor: '#F0F6FF',
         alignSelf: 'center',
     },
-    searchIcon: {
-        marginRight: 10,
-        color: COLORS.primary,
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 15,
-        color: COLORS.black,
-    },
+    searchIcon: { marginRight: 10 },
+    searchInput: { flex: 1, fontSize: 15, color: COLORS.black },
     card: {
-        backgroundColor: CARD_BG,
         borderRadius: 16,
         padding: 16,
         marginBottom: 20,
         shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.22,
-        shadowRadius: 2.22,
-        elevation: 3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 4,
     },
-    cardTitle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        marginBottom: 12,
-        color: COLORS.primary,
-    },
-    testGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-    },
-    testItem: {
-        width: '20%',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    iconCircle: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: '#E8F0FF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 6,
-    },
-    testLabel: {
-        fontSize: 12,
-        textAlign: 'center',
-        color: COLORS.greyscale900,
-        fontWeight: '500',
-    },
-    cardButton: {
-        marginTop: 12,
-        alignSelf: 'center',
-        backgroundColor: '#E0ECFF',
-        borderRadius: 24,
-        paddingHorizontal: 24,
-        paddingVertical: 10,
-    },
-    cardButtonText: {
-        color: '#1A5AC3',
-        fontWeight: '600',
-        fontSize: 13,
-    },
+    cardTitle: { fontSize: 15, fontWeight: 'bold', marginBottom: 12 },
+    testGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' },
+    testItem: { width: '20%', alignItems: 'center', marginBottom: 16 },
+    iconCircle: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
+    testLabel: { fontSize: 12, textAlign: 'center', fontWeight: '500' },
+    cardButton: { marginTop: 12, alignSelf: 'center', borderRadius: 24, paddingHorizontal: 24, paddingVertical: 10 },
+    cardButtonText: { fontWeight: '600', fontSize: 13 },
 });

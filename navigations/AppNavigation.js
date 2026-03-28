@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'; // 👈 1. Added createNavigationContainerRef
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'react-native';
@@ -60,7 +60,7 @@ import BookByWalletDirect from '../screens/paymentRelated/BookByWalletDirect';
 import BookByPaymentDirect from '../screens/paymentRelated/BookByPaymentDirect';
 import ReciptScreen from '../screens/reciptScreens/ReciptScreen';
 import SingleTestSelectSlot from '../screens/testbookingScreens/SingleTestSelectSlot';
-
+import SplashScreen from '../screens/SplashScreen'
 import SingleTestBookByWallet from '../screens/testbookingScreens/SigleTestBookByWallet';
 import SingleTestBookyByPayment from '../screens/testbookingScreens/SingleTestBookPayment';
 import PackagesTestSelectSlot from '../screens/testbookingScreens/PackagesTestSelectSlot';
@@ -96,10 +96,14 @@ import ScheduleReceipt from '../screens/patientMitraRelatedScreens/ScheduleRecei
 import CompletedReceipt from '../screens/patientMitraRelatedScreens/CompletedReceipt';
 import Physiotherapy from '../src/screens/DrawerRelatedScreens/Physiotherapy';
 import Dialysis from '../src/screens/DrawerRelatedScreens/Dialysis';
-
-
+import VideoAppointments from '../src/screens/videoRelated/VideoAppointments'
+import PatientVideoCallScreen from '../src/screens/videoRelated/PatientVideoCallScreen'
+import DrawerNavigator from './DrawerNavigation';
 
 const Stack = createNativeStackNavigator();
+
+// 👈 2. Create and Export the navigationRef
+export const navigationRef = createNavigationContainerRef();
 
 const AppNavigation = () => {
   const [isFirstLaunch, setIsFirstLaunch] = useState(null)
@@ -145,7 +149,8 @@ const MyTheme = {
 };
 
   return (
-    <NavigationContainer theme={MyTheme}>
+    // 👈 3. Attach the ref to NavigationContainer
+    <NavigationContainer theme={MyTheme} ref={navigationRef}> 
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -158,10 +163,8 @@ const MyTheme = {
         <Stack.Screen name="Onboarding2" component={Onboarding2} />
         <Stack.Screen name="Onboarding3" component={Onboarding3} />
         <Stack.Screen name="Onboarding4" component={Onboarding4} />
-        {/* <Stack.Screen name="Welcome" component={Welcome} /> */}
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="OTP" component={OTPScreen} />
-
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen name="ForgotPasswordMethods" component={ForgotPasswordMethods} />
         <Stack.Screen name="ForgotPasswordEmail" component={ForgotPasswordEmail} />
@@ -170,8 +173,7 @@ const MyTheme = {
         <Stack.Screen name="CreateNewPassword" component={CreateNewPassword} />
         <Stack.Screen name="FillYourProfile" component={FillYourProfile} />
         <Stack.Screen name="CreateNewPIN" component={CreateNewPIN} />
-        {/* <Stack.Screen name="Fingerprint" component={Fingerprint} /> */}
-        <Stack.Screen name="Main" component={BottomTabNavigation} />
+        <Stack.Screen name="Main" component={DrawerNavigator} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="SettingsNotifications" component={SettingsNotifications} />
         <Stack.Screen name='SettingsPayment' component={SettingsPayment} />
@@ -273,6 +275,7 @@ const MyTheme = {
         <Stack.Screen name="SingleTestSelectSlot" component={SingleTestSelectSlot} />
         <Stack.Screen name="SingleTestBookByWallet" component={SingleTestBookByWallet} />
         <Stack.Screen name="SingleTestBookyByPayment" component={SingleTestBookyByPayment} />
+        <Stack.Screen name="SingleTestBookByPayment" component={SingleTestBookyByPayment} />
         <Stack.Screen name="PackagesTestSelectSlot" component={PackagesTestSelectSlot} />
         <Stack.Screen name="PackagesTestBookByWallet" component={PackagesTestBookByWallet} />
         <Stack.Screen name="PackagesTestBookByPament" component={PackagesTestBookByPament} />
@@ -303,70 +306,14 @@ const MyTheme = {
         <Stack.Screen name="CompletedMoreDetail" component={CompletedMoreDetail} />
         <Stack.Screen name="ScheduleReceipt" component={ScheduleReceipt} />
         <Stack.Screen name="CompletedReceipt" component={CompletedReceipt} />
-         <Stack.Screen name="Physiotherapy" component={Physiotherapy} />
-                  <Stack.Screen name="Dialysis" component={Dialysis} />
-           
-
-
-
+        <Stack.Screen name="Physiotherapy" component={Physiotherapy} />
+        <Stack.Screen name="Dialysis" component={Dialysis} />
+        <Stack.Screen name="VideoAppointments" component={VideoAppointments} />
+        <Stack.Screen name="PatientVideoCallScreen" component={PatientVideoCallScreen} />
+        <Stack.Screen name="Splash" component={SplashScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
 }
 
-export default AppNavigation
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default AppNavigation;

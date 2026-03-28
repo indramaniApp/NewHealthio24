@@ -98,9 +98,16 @@ const CompleteBloodTests = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <StatusBar
+                barStyle="dark-content"
+                backgroundColor="transparent"
+                translucent
+            />
             <LinearGradient
-                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
-                style={{ flex: 1 }}
+                colors={['#fff', '#fff', '#fff']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.gradientBackground}
             >
                 <Header
                     title="Complete Blood Tests"
@@ -108,7 +115,7 @@ const CompleteBloodTests = () => {
                     cartCount={cartCount}
                     onBackPress={() => navigation.goBack()}
                     onCartPress={() => navigation.navigate('CartScreen')}
-                    style={{ backgroundColor: 'transparent', marginTop: 40 }}
+                    titleColor="#6A1B9A"
                 />
 
                 <ScrollView
@@ -133,11 +140,18 @@ const CompleteBloodTests = () => {
                                     colors={['#FFFFFF', '#F9FAFB']}
                                     style={styles.testCard}
                                 >
-                                    <View style={styles.accentStrip} />
+                                    {/* Gradient Accent Strip */}
+                                    <LinearGradient
+                                        colors={['#F06292', '#6A1B9A']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 0, y: 1 }}
+                                        style={{ width: 6 }}
+                                    />
+
                                     <View style={styles.cardContent}>
                                         <View style={{ flex: 1 }}>
                                             <Text style={styles.testName}>
-                                                <Icon name="flask-outline" size={16} color={COLORS.primary} /> {item.testDescription?.testName}
+                                                <Icon name="flask-outline" size={16} color="#6A1B9A" /> {item.testDescription?.testName}
                                             </Text>
                                             {item.testDescription?.description ? (
                                                 <Text style={styles.testDescription}>
@@ -153,30 +167,44 @@ const CompleteBloodTests = () => {
                                                 <Text style={styles.priceTagText}>
                                                     ₹{item.testDescription?.testFee}
                                                 </Text>
+
+                                                {/* % OFF Gradient Badge */}
                                                 {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
-                                                    <Text style={styles.discountText}>
-                                                        {Math.round(
-                                                            ((item.testDescription?.higherTestFee - item.testDescription?.testFee) /
-                                                                item.testDescription?.higherTestFee) * 100
-                                                        )}% OFF
-                                                    </Text>
+                                                    <LinearGradient
+                                                        colors={['#F06292', '#6A1B9A']}
+                                                        start={{ x: 0, y: 0 }}
+                                                        end={{ x: 1, y: 0 }}
+                                                        style={styles.discountBadge}
+                                                    >
+                                                        <Text style={styles.discountText}>
+                                                            {Math.round(
+                                                                ((item.testDescription?.higherTestFee - item.testDescription?.testFee) /
+                                                                    item.testDescription?.higherTestFee) * 100
+                                                            )}% OFF
+                                                        </Text>
+                                                    </LinearGradient>
                                                 )}
                                             </View>
                                         </View>
 
                                         <View style={styles.buttonColumn}>
+                                            {/* Add to Cart Gradient Button */}
                                             <TouchableOpacity onPress={() => handleAddToCart(item._id)}>
                                                 <LinearGradient
-                                                    colors={['#E9F1FF', '#D4E2FF']}
+                                                    colors={['#E1BEE7', '#CE93D8']}
+                                                    start={{ x: 0, y: 0 }}
+                                                    end={{ x: 1, y: 1 }}
                                                     style={styles.cartBtn}
                                                 >
-                                                    <Icon name="cart-plus" size={16} color={COLORS.primary} />
+                                                    <Icon name="cart-plus" size={16} color="#6A1B9A" />
                                                     <Text style={styles.cartText}>Add</Text>
                                                 </LinearGradient>
                                             </TouchableOpacity>
+
+                                            {/* Book Test Gradient Button */}
                                             <TouchableOpacity onPress={() => navigation.navigate('SingleTestSelectSlot', { testId: item._id })}>
                                                 <LinearGradient
-                                                    colors={['#00b4db', '#0077b6']}
+                                                    colors={['#F06292', '#6A1B9A']}
                                                     start={{ x: 0, y: 0 }}
                                                     end={{ x: 1, y: 1 }}
                                                     style={styles.bookBtn}
@@ -201,6 +229,10 @@ export default CompleteBloodTests;
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: '#EDE7F6', // fallback
+    },
+    gradientBackground: {
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
@@ -236,21 +268,17 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         overflow: 'hidden',
     },
-    accentStrip: {
-        width: 6,
-        backgroundColor: '#00b4db',
-    },
     cardContent: {
         flex: 1,
         padding: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: 'transparent', 
+        backgroundColor: 'transparent',
     },
     testName: {
         fontSize: 15,
         fontWeight: '700',
-        color: COLORS.primary,
+        color: '#6A1B9A',
         marginBottom: 4,
     },
     testDescription: {
@@ -270,16 +298,20 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         alignSelf: 'flex-start',
     },
+    discountBadge: {
+        borderRadius: 6,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+    },
     discountText: {
         fontSize: 12,
-        color: '#10b981',
+        color: '#fff',
         fontWeight: '700',
-        marginLeft: 6,
     },
     priceTagText: {
         fontSize: 13,
         fontWeight: '600',
-        color: COLORS.primary,
+        color: '#6A1B9A',
     },
     cutPrice: {
         fontSize: 13,
@@ -297,12 +329,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 20,
-        marginBottom: 10, // Added space between buttons
-        minWidth: 80, // Ensure buttons have a consistent width
+        borderRadius: 24,
+        marginBottom: 10,
+        minWidth: 80,
     },
     cartText: {
-        color: COLORS.primary,
+        color: '#6A1B9A',
         fontSize: 13,
         marginLeft: 6,
         fontWeight: '600',
@@ -313,8 +345,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 20,
-        minWidth: 80, // Ensure buttons have a consistent width
+        borderRadius: 24,
+        minWidth: 80,
     },
     bookText: {
         color: '#fff',

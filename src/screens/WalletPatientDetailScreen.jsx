@@ -4,7 +4,8 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Alert
+  Alert,
+  StatusBar
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
@@ -25,7 +26,7 @@ const WalletPatientDetailScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
   const { startedDate, selectedHour, selectedItem, doctorId } = route?.params;
-console.log('doctorId=======', doctorId);
+console.log('doctorId=======idssdjfs===', doctorId);
   const [patient_age, setPatient_Age] = useState('');
   const [patient_gender, setPatient_Gender] = useState(null);
   const [patient_name, setPatient_Name] = useState('');
@@ -78,9 +79,10 @@ console.log('doctorId=======', doctorId);
 
   const renderContent = () => (
     <View>
-      <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>
-        Patient Name
-      </Text>
+   <Text style={[styles.title, { color: '#FFFFFF' }]}>
+    Patient Name
+</Text>
+
       <View style={[styles.inputContainer, { backgroundColor: dark ? COLORS.dark2 : COLORS.tertiaryWhite }]}>
         <TextInput
           style={[styles.picker, { color: dark ? COLORS.grayscale200 : COLORS.greyscale900 }]}
@@ -127,7 +129,7 @@ console.log('doctorId=======', doctorId);
         />
       </View>
 
-      <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>
+      {/* <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>
         Referral ID (Optional)
       </Text>
       <View style={[styles.inputContainer, { backgroundColor: dark ? COLORS.dark2 : COLORS.tertiaryWhite }]}>
@@ -138,18 +140,28 @@ console.log('doctorId=======', doctorId);
           value={referralId}
           onChangeText={setReferralId}
         />
-      </View>
+      </View> */}
     </View>
   );
 
   return (
     <LinearGradient
-      colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
+      colors={['#001F3F', '#003366', '#fff', '#fff', '#fff', '#fff', '#fff']}
       style={{ flex: 1 }}
     >
+      <StatusBar
+  backgroundColor="#001F3F"
+  barStyle="light-content"
+/>
       <SafeAreaView style={styles.area}>
         {/* Header fix upar */}
-        <Header title="Patient Details" onBackPress={() => navigation.goBack()} />
+       <Header
+    title="Patient Details"
+    onBackPress={() => navigation.goBack()}
+    titleStyle={{ color: '#FFFFFF' }}
+    bottomLineStyle={{ backgroundColor: 'transparent' }} // optional
+/>
+
 
         {/* ScrollView header ke niche start hoga */}
         <KeyboardAwareScrollView

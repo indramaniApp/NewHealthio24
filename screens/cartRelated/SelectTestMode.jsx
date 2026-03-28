@@ -18,7 +18,6 @@ import { useDispatch } from 'react-redux';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import ApiService from '../../src/api/ApiService';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
-// Import LinearGradient
 import LinearGradient from 'react-native-linear-gradient';
 import Header from '../../components/Header';
 
@@ -40,6 +39,12 @@ const SelectTestMode = ({ route }) => {
     patient_age: patient_age || '',
     patient_gender: patient_gender || '',
   });
+// Format date function
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const [year, month, day] = dateString.split('-');
+  return `${day}-${month}-${year}`;
+};
 
   const handleChange = (key, value) => {
     setAppointmentDetails(prev => ({
@@ -85,7 +90,6 @@ const SelectTestMode = ({ route }) => {
   ];
 
   const selectedModeLabel = modeOptions.find(opt => opt.value === selectedMode)?.label || 'Select Mode';
-
   const isFormValid =
     appointmentDetails.patient_name &&
     appointmentDetails.patient_age &&
@@ -93,21 +97,21 @@ const SelectTestMode = ({ route }) => {
     selectedMode;
 
   return (
-
-    <LinearGradient colors={['#caeefc', '#ffffff']} style={styles.flexContainer}>
+    <LinearGradient colors={['#fff', '#fff']} style={styles.flexContainer}>
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} backgroundColor={'transparent'} translucent />
 
         {/* Header */}
-      <Header title="Patient Details" onBackPress={() => navigation.goBack()} 
+        <Header title="Patient Details" onBackPress={() => navigation.goBack()} 
                 titleStyle={{ color: colors.text }}
                 style={{ backgroundColor: 'transparent', marginTop: 40 }}/>
 
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
           <View style={[styles.card, { backgroundColor: colors.card }]}>
             <Text style={[styles.text, { color: colors.text }]}>
-              📅 Date: {appointmentDetails.appointment_request_date || 'Not selected'}
-            </Text>
+  📅 Date: {formatDate(appointmentDetails.appointment_request_date) || 'Not selected'}
+</Text>
+
             <Text style={[styles.text, { color: colors.text }]}>
               ⏰ Time: {appointmentDetails.appointment_time || 'Not selected'}
             </Text>
@@ -118,7 +122,7 @@ const SelectTestMode = ({ route }) => {
           <TextInput
             placeholder="Enter patient name"
             placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
-            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+            style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: '#6A1B9A' }]}
             value={appointmentDetails.patient_name}
             onChangeText={text => handleChange('patient_name', text)}
           />
@@ -129,14 +133,14 @@ const SelectTestMode = ({ route }) => {
             placeholder="Enter age"
             placeholderTextColor={colors.placeholder || (dark ? '#aaa' : '#666')}
             keyboardType="number-pad"
-            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+            style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: '#6A1B9A' }]}
             value={appointmentDetails.patient_age}
             onChangeText={text => handleChange('patient_age', text)}
           />
 
           {/* Gender */}
           <Text style={[styles.label, { color: colors.text }]}>Gender</Text>
-          <View style={[styles.pickerContainer, { backgroundColor: colors.card }]}>
+          <View style={[styles.pickerContainer, { backgroundColor: colors.card, borderColor: '#6A1B9A' }]}>
             <Picker
               selectedValue={appointmentDetails.patient_gender}
               onValueChange={value => handleChange('patient_gender', value)}
@@ -153,7 +157,7 @@ const SelectTestMode = ({ route }) => {
           {/* Mode */}
           <Text style={[styles.label, { color: colors.text }]}>Choose Mode</Text>
           <TouchableOpacity
-            style={[styles.pickerBox, { backgroundColor: colors.card }]}
+            style={[styles.pickerBox, { backgroundColor: colors.card, borderColor: '#6A1B9A' }]}
             onPress={() => setModeModalVisible(true)}
           >
             <Text style={{ fontSize: 16, color: selectedMode ? colors.text : colors.placeholder || '#999' }}>
@@ -162,14 +166,14 @@ const SelectTestMode = ({ route }) => {
             <Icon name="chevron-down" size={20} color={colors.text} />
           </TouchableOpacity>
 
-          {/* Proceed to Pay Button with LinearGradient */}
+          {/* Proceed to Pay Button */}
           <TouchableOpacity
             onPress={handleSubmit}
             disabled={!isFormValid}
             style={styles.buttonWrapper}
           >
             <LinearGradient
-              colors={isFormValid ? ['#0077b6', '#00b4db'] : ['#B0B0B0', '#9E9E9E']}
+              colors={isFormValid ? ['#6A1B9A', '#AB47BC'] : ['#B0B0B0', '#9E9E9E']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.button}
@@ -224,94 +228,19 @@ const SelectTestMode = ({ route }) => {
 export default SelectTestMode;
 
 const styles = StyleSheet.create({
-  flexContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: StatusBar.currentHeight, // Adjust for translucent status bar
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    marginBottom: 16,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: { fontSize: 18, fontWeight: 'bold' },
-  card: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    elevation: 3,
-  },
+  flexContainer: { flex: 1 },
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: StatusBar.currentHeight },
+  card: { padding: 16, borderRadius: 12, marginBottom: 24, elevation: 3 },
   text: { fontSize: 16, marginBottom: 6 },
   label: { fontSize: 16, marginBottom: 6, fontWeight: '600', marginLeft: 4 },
-  input: {
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd'
-  },
-  pickerContainer: {
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#ddd'
-  },
-  pickerBox: {
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 24,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd'
-  },
-  buttonWrapper: {
-    borderRadius: 8,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
+  input: { borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 16, borderWidth: 1 },
+  pickerContainer: { borderRadius: 8, overflow: 'hidden', marginBottom: 24, borderWidth: 1 },
+  pickerBox: { borderRadius: 8, padding: 12, marginBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1 },
+  buttonWrapper: { borderRadius: 8, marginTop: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 5 },
+  button: { paddingVertical: 14, borderRadius: 8, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBox: {
-    borderRadius: 10,
-    width: '80%',
-    paddingVertical: 10,
-    elevation: 5,
-  },
-  modalItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  modalItemText: {
-    fontSize: 16,
-  },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
+  modalBox: { borderRadius: 10, width: '80%', paddingVertical: 10, elevation: 5 },
+  modalItem: { paddingVertical: 12, paddingHorizontal: 16 },
+  modalItemText: { fontSize: 16 },
 });

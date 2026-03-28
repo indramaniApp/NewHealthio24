@@ -186,14 +186,14 @@ const BookByWalletDirect = ({ route }) => {
             <Icon name="chevron-down" size={20} color={colors.text} />
           </TouchableOpacity>
           {/* 2. Added Referral ID Input Field */}
-          <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+          {/* <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
           <TextInput
             placeholder="Enter referral ID"
             placeholderTextColor={placeholderColor}
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
             value={appointmentDetails.referral_id}
             onChangeText={text => handleChange('referral_id', text)}
-          />
+          /> */}
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: isFormValid ? '#007BFF' : '#ccc' }]}

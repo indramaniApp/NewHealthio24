@@ -1,326 +1,312 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    SafeAreaView,
-    Platform,
-    StatusBar,
-    ScrollView,
-    TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Header from '../../components/Header';
-import { COLORS } from '../../constants';
 import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { useDispatch } from 'react-redux';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
-import LinearGradient from 'react-native-linear-gradient'; 
+import LinearGradient from 'react-native-linear-gradient';
 
 const CartScreen = () => {
-    const navigation = useNavigation();
-    const dispatch = useDispatch();
-    const [cartItems, setCartItems] = useState([]);
-    const [totalAmount, setTotalAmount] = useState(0);
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        fetchCartItems();
-    }, []);
+  const [cartItems, setCartItems] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchCartItems();
-        }, [])
-    );
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
 
-    const fetchCartItems = async () => {
-        try {
-            dispatch(showLoader());
-            const response = await ApiService.get(ENDPOINTS.get_cart);
-            console.log('Cart API Response:', response);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCartItems();
+    }, [])
+  );
 
-            const items = response?.data?.items || [];
-            const total = response?.data?.totalAmount || 0;
+  const fetchCartItems = async () => {
+    try {
+      dispatch(showLoader());
+      const res = await ApiService.get(ENDPOINTS.get_cart);
 
-            const mapped = items.map((item) => ({
-                productId: item?._id,
-                name: item?.name || 'Test',
-                fee: item?.price || 0,
-                quantity: item?.quantity || 1,
-                productRefId: item?.productId,
-                description: item?.description || '',
-            }));
+      const items = res?.data?.items || [];
+      const total = res?.data?.totalAmount || 0;
 
-            setCartItems(mapped);
-            setTotalAmount(total);
-            dispatch(hideLoader());
-        } catch (error) {
-            dispatch(hideLoader());
-            Toast.show('Failed to load cart. Please try again.');
-        }
-    };
+      const mapped = items.map(item => ({
+        productId: item?._id,
+        name: item?.name || 'Test',
+        fee: item?.price || 0,
+        quantity: item?.quantity || 1,
+        productRefId: item?.productId,
+        description: item?.description || '',
+      }));
 
-    const calculateTotal = (items) => {
-        return items.reduce((acc, item) => acc + item.fee * item.quantity, 0);
-    };
+      setCartItems(mapped);
+      setTotalAmount(total);
+    } catch {
+      Toast.show('Failed to load cart');
+    } finally {
+      dispatch(hideLoader());
+    }
+  };
 
-    const handleQuantityChange = async (productId, productRefId, delta) => {
-        const item = cartItems.find((i) => i.productId === productId);
-        if (!item) return;
+  const calculateTotal = items =>
+    items.reduce((sum, i) => sum + i.fee * i.quantity, 0);
 
-        try {
-            dispatch(showLoader());
+  const handleQuantityChange = async (productId, productRefId, delta) => {
+    const item = cartItems.find(i => i.productId === productId);
+    if (!item) return;
 
-            if (delta === 1) {
-                await ApiService.post(ENDPOINTS.add_to_cart, { productId: productRefId }, true, false);
-                Toast.show('Quantity increased');
-            } else if (delta === -1) {
-                await ApiService.post(ENDPOINTS.remove_from_cart, { productId: productRefId }, true, false);
-                Toast.show(item.quantity === 1 ? 'Item removed from cart' : 'Quantity decreased');
-            }
+    try {
+      dispatch(showLoader());
+      if (delta === 1) {
+        await ApiService.post(ENDPOINTS.add_to_cart, { productId: productRefId }, true, false);
+      } else {
+        await ApiService.post(ENDPOINTS.remove_from_cart, { productId: productRefId }, true, false);
+      }
+    } catch {
+      Toast.show('Update failed');
+      return;
+    } finally {
+      dispatch(hideLoader());
+    }
 
-            dispatch(hideLoader());
-        } catch (error) {
-            dispatch(hideLoader());
-            console.log('Cart API Error:', error.response?.data || error.message);
-            Toast.show('Failed to update cart. Try again.');
-            return;
-        }
+    const updated = cartItems
+      .map(i =>
+        i.productId === productId
+          ? { ...i, quantity: i.quantity + delta }
+          : i
+      )
+      .filter(i => i.quantity > 0);
 
-        const updatedItems = cartItems
-            .map((i) => {
-                if (i.productId === productId) {
-                    const newQty = i.quantity + delta;
-                    return newQty > 0 ? { ...i, quantity: newQty } : null;
-                }
-                return i;
-            })
-            .filter(Boolean);
+    setCartItems(updated);
+    setTotalAmount(calculateTotal(updated));
+  };
 
-        setCartItems(updatedItems);
-        setTotalAmount(calculateTotal(updatedItems));
-    };
+  const handleBookTests = () => {
+    if (!cartItems.length) {
+      Toast.show('Cart is empty');
+      return;
+    }
+    navigation.navigate('SelectSlot', {
+      totalAmount,
+      selectedTests: cartItems,
+    });
+  };
 
-    const handleBookTests = () => {
-        if (cartItems.length === 0) {
-            Toast.show('Cart is empty!');
-            return;
-        }
-        navigation.navigate('SelectSlot', {
-            totalAmount,
-            selectedTests: cartItems,
-        });
-    };
+  return (
+    <LinearGradient colors={['#fff', '#fff', '#fff']} style={{ flex: 1 }}>
+      <SafeAreaView style={styles.safe}>
+        <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
 
- 
-    return (
-        <LinearGradient
-            colors={['#00b4db', '#fff', '#fff', '#fff']}
-            style={{ flex: 1 }}
-        >
-            <SafeAreaView style={styles.container}>
-                <Header
-                    title="Your Test Cart"
-                    titleStyle={{ color: COLORS.black }}
-                    onBackPress={() => navigation.goBack()}
-                    showCart={false}
-                    style={{ backgroundColor: 'transparent', marginTop: 40 }} 
-                />
-                <View style={styles.content}>
-                    {cartItems.length === 0 ? (
-                        <Text style={styles.placeholder}>🛒 Your cart is empty.</Text>
-                    ) : (
-                        <ScrollView
-                            style={styles.card}
-                            contentContainerStyle={{ paddingBottom: 44 }}
-                            showsVerticalScrollIndicator={false}
+        <Header
+          title="Your Test Cart"
+          onBackPress={() => navigation.goBack()}
+          showCart={false}
+          style={{ backgroundColor: 'transparent' }}
+          titleStyle={{ color: '#4A148C' }}
+        />
+
+        <View style={styles.container}>
+          {cartItems.length === 0 ? (
+            <Text style={styles.empty}>🛒 Your cart is empty</Text>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {cartItems.map(item => {
+                const itemTotal = item.fee * item.quantity;
+
+                return (
+                  <View key={item.productId} style={styles.card}>
+                    <LinearGradient
+                      colors={['#F06292', '#6A1B9A']}
+                      style={styles.strip}
+                    />
+
+                    <View style={styles.cardContent}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.name}>
+                          <Icon name="flask-outline" size={16} /> {item.name}
+                        </Text>
+
+                        {!!item.description && (
+                          <Text style={styles.desc}>{item.description}</Text>
+                        )}
+
+                        <Text style={styles.price}>₹{item.fee} / test</Text>
+
+                        <Text style={styles.itemTotal}>
+                          Item Total: ₹{itemTotal}
+                        </Text>
+                      </View>
+
+                      <View style={styles.qtyWrap}>
+                        <TouchableOpacity
+                          style={styles.qtyBtn}
+                          onPress={() =>
+                            handleQuantityChange(item.productId, item.productRefId, -1)
+                          }
                         >
-                            <View style={styles.totalContainer}>
-                                <Text style={styles.totalText}>Total Amount:</Text>
-                                <Text style={styles.totalPrice}>₹{totalAmount}</Text>
-                            </View>
+                          <Icon name="minus" size={18} color="#6A1B9A" />
+                        </TouchableOpacity>
 
-                            {cartItems.map((item, index) => (
-                                <View key={item.productId} style={styles.itemCard}>
-                                    <View style={styles.accentStrip} />
-                                    <View style={styles.cardContent}>
-                                        <View style={{ flex: 1 }}>
-                                            <Text style={styles.testName}>
-                                                <Icon name="flask-outline" size={16} color={COLORS.primary} /> {item.name}
-                                            </Text>
-                                            {item.description ? (
-                                                <Text style={styles.testDescription}>
-                                                    <Icon name="text" size={13} color="#6b7280" /> {item.description}
-                                                </Text>
-                                            ) : null}
-                                            <View style={styles.priceTag}>
-                                                <Text style={styles.priceTagText}>₹{item.fee} x {item.quantity}</Text>
-                                            </View>
-                                        </View>
+                        <Text style={styles.qty}>{item.quantity}</Text>
 
-                                        <View style={styles.quantityControl}>
-                                            <TouchableOpacity
-                                                onPress={() => handleQuantityChange(item.productId, item.productRefId, -1)}
-                                                style={styles.qtyBtn}
-                                            >
-                                                <Icon name="minus" size={18} color={COLORS.primary} />
-                                            </TouchableOpacity>
-                                            <Text style={styles.qtyText}>{item.quantity}</Text>
-                                            <TouchableOpacity
-                                                onPress={() => handleQuantityChange(item.productId, item.productRefId, 1)}
-                                                style={styles.qtyBtn}
-                                            >
-                                                <Icon name="plus" size={18} color={COLORS.primary} />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                 
-                                    {index < cartItems.length - 1 && <View style={styles.separator} />}
-                                </View>
-                            ))}
+                        <TouchableOpacity
+                          style={styles.qtyBtn}
+                          onPress={() =>
+                            handleQuantityChange(item.productId, item.productRefId, 1)
+                          }
+                        >
+                          <Icon name="plus" size={18} color="#6A1B9A" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                );
+              })}
 
-                            <TouchableOpacity style={styles.bookBtn} onPress={handleBookTests}>
-                                <Icon name="calendar-check" size={18} color="#fff" />
-                                <Text style={styles.bookText}>Book Tests</Text>
-                            </TouchableOpacity>
-                        </ScrollView>
-                    )}
+              {/* FOOTER TOTAL */}
+              <View style={styles.footer}>
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>Total Amount</Text>
+                  <Text style={styles.totalValue}>₹{totalAmount}</Text>
                 </View>
-            </SafeAreaView>
-        </LinearGradient>
-    );
+
+                <TouchableOpacity onPress={handleBookTests}>
+                  <LinearGradient
+                    colors={['#F06292', '#6A1B9A']}
+                    style={styles.bookBtn}
+                  >
+                    <Icon name="calendar-check" size={18} color="#fff" />
+                    <Text style={styles.bookText}>Book Tests</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          )}
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
+  );
 };
 
 export default CartScreen;
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  container: { flex: 1, padding: 16 },
 
-    container: {
-        flex: 1,
-        backgroundColor: 'transparent', 
+  empty: {
+    marginTop: 40,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#6B7280',
+  },
 
-    },
-    content: {
-        flex: 1,
-        padding: 16,
-    },
-    placeholder: {
-        fontSize: 16,
-        color: COLORS.gray,
-        textAlign: 'center',
-        marginTop: 40,
-    },
-    card: {
-        backgroundColor: '#FAFCFF',
-        padding: 16,
-        borderRadius: 12,
-        elevation: 2,
-    },
-    totalContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-    },
-    totalText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: COLORS.primary,
-    },
-    totalPrice: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: COLORS.success,
-    },
-    itemCard: {
-        marginBottom: 14,
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 1 },
-        shadowRadius: 2,
-        overflow: 'hidden', // to keep the accent strip contained
-    },
-    accentStrip: {
-        width: 6,
-        backgroundColor: COLORS.primary,
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        bottom: 0,
-    },
-    cardContent: {
-        flex: 1,
-        padding: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginLeft: 6, // space for the accent strip
-    },
-    testName: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: COLORS.primary,
-        marginBottom: 4,
-    },
-    testDescription: {
-        fontSize: 13,
-        color: '#6b7280',
-        marginTop: 2,
-        marginBottom: 6,
-    },
-    priceTag: {
-        alignSelf: 'flex-start',
-        backgroundColor: '#e6f2ff',
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 6,
-    },
-    priceTagText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: COLORS.primary,
-    },
-    quantityControl: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 8,
-    },
-    qtyBtn: {
-        padding: 4,
-        borderWidth: 1,
-        borderColor: COLORS.primary,
-        borderRadius: 4,
-    },
-    qtyText: {
-        marginHorizontal: 10,
-        fontWeight: '600',
-        fontSize: 16,
-        color: COLORS.primary,
-    },
-    separator: {
-        height: 1,
-        backgroundColor: '#E0E0E0',
-        marginVertical: 10,
-        marginHorizontal: 12
-    },
-    bookBtn: {
-        marginTop: 20,
-        backgroundColor: COLORS.primary,
-        paddingVertical: 12,
-        borderRadius: 30,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 8,
-    },
-    bookText: {
-        color: '#fff',
-        fontSize: 15,
-        fontWeight: '600',
-        marginLeft: 6,
-    },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 14,
+    overflow: 'hidden',
+    elevation: 2,
+  },
+  strip: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 6,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    padding: 14,
+    marginLeft: 6,
+  },
+
+  name: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#6A1B9A',
+  },
+  desc: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  price: {
+    fontSize: 13,
+    color: '#374151',
+    marginTop: 6,
+  },
+  itemTotal: {
+    marginTop: 6,
+    fontWeight: '700',
+    color: '#4A148C',
+  },
+
+  qtyWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+  },
+  qtyBtn: {
+    borderWidth: 1,
+    borderColor: '#6A1B9A',
+    borderRadius: 4,
+    padding: 4,
+  },
+  qty: {
+    marginVertical: 6,
+    fontWeight: '700',
+    color: '#6A1B9A',
+  },
+
+  footer: {
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  totalValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#4A148C',
+  },
+
+  bookBtn: {
+    borderRadius: 30,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bookText: {
+    color: '#fff',
+    marginLeft: 8,
+    fontWeight: '600',
+    fontSize: 15,
+  },
 });

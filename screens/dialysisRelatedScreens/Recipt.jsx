@@ -16,25 +16,24 @@ import { COLORS } from '../../constants';
 import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 
+const DIALYSIS_RED = "#D32F2F";
+const DIALYSIS_LIGHT = "#FFEBEE";
+
 const Recipt = ({ navigation, route }) => {
   const { id } = route.params || {};
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchReceipt();
-    }
+    if (id) fetchReceipt();
   }, [id]);
 
   const fetchReceipt = async () => {
     try {
       setLoading(true);
       const response = await ApiService.get(`${ENDPOINTS.debit_transaction_dialysis_book}/${id}`);
-      console.log('Dialysis receipt fetched: ', response.data);
       setReceipt(response.data?.[0]);
     } catch (error) {
-      console.error(error);
       Alert.alert('Error', 'Failed to fetch receipt data.');
     } finally {
       setLoading(false);
@@ -49,10 +48,10 @@ const Recipt = ({ navigation, route }) => {
         <head>
           <style>
             body { font-family: Arial; padding: 24px; font-size: 14px; color: #333; }
-            h1 { text-align: center; font-size: 20px; margin-bottom: 0; }
+            h1 { text-align: center; font-size: 20px; margin-bottom: 0; color: ${DIALYSIS_RED}; }
             h2 { text-align: center; font-size: 14px; color: #888; margin-top: 4px; }
             .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-            .total { font-weight: bold; border-top: 1px solid #000; padding-top: 8px; }
+            .total { font-weight: bold; border-top: 2px solid ${DIALYSIS_RED}; padding-top: 8px; color:${DIALYSIS_RED}; }
             .footer { text-align: center; margin-top: 30px; font-size: 13px; color: #666; }
           </style>
         </head>
@@ -107,13 +106,13 @@ const Recipt = ({ navigation, route }) => {
   if (loading || !receipt) {
     return (
       <SafeAreaView style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={DIALYSIS_RED} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <Header title="Dialysis Receipt" onBackPress={() => navigation.goBack()} />
 
       <View style={{ flex: 1, padding: 16 }}>
@@ -143,7 +142,16 @@ const Recipt = ({ navigation, route }) => {
             <Text style={styles.totalText}>₹ {receipt.amount}</Text>
           </View>
 
-          <Button title="Download PDF" filled style={{ marginTop: 20 }} onPress={generatePDF} />
+   <Button
+  title="Download PDF"
+  filled
+  colors={['#D32F2F', '#9C27B0']}   // Dialysis red gradient
+  textColor="#FFFFFF"
+  style={{ marginTop: 20 }}
+  onPress={generatePDF}
+/>
+
+
         </View>
       </View>
     </SafeAreaView>
@@ -153,62 +161,38 @@ const Recipt = ({ navigation, route }) => {
 export default Recipt;
 
 const styles = StyleSheet.create({
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
   card: {
-    padding: 12,
+    padding: 14,
     borderRadius: 16,
-    elevation: 2,
-    backgroundColor: COLORS.white,
-    width: 340,
+    backgroundColor: '#fff',
+    borderWidth: 0.3,
+    borderColor: '#000',
     alignSelf: 'center',
+    width: 340,
+    elevation: 3,
   },
   headerText: {
     fontSize: 20,
-    fontFamily: 'Urbanist Bold',
+    fontFamily: 'Urbanist-Bold',
     textAlign: 'center',
+    color: DIALYSIS_RED,
   },
   subHeader: {
     fontSize: 14,
     textAlign: 'center',
     marginTop: 4,
-    color: COLORS.gray,
+    color: '#777',
   },
-  itemRow: {
-    marginTop: 10,
-  },
-  label: {
-    fontSize: 13,
-    fontFamily: 'Urbanist Medium',
-    color: COLORS.gray,
-  },
-  value: {
-    fontSize: 14,
-    fontFamily: 'Urbanist SemiBold',
-    color: COLORS.black,
-    marginTop: 2,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  text: {
-    fontSize: 14,
-    fontFamily: 'Urbanist Regular',
-    color: COLORS.black,
-  },
-  totalText: {
-    fontSize: 16,
-    fontFamily: 'Urbanist Bold',
-    color: COLORS.primary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 16,
-  },
+  itemRow: { marginTop: 10 },
+  label: { fontSize: 13, color: '#777' },
+  value: { fontSize: 14, fontWeight: '600', marginTop: 2, color: '#111' },
+
+  row: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
+  text: { fontSize: 14, color: '#333' },
+
+  totalText: { fontSize: 16, fontWeight: 'bold', color: DIALYSIS_RED },
+
+  divider: { height: 1, backgroundColor: '#FFCDD2', marginVertical: 16 },
 });

@@ -20,7 +20,7 @@ import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
 import LinearGradient from 'react-native-linear-gradient';
 
-const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
+const RAZORPAY_KEY_ID = 'rzp_live_RQTJU3bg9xBPn0';
 
 const PhysiotherapyBookByPayment = ({ route, navigation }) => {
     const { centreId, startedDate, selectedHour } = route.params || {};
@@ -119,11 +119,11 @@ const PhysiotherapyBookByPayment = ({ route, navigation }) => {
     return (
 
         <LinearGradient
-            colors={['#00b4db', '#f5fcff', '#fff']}
+            colors={['#ffff', '#f5fcff', '#fff']}
             style={styles.container}
         >
         
-            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
             <Header
                 title="Book Physiotherapy"
                 onBackPress={() => navigation.goBack()}
@@ -186,14 +186,14 @@ const PhysiotherapyBookByPayment = ({ route, navigation }) => {
                     placeholderTextColor="#9CA3AF"
                 />
                 
-                <Text style={styles.label}>Referral ID (Optional)</Text>
+                {/* <Text style={styles.label}>Referral ID (Optional)</Text>
                 <TextInput
                     style={styles.input}
                     value={referralId}
                     onChangeText={setReferralId}
                     placeholder="Enter Referral ID"
                     placeholderTextColor="#9CA3AF"
-                />
+                /> */}
 
                 {/* 4. बटन पर ग्रेडिएंट लगाएं */}
                 <TouchableOpacity onPress={handleSubmit}>

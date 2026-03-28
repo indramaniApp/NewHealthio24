@@ -3,7 +3,7 @@ import React from 'react';
 import { COLORS, SIZES } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
 
-const SubHeaderItem = ({ title, onPress, navTitle }) => {
+const SubHeaderItem = ({ title, onPress, navTitle,titleStyle }) => {
     const { dark } = useTheme();
 
     return (
@@ -12,6 +12,7 @@ const SubHeaderItem = ({ title, onPress, navTitle }) => {
                 style={[
                     styles.title,
                     { color: dark ? COLORS.white : COLORS.greyscale900 },
+                    titleStyle 
                 ]}
             >
                 {title}

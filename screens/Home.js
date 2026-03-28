@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image, RefreshControl } from 'react-native';
+
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image, RefreshControl, StatusBar } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,10 +12,21 @@ import { ENDPOINTS } from '../src/constants/Endpoints';
 import { useDispatch } from 'react-redux';
 import { hideLoader, showLoader } from '../src/redux/slices/loaderSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect,DrawerActions } from '@react-navigation/native';
+
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import user from '../assets/icons/user-default3.png';
+// The banner image is now imported and ready to be used
+import banner from '../assets/newAssets/banner.png'
+import hospital from '../assets/newAssets/hospital.png'
+import dialysis from '../assets/newAssets/dialysis.png'
+import physiotherapy from '../assets/newAssets/physiotherapy.png'
+import discount from '../assets/newAssets/discount.png'
+// Import your card images
+// import hosptial from '../assets/hop.png'
+// import pathology from '../assets/path.png'
 
 export const banners = [
     {
@@ -32,6 +44,7 @@ export const banners = [
         bottomSubtitle: "Book now for this weekend",
     },
 ];
+const bannerImages = [banner, hospital, dialysis, physiotherapy,discount];
 
 const lightenColor = (rgbaColor) => {
     const [r, g, b] = rgbaColor.match(/\d+/g).map(Number);
@@ -40,6 +53,36 @@ const lightenColor = (rgbaColor) => {
     const newB = Math.min(255, b + 60);
     return `rgba(${newR}, ${newG}, ${newB}, 1)`;
 };
+const compactServices = [
+  {
+    id: '1',
+    name: 'Patient-Mitra',
+    icon: 'account-heart',
+    description: 'Get 24x7 dedicated support and personalized assistance for all your medical needs and hospital coordination.',
+    screen: 'PatientMitra',
+  },
+  {
+    id: '2',
+    name: 'Dialysis',
+    icon: 'water-pump',
+    description: 'Expert kidney care and dialysis sessions scheduled at top-rated medical centers near your location.',
+    screen: 'Dialysis',
+  },
+  {
+    id: '3',
+    name: 'Physiotherapy',
+    icon: 'run',
+    description: 'In-home or clinic-based rehabilitation programs designed by professional physiotherapists for faster recovery.',
+    screen: 'Physiotherapy',
+  },
+];
+
+const serviceColors = [
+  { bg: '#E1F5FE', iconBg: '#81D4FA', iconColor: '#01579B' }, // Light Blue
+  { bg: '#EDE7F6', iconBg: '#B39DDB', iconColor: '#4527A0' }, // Soft Purple
+  { bg: '#E0F2F1', iconBg: '#80CBC4', iconColor: '#004D40' }, // Teal
+  { bg: '#FFF8E1', iconBg: '#FFE082', iconColor: '#FF6F00' }, // Amber/Gold
+];
 
 const originalCategories = [
     { id: "1", name: "Physician", icon: icons.friends, iconColor: "rgba(36, 107, 253, 1)" },
@@ -68,12 +111,61 @@ const originalCategories = [
     { id: "49", name: "Psychiatrist", icon: icons.psychiatrist, iconColor: "rgba(0, 121, 107, 1)" },
     { id: "50", name: "ENT Surgeon", icon: icons.ent, iconColor: "rgba(255, 143, 0, 1)" }
 ];
-
 const categories = originalCategories.map(category => ({
-    ...category,
-    gradientColors: [category.iconColor, lightenColor(category.iconColor)],
-    iconColor: '#fff'
+  ...category,
+  gradientColors: [category.iconColor, lightenColor(category.iconColor)],
+  iconColor: '#fff'
 }));
+
+/* 🔥 FRONT PAGE CATEGORY MAPPING */
+const frontCategoryMap = {
+  Physician: 'General Physician',
+  Gynaecologist: 'Gynaecologist',
+  'Child Specialist': 'Paediatrician',
+  'Bone Joints': 'Orthopedist',
+  'Eye Specialist': 'Eye Specialist',
+  Cardiologist: 'Cardiologist',
+  Neurologist: 'Neurologist',
+  Dentist: 'Dentist',
+  'Ear Nose Throat Specialist': 'ENT',
+};
+const frontCategories = Object.values(
+  categories
+    .filter(cat => frontCategoryMap[cat.name])
+    .reduce((acc, cat) => {
+      if (!acc[cat.name]) {
+        acc[cat.name] = {
+          ...cat,
+          displayName: frontCategoryMap[cat.name],
+        };
+      }
+      return acc;
+    }, {})
+);
+
+
+// const categories = originalCategories.map(category => ({
+//     ...category,
+//     gradientColors: [category.iconColor, lightenColor(category.iconColor)],
+//     iconColor: '#fff'
+// }));
+const categoryColorMap = {
+  'General Physician': { bg: '#C8E6C9', icon: '#2E7D32' },
+  Dentist: { bg: '#BBDEFB', icon: '#1565C0' },
+  'Eye Specialist': { bg: '#E1BEE7', icon: '#6A1B9A' },
+  Neurologist: { bg: '#FFE0B2', icon: '#EF6C00' },
+  ENT: { bg: '#F8BBD0', icon: '#AD1457' },
+  Paediatrician: { bg: '#E3F2FD', icon: '#0277BD' },
+  Orthopedist: { bg: '#ECEFF1', icon: '#455A64' },
+  Cardiologist: { bg: '#FFCDD2', icon: '#C62828' },
+};
+
+
+const DIALYSIS_RED_THEME = {
+  bg: '#FFE5E5',        // light red card background
+  iconBg: '#FF4D4D',    // bright red icon circle
+  iconColor: '#FFFFFF', // white icon + button text
+};
 
 const Home = ({ navigation }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -81,12 +173,14 @@ const Home = ({ navigation }) => {
     const [AllDoctors, setAllDoctors] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [videoAppointmentCount, setVideoAppointmentCount] = useState(0);
     const dispatch = useDispatch();
 
     const FetchAllDocotr = async () => {
         try {
             dispatch(showLoader());
             let response = await ApiService.get(ENDPOINTS.patient_get_doctors);
+            console.log('responsedata========',response)
             setAllDoctors(response.data);
             dispatch(hideLoader());
         } catch (error) {
@@ -109,10 +203,22 @@ const Home = ({ navigation }) => {
             dispatch(hideLoader());
         }
     };
-
+const fetchVideoCount = async () => {
+    try {
+        const response = await ApiService.get(ENDPOINTS.patient_approved_video_appointments_count);
+        // Fix: response.data.appointments se count uthayein
+        const count = response?.data?.appointments || 0;
+        console.log('Final Count Set:', count);
+        setVideoAppointmentCount(Number(count));
+    } catch (error) {
+        console.log("Video Count Error:", error);
+        setVideoAppointmentCount(0);
+    }
+};
     useFocusEffect(
         useCallback(() => {
             FetchAllDocotr();
+            fetchVideoCount();
         }, [])
     );
 
@@ -129,38 +235,24 @@ const Home = ({ navigation }) => {
         checkLoginStatus();
     }, [navigation]);
 
-    const renderHeader = () => (
-        <View style={styles.headerContainer}>
-            <View style={styles.viewLeft}>
-                <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                    <Image
-                        source={user}
-                        style={{ width: 32, height: 32, borderRadius: 16 }}
-                        resizeMode="cover"
-                    />
-                </TouchableOpacity>
-            </View>
-            <View style={styles.viewRight}>
-                <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+const renderHeader = () => (
+  <View style={styles.headerContainer}>
+    <View style={styles.viewLeft}>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.dispatch(DrawerActions.openDrawer());
+        }}
+      >
+        <Image
+          source={user}
+          style={{ width: 32, height: 32, borderRadius: 16 }}
+          resizeMode="cover"
+        />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
 
-                    <MaterialCommunityIcons
-                        name="bell-outline"
-                        size={24}
-                        color={dark ? COLORS.white : COLORS.white}
-                        style={{ marginRight: 12 }}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("Favourite")}>
-
-                    <MaterialCommunityIcons
-                        name="heart-outline"
-                        size={24}
-                        color={dark ? COLORS.white : COLORS.white}
-                    />
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
 
     const renderSearchBar = () => {
         const handleInputFocus = () => {
@@ -189,187 +281,415 @@ const Home = ({ navigation }) => {
         );
     };
 
-    const renderBanner = () => {
-        const renderBannerItem = ({ item }) => (
+// Is block ko "Home" component ke bahar (top par) ya "const Home = ..." ke andar start mein rakhein
+const bannerWidth = SIZES.width - 32;
+
+const renderBanner = () => {
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const bannerRef = React.useRef(null);
+
+  // Auto-scroll logic
+  useEffect(() => {
+    if (bannerImages.length > 0) {
+      const interval = setInterval(() => {
+        let nextIndex = (currentBanner + 1) % bannerImages.length;
+        setCurrentBanner(nextIndex);
+        
+        // Safety check to ensure ref is attached
+        if (bannerRef.current) {
+          bannerRef.current.scrollToIndex({ index: nextIndex, animated: true });
+        }
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [currentBanner]);
+
+  return (
+    <View style={styles.bannerImageContainer}>
+      <FlatList
+        ref={bannerRef}
+        data={bannerImages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => index.toString()}
+        // Image ki width ko explicitly handle karna zaroori hai
+        renderItem={({ item }) => (
+          <View style={{ width: bannerWidth, height: 160 }}>
+            <Image
+              source={item}
+              style={styles.bannerImage}
+              resizeMode="cover"
+            />
+          </View>
+        )}
+        // Layout calculations for smooth scrolling
+        getItemLayout={(_, index) => ({
+          length: bannerWidth,
+          offset: bannerWidth * index,
+          index,
+        })}
+        onMomentumScrollEnd={(event) => {
+          const index = Math.round(event.nativeEvent.contentOffset.x / bannerWidth);
+          setCurrentBanner(index);
+        }}
+      />
+      
+      {/* Dots / Pagination */}
+      <View style={styles.pagination}>
+        {bannerImages.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              { 
+                backgroundColor: index === currentBanner ? '#fff' : 'rgba(255,255,255,0.4)',
+                width: index === currentBanner ? 20 : 8 // Active dot ko lamba dikhane ke liye
+              },
+            ]}
+          />
+        ))}
+      </View>
+    </View>
+  );
+};
+
+
+
+const renderCategories = () => (
+  <View style={{ paddingHorizontal: 2 }}>
+    <SubHeaderItem
+      title="Categories"
+      navTitle="See all"
+      onPress={() => navigation.navigate("Categories")}
+       titleStyle={{ fontSize: 26, color: '#fff', fontWeight: '800' }}
+    />
+
+    <FlatList
+      data={frontCategories}
+      keyExtractor={(item) => item.id.toString()}
+      numColumns={2}
+      scrollEnabled={false}
+      columnWrapperStyle={{
+        justifyContent: 'space-between',
+        marginBottom: 14,
+      }}
+      renderItem={({ item }) => {
+      const theme =
+  categoryColorMap[item.displayName] ||
+  { bg: '#ECEFF1', icon: '#607D8B' };
+
+
+        return (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={[styles.categoryCard, { backgroundColor: theme.bg }]}
+           onPress={() =>
+  navigation.navigate('CategoriesScreen', {
+    categoryName: item.displayName,  // 👈 ab ENT aa jayega
+  })
+
+            }
+          >
+            {/* ICON */}
+            <View
+              style={[
+                styles.categoryIconBox,
+                { backgroundColor: theme.icon },
+              ]}
+            >
+              <Image
+                source={item.icon}
+                style={styles.categoryIcon}
+                resizeMode="contain"
+              />
+            </View>
+
+            {/* TEXT */}
+            <Text style={styles.categoryTitle} numberOfLines={2}>
+              {item.displayName}
+            </Text>
+
+            {/* DECORATIVE CIRCLE */}
+            <View
+              style={[
+                styles.decorCircle,
+                { borderColor: theme.icon },
+              ]}
+            />
+          </TouchableOpacity>
+        );
+      }}
+    />
+  </View>
+);
+
+
+// *** MODIFIED FUNCTION WITH PATHOLOGY ICON & BUTTON GRADIENT ***
+const renderServiceCardsGrid = () => {
+  return (
+    <View style={styles.serviceCardsGridContainer}>
+      {[
+        {
+          title: 'Pathology',
+          sub: 'Book comprehensive lab tests, full body checkups, and receive digital reports directly on your phone.',
+          icon: 'test-tube',
+          bgGradient: ['#F8BBD0', '#F48FB1'],       // Gradient for card background
+          iconGradient: ['#F48FB1', '#AD1457'],     // SAME as TestBookingScreen
+          iconColor: '#fff',                        // Icon white on gradient
+          nav: 'TestBookingScreen'
+        },
+        { 
+          title: 'Hospital', 
+          sub: 'Find and book appointments at the best hospitals nearby with real-time availability and emergency care.', 
+          icon: 'hospital-building', 
+          bgGradient: ['#68cdf8', '#4A90E2'], 
+          iconGradient: ['#FF8A65', '#BF360C'], 
+          iconColor: '#fff', 
+          nav: 'Hospital' 
+        }
+      ].map((item, index) => (
+        <TouchableOpacity
+          key={index}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate(item.nav)}
+          style={{ borderRadius: 16, marginBottom: 16, overflow: 'hidden' }} // Rounded corners + gradient overflow
+        >
+          <LinearGradient
+            colors={item.bgGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gridServiceCard}
+          >
+            {/* Icon with gradient circle */}
             <LinearGradient
-                colors={['#0077b6', '#00b4db']}
-                style={styles.bannerContainer}>
-                <View style={styles.bannerTopContainer}>
-                    <View>
-                        <Text style={styles.bannerDicount}>{item.discount} OFF</Text>
-                        <Text style={styles.bannerDiscountName}>{item.discountName}</Text>
-                    </View>
-                    <Text style={styles.bannerDiscountNum}>{item.discount}</Text>
-                </View>
-                <View style={styles.bannerBottomContainer}>
-                    <Text style={styles.bannerBottomTitle}>{item.bottomTitle}</Text>
-                    <Text style={styles.bannerBottomSubtitle}>{item.bottomSubtitle}</Text>
-                </View>
+              colors={item.title === 'Pathology' ? ['#F48FB1', '#AD1457'] : item.iconGradient} 
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gridIconBox}
+            >
+              <MaterialCommunityIcons name={item.icon} size={26} color={item.iconColor} />
             </LinearGradient>
-        );
+
+            <View style={{ flex: 1, paddingBottom: 20 }}>
+              <Text style={styles.gridTitle}>{item.title}</Text>
+              <Text style={styles.gridSubtitle}>{item.sub}</Text>
+              
+              {/* GO TO SCREEN BUTTON */}
+              <LinearGradient
+                colors={item.title === 'Pathology' ? ['#F48FB1', '#AD1457'] : ['#ccc', '#999']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.btnContainer, { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, alignSelf: 'flex-start', marginTop: 8 }]}
+              >
+                <Text style={[styles.btnText, { color: '#fff' }]}>Go to screen</Text>
+                <MaterialCommunityIcons name="arrow-right-circle" size={18} color="#fff" style={{ marginLeft: 4 }} />
+              </LinearGradient>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
+
+
+
+
+
+
+
+const renderCompactServiceCards = () => {
+  return (
+    <View style={{ marginTop: 4 }}>
+      {compactServices.map((item, index) => {
+
+        // Default color from array
+        let color = serviceColors[index % serviceColors.length];
+
+        // 🔴 Override ONLY for Dialysis
+        if (item.name?.toLowerCase().includes('dialysis')) {
+          color = DIALYSIS_RED_THEME;
+        }
 
         return (
-            <View style={styles.bannerItemContainer}>
-                <FlatList
-                    data={banners}
-                    renderItem={renderBannerItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal
-                    pagingEnabled
-                    showsHorizontalScrollIndicator={false}
-                    onMomentumScrollEnd={(event) => {
-                        const newIndex = Math.round(event.nativeEvent.contentOffset.x / SIZES.width);
-                        setCurrentIndex(newIndex);
-                    }}
-                />
-                <View style={styles.dotContainer}>
-                    {banners.map((_, index) => (
-                        <View key={index} style={[styles.dot, index === currentIndex && styles.activeDot]} />
-                    ))}
-                </View>
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => navigation.navigate(item.screen)}
+            activeOpacity={0.85}
+            style={[styles.serviceCard, { backgroundColor: color.bg }]}
+          >
+            <View style={[styles.serviceIconBox, { backgroundColor: color.iconBg }]}>
+              <MaterialCommunityIcons name={item.icon} size={24} color={color.iconColor} />
             </View>
-        );
-    };
 
-    const renderCategories = () => (
-        <View>
-            <SubHeaderItem title="Categories" navTitle="See all" onPress={() => navigation.navigate("Categories")} />
-            <FlatList
-                data={categories.slice(1, 9)}
-                keyExtractor={(item) => item.id.toString()}
-                horizontal={false}
-                numColumns={4}
-                scrollEnabled={false}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.categoryContainer}
-                        onPress={() => {
-                            if (item.name === "More") {
-                                navigation.navigate("Categories");
-                            } else {
-                                navigation.navigate('CategoriesScreen', { categoryName: item.name });
-                            }
-                        }}
-                    >
-                        <View style={styles.categoryCircle}>
-                            <Image
-                                source={item.icon}
-                                style={[styles.categoryIcon, { tintColor: item.iconColor }]}
-                                resizeMode="contain"
-                            />
-                        </View>
-                        <Text style={[styles.categoryName, { color: COLORS.black }]}>{item.name}</Text>
-                    </TouchableOpacity>
-                )}
-            />
-        </View>
-    );
+            <View style={{ flex: 1, paddingBottom: 20 }}>
+              <Text style={styles.serviceTitle}>{item.name}</Text>
+              <Text style={styles.serviceSubtitle}>{item.description}</Text>
+              
+             <View style={styles.btnContainer}>
+  <Text
+    style={[
+      styles.btnText,
+      { color: item.name?.toLowerCase().includes('dialysis') ? '#D10000' : color.iconColor }
+    ]}
+  >
+    Go to screen
+  </Text>
 
+  <MaterialCommunityIcons
+    name="arrow-right-circle"
+    size={18}
+    color={item.name?.toLowerCase().includes('dialysis') ? '#D10000' : color.iconColor}
+  />
+</View>
 
-    const renderServiceCardsGrid = () => (
-        <View style={styles.serviceCardsGridContainer}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('TestBookingScreen')}
-                style={[styles.gridCard, { backgroundColor: "#00b4db", marginRight: 8 }]}>
-                <View style={[styles.gridCardIconContainer, { backgroundColor: '#fff' }]}>
-                    <MaterialCommunityIcons name="test-tube" size={24} color={'#0077b6'} />
-                </View>
-                <Text style={styles.gridCardTitle}>Pathology</Text>
-                <Text style={styles.gridCardSubtitle}>Book Tests & Checkups</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('Hospital')}
-                style={[styles.gridCard, { backgroundColor: "#00b4db", marginLeft: 8 }]}>
-                <View style={[styles.gridCardIconContainer, { backgroundColor: '#fff' }]}>
-                    <MaterialCommunityIcons name="hospital-building" size={24} color={'#0077b6'} />
-                </View>
-                <Text style={styles.gridCardTitle}>Hospital</Text>
-                <Text style={styles.gridCardSubtitle}>Get expert advice</Text>
-            </TouchableOpacity>
-        </View>
-    );
-
-    const renderCompactServiceCards = () => {
-        const compactServices = [
-            { id: '1', name: 'Patient-Mitra', icon: 'account-heart', screen: 'PatientMiraHome', description: '24x7 help & support', color: '#0077b6', iconBg: '#fff' },
-            { id: '2', name: 'Dialysis', icon: 'water-pump', screen: 'Dialysis', description: 'Specialized kidney care', color: '#0077b6', iconBg: '#fff' },
-            { id: '3', name: 'Physiotherapy', icon: 'run', screen: 'PhysiotherapyHomeScreen', description: 'Rehab & care support', color: '#0077b6', iconBg: '#fff' },
-        ];
-
-        return (
-            <View style={styles.compactCardsContainer}>
-                {compactServices.map((item) => (
-                    <TouchableOpacity
-                        key={item.id}
-                        onPress={() => navigation.navigate(item.screen)}
-                        style={[styles.compactCard, { backgroundColor: "#00b4db" }]}
-                    >
-                        <View style={[styles.compactCardIconContainer, { backgroundColor: item.iconBg }]}>
-                            <MaterialCommunityIcons name={item.icon} size={20} color={item.color} />
-                        </View>
-                        <Text style={styles.compactCardTitle}>{item.name}</Text>
-                        <Text style={styles.compactCardSubtitle}>{item.description}</Text>
-                    </TouchableOpacity>
-                ))}
             </View>
+          </TouchableOpacity>
         );
-    };
+      })}
+    </View>
+  );
+};
 
 
-    const renderTopDoctors = () => (
-        <View style={{ paddingHorizontal: 0.5, paddingTop: 12 }}>
-            <SubHeaderItem
-                title="Top Doctors"
-                navTitle="See all"
-                onPress={() => { navigation.navigate("SeeAllDoctorList"); }}
-            />
-            <FlatList
-                data={AllDoctors}
-                keyExtractor={(item) => item._id}
-                contentContainerStyle={{
-                    paddingBottom: 40,
-                    marginTop: 16,
-                    backgroundColor: dark ? COLORS.dark1 : COLORS.secondaryWhite,
-                    borderRadius: 10,
-                    padding: 2,
-                }}
-                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => {
-                    const specializationText = Array.isArray(item.specialization)
-                        ? item.specialization.join(', ')
-                        : item.specialization || 'Specialization not specified';
 
-                    const surgeryText = Array.isArray(item.surgery)
-                        ? item.surgery.join(', ')
-                        : item.surgery || 'Surgery info not specified';
+  const renderTopDoctors = () => (
+    <View style={{ paddingHorizontal: 0.5, paddingTop: 12 }}>
+        <SubHeaderItem
+            title="Top Doctors"
+            navTitle="See all"
+            onPress={() => { navigation.navigate("SeeAllDoctorList"); }}
+             titleStyle={{ fontSize: 26, color: '#000', fontWeight: '800' }}
+        />
 
-                    return (
-                        <HorizontalDoctorCard
-                            name={item.fullName}
-                            image={item.profilePhoto}
-                            yearsOfExperience={item.yearsOfExperience}
-                            consultationFee={item.consultationFee}
-                            specialization={specializationText}
-                            surgery={surgeryText}
-                            isAvailable={item.isAvailable}
-                            rating={item.average_rating || 0}
-                            numReviews={item.rating_total_count || 0}
-                            onPress={() =>
-                                navigation.navigate("DoctorDetails", { doctor: item })
-                            }
-                        />
-                    );
-                }}
-            />
-        </View>
-    );
+        <FlatList
+            data={AllDoctors}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={{
+                paddingBottom: 40,
+                marginTop: 16,
+                backgroundColor: dark ? COLORS.dark1 : COLORS.secondaryWhite,
+                borderRadius: 10,
+                padding: 2,
+            }}
+            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => {
+
+                const specializationText = Array.isArray(item.specialization)
+                    ? item.specialization.join(', ')
+                    : item.specialization || 'Specialization not specified';
+
+                const stateText = Array.isArray(item.state)
+                    ? item.state.join(', ')
+                    : item.state || 'State not specified';
+
+                return (
+                    <HorizontalDoctorCard
+                        name={item.fullName}
+                        image={item.profilePhoto}
+                        yearsOfExperience={item.yearsOfExperience}
+                        specialization={specializationText}
+                        state={stateText}
+
+                        /* ✅ Teen fees pass ki */
+                        // consultationFeeHomeVisit={item.consultationFeeHomeVisit}
+                        consultationFeeInPerson={item.consultationFeeInPerson}
+                        // consultationFeeVideoCall={item.consultationFeeVideoCall}
+
+                        rating={item.average_rating || 0}
+                        numReviews={item.rating_total_count || 0}
+                        isAvailable={item.isAvailable}
+
+                        onPress={() =>
+                            navigation.navigate("DoctorDetails", { doctor: item })
+                        }
+                    />
+                );
+            }}
+        />
+    </View>
+);
+
+const renderVideoCallCard = () => {
+    // 2 appointments ke liye condition check
+    const hasAppointments = videoAppointmentCount > 0;
 
     return (
-        <LinearGradient
-            colors={['#00b4db', '#fff', '#fff', '#fff', '#ffff', '#ffff']}
+        <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('VideoAppointments')} 
+            style={styles.videoCallCard}
+        >
+            <LinearGradient
+                colors={['#1A237E', '#303F9F', '#3F51B5']} // 🔵 Deep Royal Blue Theme
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.videoGradient}
+            >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={styles.videoIconContainer}>
+                        <MaterialCommunityIcons name="video-wireless" size={32} color="#fff" />
+                        
+                        {/* RED CIRCLE BADGE */}
+                        {hasAppointments && (
+                            <View style={styles.badgeWrapper}>
+                                <LinearGradient
+                                    colors={['#FF5252', '#D32F2F']} 
+                                    style={styles.badgeGradient}
+                                >
+                                    <Text style={styles.badgeText}>{videoAppointmentCount}</Text>
+                                </LinearGradient>
+                            </View>
+                        )}
+                    </View>
+                    
+                    <View style={{ flex: 1, marginLeft: 15 }}>
+                        <Text style={styles.videoTitle}>Video Consultation</Text>
+                        <Text style={[styles.videoStatusBadge, { color: hasAppointments ? '#FFCDD2' : '#C5CAE9' }]}>
+                           {hasAppointments ? 'ACTIVE APPOINTMENTS' : 'NO SCHEDULED CALLS'}
+                        </Text>
+                    </View>
+                    <MaterialCommunityIcons name="chevron-right" size={28} color="rgba(255,255,255,0.7)" />
+                </View>
+
+                <View style={{ marginTop: 15, paddingRight: 10 }}>
+                    <Text style={styles.videoSub}>
+                        Talk to your specialist online. High-quality video calls for your follow-ups and consultations.
+                    </Text>
+                    
+                    {hasAppointments ? (
+                        <View style={styles.appointmentDetailBox}>
+                            <MaterialCommunityIcons name="calendar-check" size={16} color="#fff" />
+                            <Text style={styles.videoAppointText}>
+                                You have {videoAppointmentCount} sessions approved by doctor
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={styles.videoAppointText}>No upcoming video calls found.</Text>
+                    )}
+                </View>
+
+                <View style={styles.videoFooter}>
+                    <Text style={styles.videoFooterText}>Join Meeting Now</Text>
+                    <MaterialCommunityIcons name="arrow-right" size={14} color="#fff" />
+                </View>
+            </LinearGradient>
+        </TouchableOpacity>
+    );
+};
+
+    return (
+     <LinearGradient
+            colors={['#001F3F', '#003366', '#fff', '#fff']}
             style={{ flex: 1 }}
         >
+          <StatusBar
+      barStyle="light-content"     // icons white
+      backgroundColor="#001F3F"    // Android ke liye important
+      translucent={false}
+    />
             <SafeAreaView style={styles.area}>
                 <View style={styles.container}>
                     {renderHeader()}
@@ -381,9 +701,12 @@ const Home = ({ navigation }) => {
                         {renderSearchBar()}
                         {renderBanner()}
                         {renderCategories()}
-                        <SubHeaderItem title="Our Services" />
+                        <SubHeaderItem title="Our Services"
+                         titleStyle={{ fontSize: 26, color: '#000', fontWeight: '800' }}
+                        />
                         {renderServiceCardsGrid()}
                         {renderCompactServiceCards()}
+                        {renderVideoCallCard()}
                         {renderTopDoctors()}
                     </ScrollView>
                 </View>
@@ -392,6 +715,7 @@ const Home = ({ navigation }) => {
     );
 };
 
+// *** ADDED & MODIFIED STYLES ***
 const styles = StyleSheet.create({
     area: {
         flex: 1,
@@ -413,23 +737,11 @@ const styles = StyleSheet.create({
         width: 42,
         backgroundColor: "#fff",
         borderRadius: 21,
-        flexDirection: "row",
-        alignItems: "center",
+       
     },
     viewRight: {
         flexDirection: "row",
         alignItems: "center"
-    },
-    bellIcon: {
-        height: 24,
-        width: 24,
-        tintColor: COLORS.black,
-        marginRight: 8
-    },
-    bookmarkIcon: {
-        height: 24,
-        width: 24,
-        tintColor: COLORS.black
     },
     searchBarContainer: {
         width: SIZES.width - 32,
@@ -459,71 +771,20 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
         paddingVertical: 0,
     },
-    bannerContainer: {
+    bannerImageContainer: {
         width: SIZES.width - 32,
-        height: 154,
-        paddingHorizontal: 28,
-        paddingTop: 28,
-        borderRadius: 32,
+        height: 160,
+        borderRadius: 20,
+        overflow: 'hidden',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
-    bannerItemContainer: {
-        width: "100%",
-        height: 170,
-        borderRadius: 32,
-        overflow: 'hidden'
-    },
-    bannerTopContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-    bannerDicount: {
-        fontSize: 12,
-        fontFamily: "Urbanist Medium",
-        color: COLORS.white,
-        marginBottom: 4
-    },
-    bannerDiscountName: {
-        fontSize: 16,
-        fontFamily: "Urbanist Bold",
-        color: COLORS.white
-    },
-    bannerDiscountNum: {
-        fontSize: 46,
-        fontFamily: "Urbanist Bold",
-        color: COLORS.white
-    },
-    bannerBottomContainer: {
-        marginTop: 8
-    },
-    bannerBottomTitle: {
-        fontSize: 14,
-        fontFamily: "Urbanist Medium",
-        color: COLORS.white
-    },
-    bannerBottomSubtitle: {
-        fontSize: 14,
-        fontFamily: "Urbanist Medium",
-        color: COLORS.white,
-        marginTop: 4
-    },
-    dotContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 2,
-        width: '100%'
-    },
-    dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: 'black',
-        marginHorizontal: 5,
-    },
-    activeDot: {
-        backgroundColor: COLORS.primary,
+    bannerImage: {
+        width: '100%',
+        height: '100%',
     },
     categoryContainer: {
         flex: 1,
@@ -548,6 +809,16 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
     },
+    catDecorCircle: {
+        position: 'absolute',
+        right: -15,
+        bottom: -15,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderWidth: 15,
+        opacity: 0.3,
+    },
     categoryName: {
         fontSize: 12,
         fontFamily: 'Urbanist-Medium',
@@ -555,50 +826,85 @@ const styles = StyleSheet.create({
         width: '95%',
         color: COLORS.white,
     },
-    serviceCardsGridContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginHorizontal: 2,
+ serviceCardsGridContainer: {
         marginTop: 12,
-        marginBottom: 12,
     },
-
-    gridCard: {
-        borderRadius: 20,
-        padding: 15,
-        flex: 1,
-        flexDirection: 'column',
+  gridServiceCard: {
+        minHeight: 135, // Button ke liye height thodi badhai hai
+        flexDirection: 'row',
+       alignItems: 'center',
+        borderRadius: 22,
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        marginBottom: 14,
+        elevation: 2,
+        paddingBottom:20
+    },
+    btnContainer: {
+        position: 'absolute',
+        bottom: -5,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.4)', // Light glass effect
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        marginTop:5
+    },
+    btnText: {
+        fontSize: 12,
+        fontFamily: 'Urbanist-Bold',
+        marginRight: 4,
+    },
+    gridIconBox: {
+        height: 48,
+        width: 48,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
+        marginRight: 16,
+    },
+    gridTitle: {
+        fontSize: 16,
+        fontFamily: 'Urbanist-Bold',
+        color: '#212121',
+        fontWeight:'bold'
+    },
+  gridSubtitle: {
+        fontSize: 13,
+        fontFamily: 'Urbanist-Medium',
+        color: '#424242',
+        marginTop: 4,
+        lineHeight: 18,
+        paddingBottom: 5,
+        paddingRight: 10, // Button se overlap na ho
+        fontWeight:"bold"
+    },
+
+gridRightImage: {
+  width: 56,
+  height: 56,
+  resizeMode: 'contain',
+  marginLeft: 8,
+},
+
+    // Modified gridCard style
+    gridCard: {
+        borderRadius: 20,
+        flex: 1,
         height: 140,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
             height: 2,
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
+       
     },
-    gridCardIconContainer: {
-        borderRadius: 14,
-        padding: 10,
-        marginBottom: 8,
-    },
-    gridCardTitle: {
-        fontSize: 15,
-        fontFamily: 'Urbanist-Bold',
-        color: "#fff",
-        textAlign: 'center',
-        fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    gridCardSubtitle: {
-        fontSize: 12,
-        fontFamily: 'Urbanist-Regular',
-        color: COLORS.white,
-        textAlign: 'center',
-        fontWeight: 'bold',
+    // New style for the image inside the grid card
+    gridCardImage: {
+        width: '100%',
+        height: '100%',
     },
     compactCardsContainer: {
         flexDirection: 'row',
@@ -644,15 +950,277 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
         marginTop: 2,
+       
     },
-    headerContainer: {
-        flexDirection: "row",
-        width: SIZES.width - 32,
-        justifyContent: "space-between",
-        alignItems: "center"
+    singleCard: {
+  height: 70,                // 🔥 screenshot jaisi height
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#F5F7FF", // light bluish bg
+  borderRadius: 12,
+  paddingHorizontal: 16,
+  marginBottom: 12,
+
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 3,
+},
+
+iconBox: {
+  height: 42,
+  width: 42,
+  borderRadius: 10,
+  backgroundColor: "#E6EBFF", // icon bg
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: 14,
+},
+
+icon: {
+  height: 24,
+  width: 24,
+},
+
+cardText: {
+  fontSize: 16,
+  fontWeight: "600",
+  color: "#1A1A1A",
+},
+serviceCard: {
+        minHeight: 135, // Same height as grid cards for consistency
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 20,
+        paddingHorizontal: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.02)',
     },
 
+serviceIconBox: {
+        height: 48,
+        width: 48,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 16,
+    },
 
+serviceTitle: {
+        fontSize: 16,
+        fontFamily: 'Urbanist-Bold',
+        color: '#212121',
+        fontWeight:"bold"
+    },
+  serviceSubtitle: {
+        fontSize: 12,
+        fontFamily: 'Urbanist-Medium',
+        color: '#424242',
+        marginTop: 4,
+        lineHeight: 18,
+        paddingRight: 10,
+        paddingBottom: 5,
+        fontWeight:"bold"
+    },
+catCard: {
+        width: (SIZES.width - 44) / 2,
+        height: 70, // Compact horizontal height
+        borderRadius: 16,
+        paddingHorizontal: 12,
+        flexDirection: 'row', // Horizontal alignment
+        alignItems: 'center',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    catTextWrapper: {
+        flex: 1,
+    },
+    catCardTitle: {
+        fontSize: 13,
+        fontFamily: 'Urbanist-Bold',
+        color: '#212121',
+        lineHeight: 16,
+    },
+    catIconWrapper: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    catIconContainer: {
+        marginTop: 15,
+        alignItems: 'flex-start',
+    },
+    catIcon: {
+        width: 24,
+        height: 24,
+    },
+   pagination: {
+    position: 'absolute',
+    bottom: 10,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+},
+dot: {
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    marginHorizontal: 4,
+},
+categoryCard: {
+  width: (SIZES.width - 44) / 2,
+  height: 88,
+  borderRadius: 18,
+  padding: 14,
+  flexDirection: 'row',
+  alignItems: 'center',
+  position: 'relative',
+  overflow: 'hidden',   // 🔥 IMPORTANT
+
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 3,
+},
+
+
+categoryIconBox: {
+  width: 42,
+  height: 42,
+  borderRadius: 12,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: 12,
+},
+
+categoryIcon: {
+  width: 22,
+  height: 22,
+  tintColor: '#fff',
+},
+
+categoryTitle: {
+  flex: 1,
+  fontSize: 14,
+  fontFamily: 'Urbanist-Bold',
+  color: '#263238',
+  lineHeight: 18,
+  fontWeight:"bold"
+},
+
+decorCircle: {
+  position: 'absolute',
+  right: -18,
+  bottom: -18,
+  width: 70,
+  height: 70,
+  borderRadius: 35,
+  borderWidth: 14,
+  opacity: 0.15,
+},
+// Isse exact icon ke top-right par alignment mil jayegi
+    badgeWrapper: {
+        position: 'absolute',
+        top: -6,
+        right: -6,
+        zIndex: 10, // Sabse upar dikhne ke liye
+    },
+    badgeGradient: {
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: '#fff',
+        elevation: 4,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 10,
+        fontFamily: 'Urbanist-Bold',
+        includeFontPadding: false,
+        textAlignVertical: 'center',
+    },
+    videoCallCard: {
+        marginVertical: 14,
+        borderRadius: 22,
+        overflow: 'hidden',
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+    },
+    videoGradient: {
+        padding: 22,
+    },
+    videoIconContainer: {
+        position: 'relative', // IMPORTANT for badge positioning
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        padding: 12,
+        borderRadius: 16,
+    },
+    videoTitle: {
+        color: '#fff',
+        fontSize: 19,
+        fontFamily: 'Urbanist-Bold',
+    },
+    videoStatusBadge: {
+        color: '#B2DFDB',
+        fontSize: 10,
+        fontFamily: 'Urbanist-Bold',
+        marginTop: 2,
+        letterSpacing: 1.2,
+    },
+    videoSub: {
+        color: 'rgba(255,255,255,0.9)',
+        fontSize: 13,
+        fontFamily: 'Urbanist-Medium',
+        lineHeight: 19,
+    },
+    appointmentDetailBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 12,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        alignSelf: 'flex-start',
+    },
+    videoAppointText: {
+        color: '#fff',
+        fontSize: 12,
+        fontFamily: 'Urbanist-SemiBold',
+        marginLeft: 8,
+    },
+    videoFooter: {
+        marginTop: 18,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.2)',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    videoFooterText: {
+        color: '#fff',
+        fontSize: 14,
+        fontFamily: 'Urbanist-Bold',
+        marginRight: 8,
+    },
+    // Removed unused styles to keep it clean
 });
 
 export default Home;

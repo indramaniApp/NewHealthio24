@@ -37,7 +37,7 @@ const AccountDeletion = () => {
     return (
         <SafeAreaView style={styles.area}>
             <LinearGradient
-                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#fff', '#fff', '#fff', '#fff', '#fff']}
                 style={styles.gradientContainer}
             >
                 <Header title={'Delete Account'}

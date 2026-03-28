@@ -85,7 +85,7 @@ const SurgicalDepartment = ({ route }) => {
     return (
     
         <LinearGradient
-            colors={['#00b4db', '#ffff', '#ffff']}
+            colors={['#fff', '#ffff', '#ffff']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={styles.safeArea}>

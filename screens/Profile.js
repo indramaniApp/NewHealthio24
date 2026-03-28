@@ -87,21 +87,21 @@ const Profile = ({ navigation }) => {
                 name="Edit Profile"
                 onPress={() => navigation.navigate("EditProfile", { profile })}
             />
-            <SettingsItem
+            {/* <SettingsItem
                 icon={icons.shieldOutline}
                 name="Security"
                 onPress={() => navigation.navigate("SettingsSecurity")}
-            />
+            /> */}
             <SettingsItem
                 icon={icons.lockedComputerOutline}
                 name="Privacy Policy"
                 onPress={() => navigation.navigate("SettingsPrivacyPolicy")}
             />
-            <SettingsItem
+            {/* <SettingsItem
                 icon={icons.infoCircle}
                 name="Help Center"
                 onPress={() => navigation.navigate("HelpCenter")}
-            />
+            /> */}
             <SettingsItem
                 icon={icons.people4}
                 name="Invite Friends"
@@ -125,7 +125,7 @@ const Profile = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.area}>
             <LinearGradient
-                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#fff', '#fff', '#fff', '#fff', '#fff']}
                 style={styles.gradientContainer}
             >
                 <ScrollView

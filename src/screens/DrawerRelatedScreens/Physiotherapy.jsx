@@ -19,7 +19,7 @@ import { ENDPOINTS } from '../../constants/Endpoints';
 import { useDispatch } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import LinearGradient from 'react-native-linear-gradient'; // Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const placeholderImage = require('../../../assets/physiotherapy.png');
 
@@ -32,7 +32,6 @@ const Physiotherapy = ({ navigation }) => {
         try {
             dispatch(showLoader());
             const response = await ApiService.get(ENDPOINTS.patient_get_physiotherapys);
-            console.log('physiotherapy data===============', response.data);
             setPhysiotherapy(response.data);
         } catch (error) {
             console.log('Error fetching physiotherapy:', error);
@@ -80,31 +79,47 @@ const Physiotherapy = ({ navigation }) => {
 
         return (
             <View style={styles.card}>
-                <View style={styles.imageWrapper}>
-                    <Image source={imageSource} style={styles.photo} resizeMode="cover" />
-                </View>
+                {/* Image left */}
+                <Image source={imageSource} style={styles.image} resizeMode="cover" />
 
+                {/* Content right */}
                 <View style={styles.cardContent}>
                     <Text style={styles.name}>{centreName}</Text>
 
                     <View style={styles.row}>
-                        <Icon name="id-card" size={14} color={COLORS.primary} style={styles.icon} />
-                        <Text style={styles.text}><Text style={styles.label}>Reg.No:</Text> {registrationNumber}</Text>
+                        <View style={styles.iconCircle}>
+                            <Icon name="id-card" size={14} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.text}>
+                            <Text style={styles.label}>Reg.No:</Text> {registrationNumber}
+                        </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Icon name="calendar-alt" size={14} color={COLORS.primary} style={styles.icon} />
-                        <Text style={styles.text}><Text style={styles.label}>Established:</Text> {dateOfEstablishment}</Text>
+                        <View style={styles.iconCircle}>
+                            <Icon name="calendar-alt" size={14} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.text}>
+                            <Text style={styles.label}>Established:</Text> {dateOfEstablishment}
+                        </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Icon name="hospital" size={14} color={COLORS.primary} style={styles.icon} />
-                        <Text style={styles.text}><Text style={styles.label}>Type:</Text> {centreType}</Text>
+                        <View style={styles.iconCircle}>
+                            <Icon name="hospital" size={14} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.text}>
+                            <Text style={styles.label}>Type:</Text> {centreType}
+                        </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Icon name="map-marker-alt" size={14} color={COLORS.primary} style={styles.icon} />
-                        <Text style={styles.text}><Text style={styles.label}>Address:</Text> {`${street}, ${city}, ${state}, ${postalCode}`}</Text>
+                        <View style={styles.iconCircle}>
+                            <Icon name="map-marker-alt" size={14} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.text}>
+                            <Text style={styles.label}>Address:</Text> {`${street}, ${city}, ${state}, ${postalCode}`}
+                        </Text>
                     </View>
 
                     <TouchableOpacity
@@ -121,11 +136,12 @@ const Physiotherapy = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <LinearGradient
-                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#fff', '#e0f7fa', '#fff']}
                 style={styles.gradientContainer}
             >
-                <Header title="Physiotherapy Centre List" onBackPress={() => navigation.goBack()} />
+                <Header title="Physiotherapy Centresss List" onBackPress={() => navigation.goBack()} />
 
+                {/* Search Bar */}
                 <View style={styles.searchBarWrapper}>
                     <Icon name="search" size={16} color={COLORS.gray} style={styles.searchIcon} />
                     <TextInput
@@ -137,12 +153,13 @@ const Physiotherapy = ({ navigation }) => {
                     />
                 </View>
 
+                {/* List */}
                 <FlatList
                     data={filteredData}
                     keyExtractor={(item) => item._id}
                     renderItem={renderCentreCard}
                     contentContainerStyle={{ padding: 16 }}
-                    ItemSeparatorComponent={() => <View style={{ height: 18 }} />}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
                     showsVerticalScrollIndicator={false}
                     ListFooterComponent={<View style={{ height: 100 }} />}
                     ListEmptyComponent={
@@ -160,101 +177,113 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        backgroundColor: '#f5f7fa',
     },
-    gradientContainer: { // Style for the gradient
+    gradientContainer: {
         flex: 1,
     },
     searchBarWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         marginHorizontal: SIZES.padding,
-        marginTop: 10,
-        marginBottom: 10,
-        paddingHorizontal: 12,
-        paddingVertical: Platform.OS === 'ios' ? 10 : 6,
-        borderRadius: 25,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        backgroundColor: '#f0f0f0',
-        elevation: 2,
+        marginVertical: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 30,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     searchIcon: {
-        marginRight: 8,
-        padding: 6,
-        backgroundColor: '#e6e6e6',
-        borderRadius: 20,
+        marginRight: 10,
     },
     searchInput: {
         flex: 1,
         fontSize: 15,
         paddingVertical: 0,
         fontFamily: 'Urbanist-Regular',
+        color: '#333',
     },
     card: {
-        borderRadius: 20,
-        overflow: 'hidden',
-        backgroundColor: '#fefefe',
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderRadius: 16,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.05,
         shadowRadius: 10,
-        elevation: 6,
-        borderWidth: 1,
-        borderColor: '#f0f0f0',
+        elevation: 4,
+        overflow: 'hidden',
+        marginVertical: 8,
+        alignItems:'center'
     },
-    imageWrapper: {
-        width: '100%',
-        height: 150,
-        backgroundColor: '#e6e6e6',
-    },
-    photo: {
-        width: '100%',
-        height: '100%',
+    image: {
+        width: 100,
+        height: 100,
+       borderRadius:10,
+        marginLeft: 10,
     },
     cardContent: {
-        padding: 16,
+        flex: 1,
+        padding: 12,
+        justifyContent: 'center',
     },
     name: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 18,
+        fontWeight: '700',
         color: COLORS.primary,
-        marginBottom: 10,
+        marginBottom: 6,
     },
     row: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 8,
+        alignItems: 'center',
+        marginBottom: 4,
     },
-    icon: {
-        marginRight: 6,
-        marginTop: 2,
+    iconCircle: {
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        backgroundColor: '#e0f7fa',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
     },
     text: {
-        fontSize: 14,
-        color: COLORS.grayscale700,
+        fontSize: 13,
+        color: '#555',
         flexShrink: 1,
     },
     label: {
         fontWeight: '600',
+        color: COLORS.primary,
+    },
+    separator: {
+        height: 1,
+        backgroundColor: '#eee',
+        marginVertical: 4,
     },
     bookButton: {
-        marginTop: 12,
+        marginTop: 8,
         backgroundColor: COLORS.primary,
-        borderRadius: 30,
-        paddingVertical: 10,
-        paddingHorizontal: 24,
+        paddingVertical: 8,
+        paddingHorizontal: 18,
+        borderRadius: 25,
         alignSelf: 'flex-start',
         shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 3,
+        elevation: 2,
     },
     bookButtonText: {
-        color: COLORS.white,
+        color: '#fff',
         fontWeight: '600',
         fontSize: 15,
     },
 });
+
 
 export default Physiotherapy;

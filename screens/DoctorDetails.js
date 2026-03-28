@@ -6,6 +6,7 @@ import {
     StyleSheet,
     FlatList,
     Modal,
+    StatusBar,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -204,10 +205,16 @@ const DoctorDetails = ({ navigation, route }) => {
     };
 
     return (
+        <>
+        <StatusBar barStyle="light-content" backgroundColor="#001F3F" />
         <LinearGradient
-            colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
+            colors={['#001F3F', '#003366', '#fff', '#fff', '#fff', '#fff']}
             style={{ flex: 1 }}
         >
+            <StatusBar
+  backgroundColor="#001F3F"
+  barStyle="light-content"
+/>
             <SafeAreaView style={styles.area}>
                 <View style={styles.container}>
                     {renderHeader()}
@@ -247,7 +254,7 @@ const DoctorDetails = ({ navigation, route }) => {
                                 onPress={() => handleBookOption('wallet')}
                             >
                                 <LinearGradient
-                                    colors={['#0077b6', '#00b4db']}
+                                    colors={['#001F3F', '#003366']}
                                     style={styles.modalGradientButton}
                                 >
                                     <Text style={styles.modalButtonText}>Book by Wallet</Text>
@@ -260,7 +267,7 @@ const DoctorDetails = ({ navigation, route }) => {
                                 onPress={() => handleBookOption('payment')}
                             >
                                 <LinearGradient
-                                    colors={['#0077b6', '#00b4db']}
+                                    colors={['#001F3F', '#003366']}
                                     style={styles.modalGradientButton}
                                 >
                                     <Text style={styles.modalButtonText}>Book by Payment</Text>
@@ -279,6 +286,7 @@ const DoctorDetails = ({ navigation, route }) => {
                 </Modal>
             </SafeAreaView>
         </LinearGradient>
+         </>
     );
 };
 
@@ -352,7 +360,7 @@ const styles = StyleSheet.create({
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
     modalContainer: { width: '80%', backgroundColor: 'white', borderRadius: 20, padding: 20, alignItems: 'center' },
     modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-    // 👇 3. ग्रेडिएंट बटन के लिए नई स्टाइल
+  
     modalGradientButton: {
         paddingVertical: 12,
         borderRadius: 12,
@@ -360,7 +368,7 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
     },
-    // यह स्टाइल Cancel बटन के लिए है
+  
     modalButton: {
         backgroundColor: COLORS.primary,
         paddingVertical: 12,

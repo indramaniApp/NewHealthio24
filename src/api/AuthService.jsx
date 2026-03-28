@@ -1,59 +1,59 @@
 import { API_BASE_URL } from '../../src/api/config/ApiConfig';
-
 import StorageHelper from '../../utils/StorageHelper';
 import { ENDPOINTS } from "../constants/Endpoints";
 
-// console.log(ENDPOINTS); 
-// console.log("API_BASE_URL:============== ", API_BASE_URL);  
 const AuthService = {
-    // Send OTP to the provided phone number
-    sendOtp: async (phone) => {
+
+    // ✅ SEND OTP (FIXED)
+    sendOtp: async (payload) => {
         try {
-            console.log("Sending OTP for phone number: ", phone);
+            console.log("Sending OTP payload:", payload);
 
             const response = await fetch(`${API_BASE_URL}${ENDPOINTS.SEND_OTP}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone }),
+                body: JSON.stringify(payload),   // ✅ FIX — no nesting अब
             });
 
             const data = await response.json();
-            console.log("Send OTP Response: ", data);
+            console.log("Send OTP Response:", data);
 
             if (data.status === "success") {
-                return data;  // Success message or any relevant info from the API
+                return data;
             } else {
                 throw new Error(data.message || "Failed to send OTP.");
             }
         } catch (error) {
-            console.error("Error sending OTP: ", error);
+            console.error("Error sending OTP:", error);
             throw error;
         }
     },
 
-    // Verify the OTP sent to the phone number
+    // ✅ VERIFY OTP
     verifyOtp: async (phoneNumber, otp) => {
         try {
-            console.log("Verifying OTP for phone number: ", phone);
+            console.log("Verifying OTP for phone number:", phoneNumber);
 
             const response = await fetch(`${API_BASE_URL}${ENDPOINTS.VERIFY_OTP}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, otp }),
+                body: JSON.stringify({
+                    phone: phoneNumber,
+                    otp: otp,
+                }),
             });
 
             const data = await response.json();
-            console.log("Verify OTP Response: ", data);
+            console.log("Verify OTP Response:", data);
 
             if (data.accessToken) {
-                // Save the access token if verification is successful
                 await StorageHelper.setItem("accessToken", data.accessToken);
-                return data;  // Return data (access token and user info)
+                return data;
             } else {
                 throw new Error(data.message || "Failed to verify OTP.");
             }
         } catch (error) {
-            console.error("Error verifying OTP: ", error);
+            console.error("Error verifying OTP:", error);
             throw error;
         }
     },

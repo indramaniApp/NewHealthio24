@@ -31,6 +31,7 @@ const GovHospitalDetailScreen = () => {
     try {
       dispatch(showLoader());
       const response = await ApiService.get(`${ENDPOINTS.patient_get_hospital_detail}/${hospitalId}`);
+      console.log('response=======',response)
       setHospital(response.data);
     } catch (error) {
       console.log('Error fetching hospital detail:', error);

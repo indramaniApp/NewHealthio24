@@ -7,19 +7,26 @@ import {
     ScrollView,
     SafeAreaView,
     Modal,
+    StatusBar,
+    Platform,
+    Dimensions,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import LinearGradient from 'react-native-linear-gradient';
 import Header from '../../components/Header';
 import Button from '../../components/Button';
-import { COLORS, SIZES } from '../../constants';
+import { COLORS } from '../../constants';
 import { useTheme } from '../../theme/ThemeProvider';
 import { hoursData } from '../../data';
-import LinearGradient from 'react-native-linear-gradient';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const GRADIENT_COLORS = ['#e44949', '#be48d3'];
 
 const DialysisSelectSlot = ({ navigation, route }) => {
     const { unitId } = route.params || {};
-    console.log('Selected Patient Mitra ID:=======', unitId);
     const { colors, dark } = useTheme();
+
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedHour, setSelectedHour] = useState(null);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -52,81 +59,133 @@ const DialysisSelectSlot = ({ navigation, route }) => {
         });
     };
 
+    const isPastSlot = (slotHour) => {
+        if (!selectedDate) return false;
+
+        const now = new Date();
+
+        const today =
+            now.getFullYear() +
+            '-' +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            '-' +
+            String(now.getDate()).padStart(2, '0');
+
+        if (selectedDate !== today) return false;
+
+        const [time, modifier] = slotHour.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+
+        if (modifier === 'PM' && hours !== 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        const slotTime = new Date();
+        slotTime.setHours(hours, minutes || 0, 0, 0);
+
+        return slotTime.getTime() <= now.getTime();
+    };
+
     return (
-        
-        <LinearGradient
-            colors={['#00b4db', '#fff', '#fff']}
-            style={{ flex: 1 }}
-        >
-            <SafeAreaView style={styles.safeArea}>
-                <Header title="Select Appointment Slot" onBackPress={() => navigation.goBack()}
-                style={{ backgroundColor: 'transparent', marginTop: 40 }}
+        <SafeAreaView style={styles.safeArea}>
+            <StatusBar
+                barStyle={dark ? 'light-content' : 'dark-content'}
+                backgroundColor="#fff"
+            />
+
+            <View style={{ flex: 1 }}>
+                <Header
+                    title="Select Appointment Slot"
+                    onBackPress={() => navigation.goBack()}
                 />
 
-                <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
-                    <View style={styles.container}>
-                        <Text style={[styles.label, { color: colors.text }]}>Select Date</Text>
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1, paddingBottom: 140, paddingHorizontal: 16 }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <Text style={[styles.label, { color: colors.text }]}>Select Date</Text>
 
-                        <View style={styles.calendarCard}>
-                            <Calendar
-                                onDayPress={(day) => setSelectedDate(day.dateString)}
-                                minDate={new Date().toISOString().split('T')[0]}
-                                markedDates={{
-                                    [selectedDate]: {
-                                        selected: true,
-                                        selectedColor: COLORS.primary,
-                                    },
-                                }}
-                                theme={{
-                                    backgroundColor: '#F2F6FD',
-                                    calendarBackground: '#F2F6FD',
-                                    textSectionTitleColor: colors.text,
-                                    selectedDayTextColor: '#fff',
-                                    todayTextColor: COLORS.primary,
-                                    dayTextColor: colors.text,
-                                    arrowColor: COLORS.primary,
-                                    monthTextColor: COLORS.primary,
-                                }}
-                                style={{
-                                    borderRadius: 12,
-                                    backgroundColor: '#F2F6FD',
-                                    padding: 5,
-                                }}
-                            />
-                        </View>
+                    <View style={styles.calendarCard}>
+                        <Calendar
+                            onDayPress={(day) => {
+                                setSelectedDate(day.dateString);
+                                setSelectedHour(null);
+                            }}
+                            minDate={new Date().toISOString().split('T')[0]}
+                            markedDates={{
+                                [selectedDate]: {
+                                    selected: true,
+                                    selectedColor: GRADIENT_COLORS[0],
+                                },
+                            }}
+                            theme={{
+                                todayTextColor: GRADIENT_COLORS[0],
+                                arrowColor: GRADIENT_COLORS[0],
+                                monthTextColor: GRADIENT_COLORS[0],
+                                selectedDayTextColor: '#fff',
+                                dayTextColor: colors.text,
+                            }}
+                        />
+                    </View>
 
-                        {selectedDate && (
-                            <Text style={[styles.selectedDateText, { color: COLORS.primary }]}>
-                                Selected: {selectedDate}
-                            </Text>
-                        )}
+                    {selectedDate && (
+                        <Text style={styles.selectedDateText}>
+                            Selected: {selectedDate}
+                        </Text>
+                    )}
 
-                        <Text style={[styles.label, { color: colors.text }]}>Select Time Slot</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>Select Time Slot</Text>
 
-                        <View style={styles.slotGrid}>
-                            {hoursData.map((item) => {
-                                const isSelected = selectedHour === item.hour;
-                                return (
-                                    <TouchableOpacity
-                                        key={item.id}
-                                        style={[styles.hourBox, isSelected && styles.selectedHourBox]}
-                                        onPress={() => handleHourSelect(item.hour)}
+                    <View style={styles.slotGrid}>
+                        {hoursData.map((item) => {
+                            const isSelected = selectedHour === item.hour;
+                            const disabled = isPastSlot(item.hour);
+
+                            return (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={styles.hourBoxWrapper}
+                                    onPress={() => !disabled && handleHourSelect(item.hour)}
+                                    activeOpacity={disabled ? 1 : 0.7}
+                                >
+                                    <LinearGradient
+                                        colors={isSelected ? GRADIENT_COLORS : ['#F2F6FD', '#F2F6FD']}
+                                        style={[
+                                            styles.hourBox,
+                                            disabled && styles.disabledHourBox,
+                                        ]}
                                     >
-                                        <Text style={[styles.hourText, isSelected && styles.selectedHourText]}>
+                                        <Text
+                                            style={[
+                                                styles.hourText,
+                                                isSelected && styles.selectedHourText,
+                                                disabled && styles.disabledHourText,
+                                            ]}
+                                        >
                                             {item.hour}
                                         </Text>
-                                    </TouchableOpacity>
-                                );
-                            })}
-                        </View>
+                                    </LinearGradient>
+                                </TouchableOpacity>
+                            );
+                        })}
                     </View>
                 </ScrollView>
 
-                <View style={[styles.bottomBar, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
-                    <Button title="Next" filled style={styles.btn} onPress={handleNext} />
-                </View>
+                {/* Bottom Button */}
+               <View style={styles.bottomBar}>
+  <Button
+      title="Next"
+      filled
+      colors={GRADIENT_COLORS} // red-purple gradient only here
+      style={{
+          width: SCREEN_WIDTH - 32,
+          height: 52,
+          borderRadius: 14,
+      }}
+      onPress={handleNext}
+  />
+</View>
 
-                {/* Modal for Payment Method */}
+                {/* Payment Modal */}
                 <Modal
                     visible={showPaymentModal}
                     transparent
@@ -134,11 +193,25 @@ const DialysisSelectSlot = ({ navigation, route }) => {
                     onRequestClose={() => setShowPaymentModal(false)}
                 >
                     <View style={styles.modalOverlay}>
-                        <View style={[styles.modalContainer, { backgroundColor: COLORS.white }]}>
-                            <Text style={[styles.modalTitle, { color: COLORS.text }]}>Choose Payment Method</Text>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Choose Payment Method</Text>
 
-                            <Button title="Book by Wallet" filled style={styles.modalButton} onPress={handleBookByWallet} />
-                            <Button title="Book by Payment" outlined style={styles.modalButton} onPress={handleBookByPayment} />
+                          <Button
+    title="Book by Wallet"
+    filled
+    colors={GRADIENT_COLORS}
+    style={{ width: '100%', height: 50, borderRadius: 14, marginBottom: 12 }}
+    onPress={handleBookByWallet}
+/>
+
+<Button
+    title="Book by Payment"
+    filled
+    colors={GRADIENT_COLORS}
+    style={{ width: '100%', height: 50, borderRadius: 14, marginBottom: 12 }}
+    onPress={handleBookByPayment}
+/>
+
 
                             <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
                                 <Text style={styles.modalCancel}>Cancel</Text>
@@ -146,71 +219,80 @@ const DialysisSelectSlot = ({ navigation, route }) => {
                         </View>
                     </View>
                 </Modal>
-            </SafeAreaView>
-        </LinearGradient>
+            </View>
+        </SafeAreaView>
     );
 };
 
 export default DialysisSelectSlot;
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-   
-    },
-    container: {
-        padding: 16,
-    },
+    safeArea: { flex: 1, backgroundColor: '#fff' },
+
     label: {
-        fontSize: 16,
-        fontFamily: 'Urbanist SemiBold',
+        fontSize: SCREEN_WIDTH * 0.04,
+        fontFamily: 'Urbanist-SemiBold',
         marginBottom: 8,
         marginTop: 12,
     },
+
     calendarCard: {
         backgroundColor: '#F2F6FD',
         borderRadius: 16,
         padding: 10,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
+        marginBottom: 12,
     },
+
     selectedDateText: {
-        fontSize: 14,
-        fontFamily: 'Urbanist Medium',
+        fontSize: SCREEN_WIDTH * 0.035,
+        fontFamily: 'Urbanist-Medium',
         textAlign: 'center',
         marginVertical: 12,
+        color: GRADIENT_COLORS[0],
     },
+
     slotGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
     },
+
+    hourBoxWrapper: {
+        flexBasis: '30%',
+        marginBottom: 12,
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+
     hourBox: {
-        width: (SIZES.width - 64) / 3,
-        height: 48,
-        borderRadius: 10,
+        height: SCREEN_HEIGHT * 0.065,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: COLORS.primary,
-        backgroundColor: '#F2F6FD',
+        borderColor: GRADIENT_COLORS[0],
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12,
     },
-    selectedHourBox: {
-        backgroundColor: COLORS.primary,
+
+    disabledHourBox: {
+        backgroundColor: '#e0e0e0',
+        borderColor: '#aaa',
     },
+
     hourText: {
-        fontSize: 15,
-        fontFamily: 'Urbanist SemiBold',
-        color: COLORS.primary,
+        fontSize: SCREEN_WIDTH * 0.035,
+        fontFamily: 'Urbanist-SemiBold',
+        color: GRADIENT_COLORS[0],
     },
+
     selectedHourText: {
         color: '#fff',
         fontWeight: '600',
     },
+
+    disabledHourText: {
+        color: '#888',
+    },
+
     bottomBar: {
         position: 'absolute',
         bottom: 0,
@@ -218,40 +300,62 @@ const styles = StyleSheet.create({
         height: 90,
         justifyContent: 'center',
         alignItems: 'center',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        elevation: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowOffset: { width: 0, height: -2 },
+        backgroundColor: '#fff',
     },
-    btn: {
-        width: SIZES.width - 32,
+
+    gradientBtn: {
+        width: SCREEN_WIDTH - 32,
+        borderRadius: 14,
+        overflow: 'hidden',
     },
+
+    innerBtn: {
+        backgroundColor: 'transparent',
+    },
+
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.4)',
         justifyContent: 'center',
         alignItems: 'center',
     },
+
     modalContainer: {
         width: '85%',
         padding: 20,
         borderRadius: 16,
         alignItems: 'center',
+        backgroundColor: '#fff',
     },
+
     modalTitle: {
-        fontSize: 18,
-        fontFamily: 'Urbanist SemiBold',
+        fontSize: SCREEN_WIDTH * 0.045,
+        fontFamily: 'Urbanist-SemiBold',
         marginBottom: 20,
     },
-    modalButton: {
+
+    modalGradientBtn: {
         width: '100%',
+        borderRadius: 14,
         marginBottom: 12,
+        overflow: 'hidden',
     },
+
+    modalBtnInner: {
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    modalBtnText: {
+        color: '#fff',
+        fontFamily: 'Urbanist-SemiBold',
+        fontSize: 16,
+    },
+
     modalCancel: {
         marginTop: 10,
-        color: COLORS.primary,
-        fontFamily: 'Urbanist Medium',
+        color: GRADIENT_COLORS[0],
+        fontFamily: 'Urbanist-Medium',
     },
 });

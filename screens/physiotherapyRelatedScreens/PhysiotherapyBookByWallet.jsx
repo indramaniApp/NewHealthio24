@@ -67,11 +67,11 @@ const PhysiotherapyBookByWallet = ({ route, navigation }) => {
     return (
         // 2. मुख्य View को LinearGradient से बदलें
         <LinearGradient
-            colors={['#00b4db', '#f5fcff', '#fff']}
+            colors={['#fff', '#f5fcff', '#fff']}
             style={styles.container}
         >
             {/* 3. StatusBar को ग्रेडिएंट के अनुसार एडजस्ट करें */}
-            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
             <Header 
                 title="Book Physiotherapy" 
                 onBackPress={() => navigation.goBack()}
@@ -134,7 +134,7 @@ const PhysiotherapyBookByWallet = ({ route, navigation }) => {
                     placeholder="Enter Reason"
                     placeholderTextColor="#9CA3AF"
                 />
-
+{/* 
                 <Text style={styles.label}>Referral ID (Optional)</Text>
                 <TextInput
                     style={styles.input}
@@ -142,7 +142,7 @@ const PhysiotherapyBookByWallet = ({ route, navigation }) => {
                     onChangeText={setReferralId}
                     placeholder="Enter Referral ID"
                     placeholderTextColor="#9CA3AF"
-                />
+                /> */}
 
                 {/* 4. बटन पर ग्रेडिएंट लगाएं */}
                 <TouchableOpacity onPress={handleSubmit}>

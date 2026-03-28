@@ -160,208 +160,73 @@ export const banners = [
 ];
 
 export const categories = [
-    {
-        id: "1",
-        name: "Physician",
-        icon: icons.friends,
-        iconColor: "rgba(36, 107, 253, 1)", 
-        backgroundColor: "rgba(36, 107, 253, .12)",
-        onPress: "CategoryGeneralist"
-    },
-    {
-        id: "2",
-        name: "Dentist",
-        icon: icons.tooth,
-        iconColor: "rgba(0, 184, 217, 1)", // Cyan
-        backgroundColor: "rgba(0, 184, 217, .12)",
-        onPress: "CategoryDentist"
-    },
-    {
-        id: "3",
-        name: "Eye Specialist",
-        icon: icons.eye,
-        iconColor: "rgba(126, 87, 194, 1)", // Purple
-        backgroundColor: "rgba(126, 87, 194, .12)",
-        onPress: "CategoryOphthalmologist"
-    },
-    {
-        id: "4",
-        name: "Nutritionist",
-        icon: icons.nutrition1,
-        iconColor: "rgba(76, 175, 80, 1)", // Green
-        backgroundColor: "rgba(76, 175, 80, .12)",
-        onPress: "CategoryNutritionist"
-    },
-    {
-        id: "5",
-        name: "Neurologist",
-        icon: icons.brain,
-        iconColor: "rgba(236, 64, 122, 1)", // Pink
-        backgroundColor: "rgba(236, 64, 122, .12)",
-        onPress: "CategoryNeurologist"
-    },
-    {
-        id: "6",
-        name: "Dietitian",
-        icon: icons.dietitian,
-        iconColor: "rgba(156, 204, 101, 1)", // Light Green
-        backgroundColor: "rgba(156, 204, 101, .12)",
-        onPress: null
-    },
-    {
-        id: "7", // Corrected duplicate ID
-        name: "Ear Nose Throat Specialist",
-        icon: icons.ent,
-        iconColor: "rgba(255, 167, 38, 1)", // Orange
-        backgroundColor: "rgba(255, 167, 38, .12)",
-        onPress: null
-    },
-    {
-        id: "8",
-        name: "Stomach Specialist", // Corrected typo
-        icon: icons.stomatch,
-        iconColor: "rgba(161, 136, 127, 1)", // Brown
-        backgroundColor: "rgba(161, 136, 127, .12)",
-        onPress: null
-    },
-    {
-        id: "9",
-        name: "More",
-        icon: icons.more3,
-        iconColor: "rgba(144, 164, 174, 1)", // Gray
-        backgroundColor: "rgba(144, 164, 174, .12)",
-        onPress: null
-    },
-    {
-        id: "10",
-        name: "Women Health",
-        icon: icons.childspeciality,
-        iconColor: "rgba(240, 98, 146, 1)", // Light Pink
-        backgroundColor: "rgba(240, 98, 146, .12)",
-        onPress: null
-    },
-    {
-        id: "11",
-        name: "Skin & Hair",
-        icon: icons.skin,
-        iconColor: "rgba(255, 204, 128, 1)", // Peach
-        backgroundColor: "rgba(255, 204, 128, .12)",
-        onPress: null
-    },
-    {
-        id: "12",
-        name: "Diabetes Specialist",
-        icon: icons.sugar,
-        iconColor: "rgba(66, 165, 245, 1)", // Light Blue
-        backgroundColor: "rgba(66, 165, 245, .12)",
-        onPress: null
-    },
-    {
-        id: "13",
-        name: "Kidney Specialist", // Corrected typo
-        icon: icons.kidney,
-        iconColor: "rgba(229, 115, 115, 1)", // Red
-        backgroundColor: "rgba(229, 115, 115, .12)",
-        onPress: null
-    },
-    {
-        id: "14",
-        name: "Child Specialist",
-        icon: icons.children,
-        iconColor: "rgba(255, 202, 40, 1)", // Yellow
-        backgroundColor: "rgba(255, 202, 40, .12)",
-        onPress: "CategoryPediatric"
-    },
-    {
-        id: "15",
-        name: "Bone Joints",
-        icon: icons.joint2,
-        iconColor: "rgba(120, 144, 156, 1)", // Blue Gray
-        backgroundColor: "rgba(120, 144, 156, .12)",
-        onPress: null
-    },
-    {
-        id: "16",
-        name: "Lungs Specialist",
-        icon: icons.activity,
-        iconColor: "rgba(79, 195, 247, 1)", // Sky Blue
-        backgroundColor: "rgba(79, 195, 247, .12)",
-        onPress: null
-    },
-    {
-        id: "17",
-        name: "Brain Specialist",
-        icon: icons.brain2,
-        iconColor: "rgba(171, 71, 188, 1)", // Magenta
-        backgroundColor: "rgba(171, 71, 188, .12)",
-        onPress: null
-    },
-    {
-        id: "18",
-        name: "Mental Health",
-        icon: icons.brain,
-        iconColor: "rgba(38, 166, 154, 1)", // Teal
-        backgroundColor: "rgba(38, 166, 154, .12)",
-        onPress: null
-    },
-    {
-        id: "19",
-        name: "Cancer Specialist",
-        icon: icons.cancer,
-        iconColor: "rgba(149, 117, 205, 1)", // Lavender
-        backgroundColor: "rgba(149, 117, 205, .12)",
-        onPress: null
-    },
-    {
-        id: "20",
-        name: "Liver Specialist",
-        icon: icons.liver,
-        iconColor: "rgba(198, 40, 40, 1)", // Dark Red
-        backgroundColor: "rgba(198, 40, 40, .12)",
-        onPress: null
-    },
-    // ... continues for all other categories with unique colors
-    {
-        id: "46",
-        name: "Cardiologist",
-        icon: icons.cardiologist,
-        iconColor: "rgba(211, 47, 47, 1)", // Red
-        backgroundColor: "rgba(211, 47, 47, .12)",
-        onPress: null
-    },
-    {
-        id: "47",
-        name: "Dermatologist", // Corrected typo
-        icon: icons.dermatology,
-        iconColor: "rgba(255, 138, 101, 1)", // Coral
-        backgroundColor: "rgba(255, 138, 101, .12)",
-        onPress: null
-    },
-    {
-        id: "48",
-        name: "Neurologist", // Note: Duplicate name with id: 5
-        icon: icons.brain,
-        iconColor: "rgba(171, 71, 188, 1)", // Magenta
-        backgroundColor: "rgba(171, 71, 188, .12)",
-        onPress: null
-    },
-    {
-        id: "49",
-        name: "Psychiatrist",
-        icon: icons.psychiatrist,
-        iconColor: "rgba(0, 121, 107, 1)", // Dark Teal
-        backgroundColor: "rgba(0, 121, 107, .12)",
-        onPress: null
-    },
-    {
-        id: "50",
-        name: "ENT Surgeon",
-        icon: icons.ent,
-        iconColor: "rgba(255, 143, 0, 1)", // Amber
-        backgroundColor: "rgba(255, 143, 0, .12)",
-        onPress: "CategoryRadiologist"
-    }
+    { id: "1", name: "General Physician", icon: icons.friends, iconColor: "rgba(36, 107, 253, 1)", backgroundColor: "rgba(36, 107, 253, .12)", onPress: "CategoryGeneralPhysician" },
+
+    { id: "2", name: "General Surgeon", icon: icons.surgeon, iconColor: "rgba(63, 81, 181, 1)", backgroundColor: "rgba(63, 81, 181, .12)", onPress: "CategoryGeneralSurgeon" },
+
+    { id: "3", name: "Dentist", icon: icons.tooth, iconColor: "rgba(0, 184, 217, 1)", backgroundColor: "rgba(0, 184, 217, .12)", onPress: "CategoryDentist" },
+
+    { id: "4", name: "Cardiologist", icon: icons.heart, iconColor: "rgba(233, 30, 99, 1)", backgroundColor: "rgba(233, 30, 99, .12)", onPress: "CategoryCardiologist" },
+
+    { id: "5", name: "Cardiac Surgeon", icon: icons.heart, iconColor: "rgba(198, 40, 40, 1)", backgroundColor: "rgba(198, 40, 40, .12)", onPress: "CategoryCardiacSurgeon" },
+
+    { id: "6", name: "Neurologist", icon: icons.brain, iconColor: "rgba(156, 39, 176, 1)", backgroundColor: "rgba(156, 39, 176, .12)", onPress: "CategoryNeurologist" },
+
+    { id: "7", name: "Neuro Surgeon", icon: icons.brain2, iconColor: "rgba(171, 71, 188, 1)", backgroundColor: "rgba(171, 71, 188, .12)", onPress: "CategoryNeuroSurgeon" },
+
+    { id: "8", name: "Pulmonologist", icon: icons.activity, iconColor: "rgba(79, 195, 247, 1)", backgroundColor: "rgba(79, 195, 247, .12)", onPress: "CategoryPulmonologist" },
+
+    { id: "9", name: "Endocrinologist", icon: icons.thyroid, iconColor: "rgba(255, 167, 38, 1)", backgroundColor: "rgba(255, 167, 38, .12)", onPress: "CategoryEndocrinologist" },
+
+    { id: "10", name: "Endocrine Surgeon", icon: icons.surgeon2, iconColor: "rgba(255, 87, 34, 1)", backgroundColor: "rgba(255, 87, 34, .12)", onPress: "CategoryEndocrineSurgeon" },
+
+    { id: "11", name: "Nephrologist", icon: icons.kidney, iconColor: "rgba(229, 115, 115, 1)", backgroundColor: "rgba(229, 115, 115, .12)", onPress: "CategoryNephrologist" },
+
+    { id: "12", name: "Urologist", icon: icons.urinary, iconColor: "rgba(63, 81, 181, 1)", backgroundColor: "rgba(63, 81, 181, .12)", onPress: "CategoryUrologist" },
+
+    { id: "13", name: "Gastroenterologist", icon: icons.stomatch, iconColor: "rgba(161, 136, 127, 1)", backgroundColor: "rgba(161, 136, 127, .12)", onPress: "CategoryGastroMedicine" },
+
+    { id: "14", name: "Gastro Surgeon", icon: icons.laparo, iconColor: "rgba(121, 85, 72, 1)", backgroundColor: "rgba(121, 85, 72, .12)", onPress: "CategoryGastroSurgery" },
+
+    { id: "15", name: "Gynecologist", icon: icons.gyne, iconColor: "rgba(240, 98, 146, 1)", backgroundColor: "rgba(240, 98, 146, .12)", onPress: "CategoryGynecologist" },
+
+    { id: "16", name: "Pediatrician", icon: icons.children, iconColor: "rgba(255, 202, 40, 1)", backgroundColor: "rgba(255, 202, 40, .12)", onPress: "CategoryPediatrician" },
+
+    { id: "17", name: "Orthopedics", icon: icons.joint, iconColor: "rgba(120, 144, 156, 1)", backgroundColor: "rgba(120, 144, 156, .12)", onPress: "CategoryOrthopedics" },
+
+    { id: "18", name: "Oncologist", icon: icons.cancer, iconColor: "rgba(149, 117, 205, 1)", backgroundColor: "rgba(149, 117, 205, .12)", onPress: "CategoryOncoMedicine" },
+
+    { id: "19", name: "Onco Surgeon", icon: icons.surgeon, iconColor: "rgba(121, 85, 72, 1)", backgroundColor: "rgba(121, 85, 72, .12)", onPress: "CategoryOncoSurgeon" },
+
+    { id: "20", name: "Hematologist", icon: icons.blood, iconColor: "rgba(229, 57, 53, 1)", backgroundColor: "rgba(229, 57, 53, .12)", onPress: "CategoryHematologist" },
+
+    // remaining generic but valid medical categories
+    { id: "21", name: "Skin Specialist", icon: icons.skin, iconColor: "rgba(255, 204, 128, 1)", backgroundColor: "rgba(255, 204, 128, .12)", onPress: "CategoryDermatologist" },
+
+    { id: "22", name: "ENT Specialist", icon: icons.ent, iconColor: "rgba(255, 167, 38, 1)", backgroundColor: "rgba(255, 167, 38, .12)", onPress: "CategoryENT" },
+
+    { id: "23", name: "Eye Specialist", icon: icons.eye, iconColor: "rgba(126, 87, 194, 1)", backgroundColor: "rgba(126, 87, 194, .12)", onPress: "CategoryEye" },
+
+    { id: "24", name: "Diabetes Specialist", icon: icons.sugar, iconColor: "rgba(66, 165, 245, 1)", backgroundColor: "rgba(66, 165, 245, .12)", onPress: "CategoryDiabetes" },
+
+    { id: "25", name: "Mental Health", icon: icons.brain, iconColor: "rgba(38, 166, 154, 1)", backgroundColor: "rgba(38, 166, 154, .12)", onPress: "CategoryMentalHealth" },
+
+    { id: "26", name: "Nutritionist", icon: icons.nutrition1, iconColor: "rgba(76, 175, 80, 1)", backgroundColor: "rgba(76, 175, 80, .12)", onPress: "CategoryNutritionist" },
+
+    { id: "27", name: "Dietitian", icon: icons.dietitian, iconColor: "rgba(156, 204, 101, 1)", backgroundColor: "rgba(156, 204, 101, .12)", onPress: "CategoryDietitian" },
+
+    { id: "28", name: "Liver Specialist", icon: icons.liver, iconColor: "rgba(198, 40, 40, 1)", backgroundColor: "rgba(198, 40, 40, .12)", onPress: "CategoryLiver" },
+
+    { id: "29", name: "Thyroid Specialist", icon: icons.thyroid, iconColor: "rgba(255, 167, 38, 1)", backgroundColor: "rgba(255, 167, 38, .12)", onPress: "CategoryThyroid" },
+
+    { id: "30", name: "Kidney Specialist", icon: icons.kidney, iconColor: "rgba(229, 115, 115, 1)", backgroundColor: "rgba(229, 115, 115, .12)", onPress: "CategoryKidney" },
+
+    { id: "31", name: "Lungs Specialist", icon: icons.activity, iconColor: "rgba(79, 195, 247, 1)", backgroundColor: "rgba(79, 195, 247, .12)", onPress: "CategoryLungs" },
+
+    { id: "32", name: "Women Health", icon: icons.gyne, iconColor: "rgba(240, 98, 146, 1)", backgroundColor: "rgba(240, 98, 146, .12)", onPress: "CategoryWomenHealth" },
 ];
+
+
 
 export const recommendedDoctors = [
     {

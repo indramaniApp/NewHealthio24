@@ -20,7 +20,7 @@ import HorizontalDoctorCard from '../../../components/HorizontalDoctorCard';
 import { COLORS, SIZES } from '../../../constants';
 import Header from '../../../components/Header';
 import { useTheme } from '../../../theme/ThemeProvider';
-import LinearGradient from 'react-native-linear-gradient'; // Import LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const Doctors = () => {
     const [allDoctors, setAllDoctors] = useState([]);
@@ -45,62 +45,49 @@ const Doctors = () => {
         }
     };
 
-    const filteredDoctors = allDoctors.filter((doctor) => {
-        const query = searchQuery.toLowerCase();
-        const name = typeof doctor.fullName === 'string' ? doctor.fullName.toLowerCase() : '';
-        const specialization = typeof doctor.specialization === 'string' ? doctor.specialization.toLowerCase() : '';
-        const hospital = typeof doctor.currentHospitalClinicName === 'string' ? doctor.currentHospitalClinicName.toLowerCase() : '';
+  const filteredDoctors = allDoctors.filter((doctor) => {
+    const query = searchQuery.toLowerCase();
 
-        return name.includes(query) || specialization.includes(query) || hospital.includes(query);
-    });
+    const name = typeof doctor.fullName === 'string' ? doctor.fullName.toLowerCase() : '';
+    const specialization = typeof doctor.specialization === 'string' ? doctor.specialization.toLowerCase() : '';
+    const hospital = typeof doctor.currentHospitalClinicName === 'string' ? doctor.currentHospitalClinicName.toLowerCase() : '';
+
+    return name.includes(query) || specialization.includes(query) || hospital.includes(query);
+});
+
 
     const renderItem = ({ item }) => (
         <HorizontalDoctorCard
-            name={item.fullName}
-            image={item.profilePhoto}
-            distance={item.yearsOfExperience}
-            price={item.price}
-            consultationFee={item.consultationFee}
-            hospital={item.currentHospitalClinicName}
-            specialization={item.specialization}
-            rating={item.average_rating}
-            numReviews={item.rating_total_count}
-            isAvailable={item.isAvailable}
-            onPress={() =>
-                navigation.navigate('DoctorDetails', {
-                    fullName: item.fullName,
-                    yearsOfExperience: item.yearsOfExperience,
-                    specialization: item.specialization,
-                    doctorRating: item.doctorRating,
-                    doctorId: item._id,
-                    streetAddress: item.streetAddress,
-                    average_rating: item.average_rating,
-                    rating_total_count: item.rating_total_count,
-                    about_me: item.about_me,
-                    consultationDate: item.consultationDate,
-                    consultationTime: item.consultationTime,
-                    previous_OPD_Number: item.previous_OPD_Number,
-                    reviews: item.reviews,
-                    consultationTimeVideo: item.consultationTimeVideo,
-                    consultationTimeAudio: item.consultationTimeAudio,
-                    consultationTimeHomeVisit: item.consultationTimeHomeVisit,
-                    profilePhoto: item.profilePhoto,
-                })
-            }
-        />
+    name={item.fullName}
+    image={item.profilePhoto}
+    yearsOfExperience={item.yearsOfExperience}
+    hospital={item.currentHospitalClinicName}
+    specialization={item.specialization}
+    rating={item.average_rating}
+    numReviews={item.rating_total_count}
+    consultationFeeInPerson={item.consultationFee ?? item.price} // fallback
+    // consultationFeeHomeVisit={item.consultationFee ?? item.price}
+    // consultationFeeVideoCall={item.consultationFee ?? item.price}
+onPress={() =>
+    navigation.navigate('DoctorDetails', { doctor: item })
+}
+
+    
+/>
+
     );
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <LinearGradient
-                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#fff', '#fff']}
                 style={styles.gradientContainer}
             >
                 {/* Header */}
                 <View style={styles.headerContainer}>
-                    <Header title="👨‍⚕️ Doctors"
+                    <Header
+                        title=" Doctorssss"
                         onBackPress={() => navigation.goBack()}
-                      
                     />
                 </View>
 
@@ -152,11 +139,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
-    gradientContainer: { // Style for the gradient
+    gradientContainer: {
         flex: 1,
     },
     headerContainer: {
-        // backgroundColor is removed to show the gradient
         zIndex: 10,
     },
     searchBarWrapper: {

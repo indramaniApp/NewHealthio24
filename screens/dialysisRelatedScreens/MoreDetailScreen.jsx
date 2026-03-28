@@ -18,22 +18,22 @@ import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 
-// Helper function to format date and time
+const DIALYSIS_RED = "#D32F2F";
+const DIALYSIS_LIGHT = "#FFEBEE";
+
 const formatDateTime = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    const options = {
+    return new Intl.DateTimeFormat('en-GB', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,
-    };
-    return new Intl.DateTimeFormat('en-GB', options).format(date);
+    }).format(date);
 };
 
-// Helper component for displaying data rows, styled as requested
 const InfoRow = ({ label, value }) => (
     <View style={styles.infoRow}>
         <Text style={styles.label}>{label}:</Text>
@@ -66,35 +66,34 @@ const MoreDetailScreen = () => {
             dispatch(hideLoader());
         }
     };
-    
-    // Custom header component, styled like the example
+
     const renderHeader = () => (
         <View style={styles.screenHeader}>
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.screenTitle}>Appointment Details</Text>
+            <Text style={styles.screenTitle}>Dialysis Appointment Details</Text>
         </View>
     );
 
     if (!appointment) {
         return (
             <SafeAreaView style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#00b4db" />
+                <ActivityIndicator size="large" color={DIALYSIS_RED} />
                 <Text>Loading Details...</Text>
             </SafeAreaView>
         );
     }
 
     return (
-        <LinearGradient colors={['#00b4db', '#ffffff', '#fff']} style={{ flex: 1 }}>
+        <LinearGradient colors={['#fff', '#ffffff']} style={{ flex: 1 }}>
             <SafeAreaView style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={{ padding: 16 }}>
                     {renderHeader()}
-                    
+
                     <View style={styles.card}>
                         <LinearGradient
-                            colors={['#00b4db', '#1e88e5']} 
+                            colors={[DIALYSIS_RED, '#9C27B0']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                             style={styles.cardHeader}
@@ -105,7 +104,7 @@ const MoreDetailScreen = () => {
                                 <Text style={styles.serial}>#{appointment?.serialNumber}</Text>
                             </View>
                         </LinearGradient>
-                        
+
                         <View style={styles.row}>
                             <Image source={{ uri: appointment?.booked_by_image }} style={styles.avatar} />
                             <View style={{ marginLeft: 10, flex: 1 }}>
@@ -113,7 +112,7 @@ const MoreDetailScreen = () => {
                                 <Text style={styles.meta}>{`${appointment?.patient_age} / ${appointment?.patient_gender}`}</Text>
                             </View>
                         </View>
-                        
+
                         <View style={styles.section}>
                             <InfoRow label="Appointment Date" value={appointment?.appointment_request_date} />
                             <InfoRow label="Appointment Time" value={appointment?.appointment_time} />
@@ -124,27 +123,30 @@ const MoreDetailScreen = () => {
                             <InfoRow label="Center Name" value={appointment.dialysis?.dialysisUnitName} />
                             <InfoRow label="Center Contact" value={appointment.dialysis?.contactNumber} />
                         </View>
-                        
+
                         <View style={styles.section}>
                             <InfoRow label="Payment Amount" value={`₹${appointment?.appointment_payment}`} />
                             <InfoRow label="Payment Method" value={appointment?.payment_method} />
                             <InfoRow label="Payment Status" value={appointment?.payment_status} />
                             <InfoRow label="Transaction ID" value={appointment?.payment_transaction_id} />
                         </View>
-                        
+
                         {appointment.reason_for_visit && (
-                           <View style={styles.section}>
-                             <InfoRow label="Reason for Visit" value={
-                                 Array.isArray(appointment.reason_for_visit)
-                                     ? appointment.reason_for_visit.join(', ')
-                                     : appointment.reason_for_visit
-                             } />
-                           </View>
+                            <View style={styles.section}>
+                                <InfoRow
+                                    label="Reason for Visit"
+                                    value={
+                                        Array.isArray(appointment.reason_for_visit)
+                                            ? appointment.reason_for_visit.join(', ')
+                                            : appointment.reason_for_visit
+                                    }
+                                />
+                            </View>
                         )}
-                        
-                        <View style={{ marginTop: 10 }}>
-                            <Text style={styles.bookedOn}>Booked on: {formatDateTime(appointment?.createdAt)}</Text>
-                        </View>
+
+                        <Text style={styles.bookedOn}>
+                            Booked on: {formatDateTime(appointment?.createdAt)}
+                        </Text>
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -155,46 +157,31 @@ const MoreDetailScreen = () => {
 export default MoreDetailScreen;
 
 const styles = StyleSheet.create({
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    screenHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 18,
-    },
-    screenTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        marginLeft: 12,
-        color: '#333',
-    },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
+    screenHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 18, marginTop:30},
+    screenTitle: { fontSize: 20, fontWeight: '700', marginLeft: 12, color: '#000' },
+
     backButton: {
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#1e88e5',
+        backgroundColor: DIALYSIS_RED,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
     },
+
     card: {
         backgroundColor: '#fff',
         borderRadius: 14,
         padding: 16,
         marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#FFCDD2',
         elevation: 4,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
     },
+
     cardHeader: {
         borderRadius: 10,
         paddingVertical: 8,
@@ -203,70 +190,28 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
     },
-    cardHeaderText: {
-        color: '#fff',
-        fontWeight: '600',
-        fontSize: 15,
-        marginLeft: 8,
-    },
-    cardHeaderRight: {
-        marginLeft: 'auto',
-    },
-    serial: {
-        color: '#fff',
-        fontWeight: '700',
-        fontSize: 14,
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        borderWidth: 2,
-        borderColor: '#1e88e5',
-    },
-    name: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    meta: {
-        fontSize: 14,
-        color: '#666',
-    },
-    section: {
-        marginTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#f0f0f0',
-        paddingTop: 12,
-    },
-    label: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#555',
-    },
-    value: {
-        fontSize: 14,
-        color: '#111',
-        fontWeight: '600',
-        flexShrink: 1,
-        textAlign: 'right',
-    },
-    infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 6,
-    },
+
+    cardHeaderText: { color: '#fff', fontWeight: '600', fontSize: 15, marginLeft: 8 },
+    cardHeaderRight: { marginLeft: 'auto' },
+    serial: { color: '#fff', fontWeight: '700', fontSize: 14 },
+
+    row: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    avatar: { width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: DIALYSIS_RED },
+    name: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+    meta: { fontSize: 14, color: '#666' },
+
+    section: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#FFEBEE', paddingTop: 12 },
+
+    label: { fontSize: 14, fontWeight: '500', color: '#555' },
+    value: { fontSize: 14, color: '#111', fontWeight: '600', flexShrink: 1, textAlign: 'right' },
+
+    infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
+
     bookedOn: {
         fontSize: 12,
         fontStyle: 'italic',
-        color: '#666',
+        color: '#777',
         textAlign: 'right',
-        marginTop: 10,
+        marginTop: 14,
     },
 });

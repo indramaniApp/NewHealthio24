@@ -7,7 +7,7 @@ import { ScrollView } from 'react-native-virtualized-view';
 import GlobalSettingsItem from '../components/GlobalSettingsItem';
 import Button from '../components/Button';
 import { useTheme } from '../theme/ThemeProvider';
-import LinearGradient from 'react-native-linear-gradient'; // <-- ग्रेडिएंट के लिए इम्पोर्ट करें
+import LinearGradient from 'react-native-linear-gradient';
 
 // Settings for security
 const SettingsSecurity = ({ navigation }) => {

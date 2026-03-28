@@ -50,7 +50,7 @@ const Button = ({
                 ]}
             >
                 <LinearGradient
-                    colors={colors || ['#00b4db', '#0083B0']}
+                    colors={colors || ['#001F3F', '#003366']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.gradient}

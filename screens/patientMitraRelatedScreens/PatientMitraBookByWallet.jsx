@@ -73,7 +73,7 @@ console.log('Params:', route.params);
   return (
     // 🔥 Poori screen ko LinearGradient se wrap karein
     <LinearGradient
-        colors={['#00b4db', '#f4f4f5', '#f4f4f5']}
+        colors={['#fff', '#f4f4f5', '#f4f4f5']}
         style={{ flex: 1 }}
     >
         <SafeAreaView style={styles.safeArea}>
@@ -82,7 +82,7 @@ console.log('Params:', route.params);
             
             {/* 🔥 Header ko transparent style dein */}
             <Header 
-                title="Book Package by Wallet" 
+                title="Book Package " 
                 onBackPress={() => navigation.goBack()} 
                 style={{ backgroundColor: 'transparent',marginTop:40 }}
             />
@@ -143,14 +143,14 @@ console.log('Params:', route.params);
                     placeholderTextColor="#9CA3AF"
                 />
 
-                <Text style={styles.label}>Referral ID (Optional)</Text>
+                {/* <Text style={styles.label}>Referral ID (Optional)</Text>
                 <TextInput
                     style={styles.input}
                     value={referralId}
                     onChangeText={setReferralId}
                     placeholder="Enter Referral ID"
                     placeholderTextColor="#9CA3AF"
-                />
+                /> */}
 
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <Text style={styles.buttonText}>Confirm Booking</Text>

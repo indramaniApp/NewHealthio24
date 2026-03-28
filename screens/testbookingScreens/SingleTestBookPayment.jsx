@@ -178,14 +178,14 @@ const SingleTestBookPayment = ({ route, navigation }) => {
                             <Text style={{ fontSize: 16, color: selectedMode ? colors.text : '#999' }}>{selectedModeLabel}</Text>
                         </TouchableOpacity>
 
-                        <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+                        {/* <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
                         <TextInput
                             value={referralId}
                             onChangeText={setReferralId}
                             placeholder="Enter referral ID"
                             placeholderTextColor={dark ? '#888' : '#aaa'}
                             style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: dark ? '#2a2a2a' : '#fff' }]}
-                        />
+                        /> */}
 
                         {/* 4. Apply LinearGradient to the button */}
                         <TouchableOpacity disabled={!isFormValid} style={{ opacity: isFormValid ? 1 : 0.6 }} onPress={handleSubmit}>

@@ -22,7 +22,7 @@ import Button from '../components/Button';
 import Toast from 'react-native-simple-toast';
 import RazorpayCheckout from 'react-native-razorpay';
 
-const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
+const RAZORPAY_KEY_ID = 'rzp_live_RQTJU3bg9xBPn0';
 
 const PatientDetails = ({ navigation, route }) => {
   const { dark } = useTheme();
@@ -117,6 +117,8 @@ const PatientDetails = ({ navigation, route }) => {
         true,
         false,
       );
+      console.log('resoponse===',response)
+      
       if (response?.status == 'success') {
         navigation.navigate('Main');
       }
@@ -210,7 +212,7 @@ const PatientDetails = ({ navigation, route }) => {
       </View>
 
       {/* ✅ New Optional Referral ID field */}
-      <Text
+      {/* <Text
         style={[
           styles.title,
           { color: dark ? COLORS.white : COLORS.greyscale900 },
@@ -234,7 +236,7 @@ const PatientDetails = ({ navigation, route }) => {
           value={referralId}
           onChangeText={setReferralId}
         />
-      </View>
+      </View> */}
     </View>
   );
 

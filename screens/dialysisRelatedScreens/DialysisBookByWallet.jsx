@@ -70,7 +70,7 @@ const DialysisBookByWallet = ({ route, navigation }) => {
     return (
         // 2. मुख्य View को LinearGradient से बदलें
         <LinearGradient
-            colors={['#00b4db', '#fff', '#fff']}
+            colors={['#fff', '#fff', '#fff']}
             style={styles.container}
         >
             <SafeAreaView style={{ flex: 1 }}>
@@ -80,7 +80,7 @@ const DialysisBookByWallet = ({ route, navigation }) => {
                   />
 
                 <ScrollView contentContainerStyle={styles.form}>
-                    {/* 3. कार्ड पर ग्रेडिएंट लगाएँ */}
+                
                     <LinearGradient
                         colors={['#ffffff', '#f9fafb']}
                         style={styles.card}
@@ -144,19 +144,19 @@ const DialysisBookByWallet = ({ route, navigation }) => {
                     />
 
                     {/* Referral ID */}
-                    <Text style={styles.label}>Referral ID (Optional)</Text>
+                    {/* <Text style={styles.label}>Referral ID (Optional)</Text>
                     <TextInput
                         style={styles.input}
                         value={referralId}
                         onChangeText={setReferralId}
                         placeholder="Enter Referral ID"
                         placeholderTextColor="#9CA3AF"
-                    />
+                    /> */}
 
                     {/* 4. बटन पर ग्रेडिएंट लगाएँ */}
                     <TouchableOpacity onPress={handleSubmit}>
                         <LinearGradient
-                            colors={[COLORS.primary, '#0077b6']}
+                            colors={[COLORS.primary, '#2baaef']}
                             style={styles.button}
                         >
                             <Text style={styles.buttonText}>Proceed to Payment</Text>

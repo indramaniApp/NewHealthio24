@@ -34,24 +34,31 @@ const Categories = ({ navigation }) => {
         title="More Categories"
         onBackPress={() => navigation.goBack()}
       />
-        <FlatList
-          data={filteredCategories}
-          numColumns={4}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.flatListContent}
-          renderItem={({ item }) => (
-            <Category
-              name={item.name}
-              icon={item.icon}
-              iconColor={item.iconColor}
-              backgroundColor={item.backgroundColor}
-              onPress={() =>
-                navigation.navigate('CategoriesScreen', { categoryName: item.name })
-              }
-            />
-          )}
-        />
+     <FlatList
+  data={filteredCategories}
+  numColumns={2}
+  keyExtractor={(item) => item.id}
+  showsVerticalScrollIndicator={false}
+  contentContainerStyle={styles.flatListContent}
+
+  columnWrapperStyle={{
+    justifyContent: 'space-between',
+    gap: 12,          // ✅ YAHI SE DONO CARDS KE BEECH GAP
+  }}
+
+  renderItem={({ item }) => (
+    <Category
+      name={item.name}
+      icon={item.icon}
+      iconColor={item.iconColor}
+      backgroundColor={item.backgroundColor}
+      onPress={() =>
+        navigation.navigate('CategoriesScreen', { categoryName: item.name })
+      }
+    />
+  )}
+/>
+
       </View>
     </SafeAreaView>
   );

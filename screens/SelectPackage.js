@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
@@ -28,7 +28,10 @@ const SelectPackage = ({ navigation, route }) => {
 
         return (
             <View>
-                <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.greyscale900 }]}>Select Package</Text>
+              <Text style={[styles.title, { color: '#FFFFFF' }]}>
+    Select Package
+</Text>
+
                 <View style={{
              
                     backgroundColor: 'transparent',
@@ -63,16 +66,25 @@ const SelectPackage = ({ navigation, route }) => {
     return (
  
         <LinearGradient
-            colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
+            colors={['#001F3F', '#003366', '#fff', '#fff', '#fff', '#fff']}
             style={{ flex: 1 }}
         >
+            <StatusBar
+  backgroundColor="#001F3F"
+  barStyle="light-content"
+/>
             <SafeAreaView style={styles.area}>
                 <View style={styles.container}>
                     {/* Note: You might need to change the header's icon and title color to white for better visibility */}
-                    <Header
-                        title="Select Package"
-                        onBackPress={() => navigation.goBack()}
-                    />
+                   <Header
+    title="Select Package"
+    onBackPress={() => navigation.goBack()}
+    titleStyle={{ color: '#FFFFFF', fontSize: 28 }} // white text
+    // backCircleStyle={{ backgroundColor: '#FFFFFF' }} // agar back button circle white chahiye
+    // backIconStyle={{ tintColor: '#000000' }}        // back icon ka color
+    bottomLineStyle={{ backgroundColor: 'transparent' }} // divider line invisible
+/>
+
                     <ScrollView showsVerticalScrollIndicator={false}>
                         {renderContent()}
                     </ScrollView>

@@ -14,8 +14,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import ApiService from '../../src/api/ApiService';
 import { ENDPOINTS } from '../../src/constants/Endpoints';
 import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
-import { COLORS } from '../../constants';
 import LinearGradient from 'react-native-linear-gradient';
+
+const DIALYSIS_RED = "#E53935";
+const DIALYSIS_LIGHT = "#FFEBEE";
+const GRADIENT_COLORS = ['#FF3B3B', '#9C27B0'];
 
 const DatePickerView = () => {
     const [appointments, setAppointments] = useState([]);
@@ -39,7 +42,6 @@ const DatePickerView = () => {
     }, []);
 
     const renderCard = ({ item }) => {
-        // ✅ Safe handling for reason_for_visit
         const reasons = Array.isArray(item.reason_for_visit)
             ? item.reason_for_visit
             : item.reason_for_visit
@@ -47,15 +49,12 @@ const DatePickerView = () => {
             : [];
 
         return (
-            <LinearGradient
-                colors={['#E0F2FE', '#FFFFFF', '#FFFFFF']}
-                style={styles.card}
-            >
+            <View style={styles.card}>
                 <View style={styles.headerRow}>
                     <MaterialCommunityIcons
                         name="water-pump"
                         size={20}
-                        color={COLORS.primary}
+                        color={DIALYSIS_RED}
                     />
                     <Text style={styles.unitName}>
                         {item.dialysis?.dialysisUnitName || 'Unknown Unit'}
@@ -99,15 +98,12 @@ const DatePickerView = () => {
                     </View>
                 </View>
 
-                {/* ✅ Reason For Visit Safe Render */}
                 {reasons.length > 0 && (
                     <View style={styles.infoRow}>
                         <View style={styles.infoBox}>
                             <Text style={styles.label}>Reason</Text>
                             {reasons.map((reason, idx) => (
-                                <Text key={idx} style={styles.value}>
-                                    {reason}
-                                </Text>
+                                <Text key={idx} style={styles.value}>{reason}</Text>
                             ))}
                         </View>
                     </View>
@@ -123,35 +119,55 @@ const DatePickerView = () => {
                 </View>
 
                 <View style={styles.actions}>
+                    {/* Primary Button with Gradient */}
                     <TouchableOpacity
-                        style={styles.primaryBtn}
                         onPress={() =>
                             navigation.navigate('MoreDetailScreen', { id: item._id })
                         }
+                        style={{ flex: 1 }}
+                        activeOpacity={0.8}
                     >
-                        <MaterialCommunityIcons
-                            name="information-outline"
-                            size={18}
-                            color="#fff"
-                        />
-                        <Text style={styles.btnText}>More Details</Text>
+                        <LinearGradient
+                            colors={GRADIENT_COLORS}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.primaryBtn}
+                        >
+                            <MaterialCommunityIcons
+                                name="information-outline"
+                                size={18}
+                                color="#fff"
+                            />
+                            <Text style={styles.btnText}>More Details</Text>
+                        </LinearGradient>
                     </TouchableOpacity>
 
+                    {/* Outline Button with Gradient Border */}
                     <TouchableOpacity
-                        style={styles.outlineBtn}
                         onPress={() => navigation.navigate('Recipt', { id: item._id })}
+                        style={{ flex: 1 }}
+                        activeOpacity={0.8}
                     >
-                        <MaterialCommunityIcons
-                            name="file-document-outline"
-                            size={18}
-                            color={COLORS.primary}
-                        />
-                        <Text style={[styles.btnText, { color: COLORS.primary }]}>
-                            Receipt
-                        </Text>
+                        <LinearGradient
+                            colors={GRADIENT_COLORS}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.outlineBtnWrapper}
+                        >
+                            <View style={styles.outlineBtn}>
+                                <MaterialCommunityIcons
+                                    name="file-document-outline"
+                                    size={18}
+                                    color={DIALYSIS_RED}
+                                />
+                                <Text style={[styles.btnText, { color: DIALYSIS_RED }]}>
+                                    Receipt
+                                </Text>
+                            </View>
+                        </LinearGradient>
                     </TouchableOpacity>
                 </View>
-            </LinearGradient>
+            </View>
         );
     };
 
@@ -175,133 +191,69 @@ const DatePickerView = () => {
 export default DatePickerView;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'transparent',
-    },
-    list: {
-        paddingHorizontal: 16,
-        paddingVertical: 16,
-    },
+    container: { flex: 1, backgroundColor: '#fff' },
+    list: { paddingHorizontal: 16, paddingVertical: 16 },
+
     card: {
         borderRadius: 12,
         padding: 12,
         marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 3,
-        elevation: 2,
+        backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor: '#E0F2FE',
+        borderColor: '#FFCDD2',
+        elevation: 2,
     },
-    headerRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 6,
-        gap: 6,
-    },
-    unitName: {
-        fontSize: 16,
-        fontFamily: 'Urbanist-Bold',
-        color: COLORS.primary,
-    },
-    infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 4,
-    },
-    infoBox: {
-        flex: 1,
-        marginRight: 6,
-    },
-    label: {
-        fontSize: 12,
-        fontFamily: 'Urbanist-Medium',
-        color: '#6B7280',
-    },
-    value: {
-        fontSize: 14,
-        fontFamily: 'Urbanist-SemiBold',
-        color: '#1F2937',
-        marginTop: 1,
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#E5E7EB',
-        marginVertical: 6,
-    },
+
+    headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 6 },
+    unitName: { fontSize: 16, fontFamily: 'Urbanist-Bold', color: DIALYSIS_RED },
+
+    infoRow: { flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4 },
+    infoBox: { flex: 1, marginRight: 6 },
+
+    label: { fontSize: 12, color: '#6B7280', fontFamily: 'Urbanist-Medium' },
+    value: { fontSize: 14, color: '#1F2937', fontFamily: 'Urbanist-SemiBold', marginTop: 1 },
+
+    divider: { height: 1, backgroundColor: '#FECACA', marginVertical: 6 },
+
     tagRow: {
         marginTop: 6,
         alignSelf: 'flex-start',
-        backgroundColor: '#E0F2FE',
+        backgroundColor: '#FFCDD2',
         paddingHorizontal: 10,
         paddingVertical: 3,
         borderRadius: 14,
     },
-    tag: {
-        fontSize: 12,
-        fontFamily: 'Urbanist-Medium',
-        color: COLORS.primary,
-    },
-    bookedByRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    avatar: {
-        width: 32,
-        height: 32,
-        borderRadius: 6,
-        marginRight: 8,
-        borderWidth: 1,
-        borderColor: '#D1D5DB',
-    },
-    bookedByText: {
-        fontSize: 13,
-        fontFamily: 'Urbanist-SemiBold',
-        color: '#1F2937',
-    },
-    actions: {
-        flexDirection: 'row',
-        marginTop: 10,
-        gap: 8,
-    },
+    tag: { fontSize: 12, fontFamily: 'Urbanist-Medium', color: DIALYSIS_RED },
+
+    bookedByRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
+    avatar: { width: 32, height: 32, borderRadius: 6, marginRight: 8, borderWidth: 1, borderColor: '#FCA5A5' },
+    bookedByText: { fontSize: 13, fontFamily: 'Urbanist-SemiBold', color: '#1F2937' },
+
+    actions: { flexDirection: 'row', marginTop: 10, gap: 8 },
+
     primaryBtn: {
-        flex: 1,
-        backgroundColor: "#00b4db",
-        paddingVertical: 8,
-        borderRadius: 20,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         gap: 6,
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.15,
-        shadowRadius: 2,
+        paddingVertical: 8,
+        borderRadius: 20,
+    },
+
+    outlineBtnWrapper: {
+        borderRadius: 20,
+        padding: 1,
     },
     outlineBtn: {
-        flex: 1,
-        borderWidth: 1.2,
-        borderColor: COLORS.primary,
-        paddingVertical: 8,
-        borderRadius: 20,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         gap: 6,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: '#fff',
     },
-    btnText: {
-        fontSize: 13,
-        fontFamily: 'Urbanist-SemiBold',
-        color: '#fff',
-    },
-    empty: {
-        textAlign: 'center',
-        marginTop: 30,
-        fontSize: 14,
-        color: '#9CA3AF',
-        fontFamily: 'Urbanist-Regular',
-    },
+
+    btnText: { fontSize: 13, fontFamily: 'Urbanist-SemiBold', color: '#fff' },
+    empty: { textAlign: 'center', marginTop: 30, fontSize: 14, color: '#9CA3AF' },
 });

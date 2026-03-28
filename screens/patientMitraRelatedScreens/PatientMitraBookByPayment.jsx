@@ -22,11 +22,11 @@ import Toast from 'react-native-simple-toast';
 import LinearGradient from 'react-native-linear-gradient';
 
 // const RAZORPAY_KEY_ID = 'rzp_test_GvwPgZcP2tn6O2';
-const RAZORPAY_KEY_ID = 'rzp_test_R8LVEozZxuRsqb';
+const RAZORPAY_KEY_ID = 'rzp_live_RQTJU3bg9xBPn0';
 
 const PatientMitraBookByPayment = ({ route, navigation }) => {
-  const { packageId, startedDate, selectedHour } = route?.params || {};
-
+  const { patientMitraId, startedDate, selectedHour } = route?.params || {};
+console.log('patientMitraId=',patientMitraId)
   const [patientName, setPatientName] = useState('');
   const [patientGender, setPatientGender] = useState('');
   const [patientAge, setPatientAge] = useState('');
@@ -54,7 +54,7 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
         referral_id: referralId,
       };
 
-      const finalUrl = `${ENDPOINTS.book_pm_package}/${packageId}`;
+      const finalUrl = `${ENDPOINTS.book_pm_package}/${patientMitraId}`;
       const response = await ApiService.post(finalUrl, payload, true, false);
       console.log('Booking response:', response);
 
@@ -123,7 +123,7 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
 
   return (
     <LinearGradient
-      colors={['#00b4db', '#f4f4f5', '#f4f4f5']}
+      colors={['#fff', '#f4f4f5', '#f4f4f5']}
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>
@@ -190,14 +190,14 @@ const PatientMitraBookByPayment = ({ route, navigation }) => {
             placeholderTextColor="#9CA3AF"
           />
 
-          <Text style={styles.label}>Referral ID (Optional)</Text>
+          {/* <Text style={styles.label}>Referral ID (Optional)</Text>
           <TextInput
             style={styles.input}
             value={referralId}
             onChangeText={setReferralId}
             placeholder="Enter Referral ID"
             placeholderTextColor="#9CA3AF"
-          />
+          /> */}
 
           <TouchableOpacity onPress={handleSubmit} style={{ marginTop: 10 }}>
             <LinearGradient

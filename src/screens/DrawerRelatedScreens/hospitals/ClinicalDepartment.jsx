@@ -6,6 +6,7 @@ import {
     FlatList,
     Platform,
     StatusBar,
+    Text, // Text import kiya
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -30,8 +31,7 @@ const ClinicalDepartment = ({ route }) => {
             const response = await ApiService.get(
                 `${ENDPOINTS.patient_get_doctors_clinical_department}/${hospitalId}`
             );
-            console.log('=====Clinical Department Data=====', response.data);
-
+            
             const cleanedData = (response.data || []).map((doc) => ({
                 ...doc,
                 specialization: Array.isArray(doc.specialization) ? doc.specialization : [],
@@ -41,6 +41,7 @@ const ClinicalDepartment = ({ route }) => {
             setClinicalData(cleanedData);
         } catch (error) {
             console.log('Error fetching clinical department:', error);
+            setClinicalData([]); // Error aane par data clear kar rahe hain
         } finally {
             dispatch(hideLoader());
         }
@@ -81,9 +82,16 @@ const ClinicalDepartment = ({ route }) => {
         );
     };
 
+    // Jab data na ho tab ye dikhega
+    const renderEmptyComponent = () => (
+        <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No doctors found</Text>
+        </View>
+    );
+
     return (
         <LinearGradient
-            colors={['#00b4db', '#ffff','#ffff']}
+            colors={['#fff', '#ffff','#ffff']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={styles.safeArea}>
@@ -96,9 +104,10 @@ const ClinicalDepartment = ({ route }) => {
                         data={clinicalData}
                         keyExtractor={(item) => item._id}
                         renderItem={renderDoctorCard}
+                        ListEmptyComponent={renderEmptyComponent} // Empty message yahan add kiya
                         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 40 }}
+                        contentContainerStyle={clinicalData.length === 0 ? { flex: 1 } : { paddingBottom: 40 }}
                     />
                 </View>
             </SafeAreaView>
@@ -117,5 +126,16 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: 'transparent',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 50, // Screen ke center mein dikhane ke liye
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#666',
+        fontWeight: '500',
     },
 });

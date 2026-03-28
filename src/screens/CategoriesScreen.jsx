@@ -14,89 +14,162 @@ import { ENDPOINTS } from '../constants/Endpoints';
 import { hideLoader, showLoader } from '../redux/slices/loaderSlice';
 import { useDispatch } from 'react-redux';
 import Header from '../../components/Header';
-import LinearGradient from 'react-native-linear-gradient'; 
+import LinearGradient from 'react-native-linear-gradient';
 
 const CategoriesScreen = ({ route }) => {
     const [doctors, setDoctors] = useState([]);
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { categoryName } = route.params;
-    console.log('categoryName=========', categoryName);
 
-    const getEndpointByCategory = () => {
-    
-        switch (categoryName) {
-            case 'Physician': return ENDPOINTS.patient_get_doctors_general_physician;
-            case 'Dentist': return ENDPOINTS.patient_get_doctors_dentist;
-            case 'EyeSpecialist': return ENDPOINTS.patient_get_doctors_eye_specialist;
-            case 'Nutritionist': return ENDPOINTS.patient_get_doctors_nutritionist;
-            case 'Neurologist': return ENDPOINTS.patient_get_doctors_neuro_surgeon;
-            case 'Child Specialist': return ENDPOINTS.patient_get_doctors_child_specialist;
-            case 'ENT Surgeon': return ENDPOINTS.patient_get_doctors_ent_surgeon;
-            case 'Stomach Specialist': return ENDPOINTS.patient_get_doctors_stomach_specialist;
-            case 'Women Health': return ENDPOINTS.patient_get_doctors_women_health;
-            case 'Skin & Hair': return ENDPOINTS.patient_get_doctors_skin_hair;
-            case 'Kidney Specilist': return ENDPOINTS.patient_get_doctors_kidney_specialist;
-            case 'Diabetes Specialist': return ENDPOINTS.patient_get_doctors_diabetes_specialist;
-            case 'Dietitian': return ENDPOINTS.patient_get_doctors_dietitian;
-            case 'Bone Joints': return ENDPOINTS.patient_get_doctors_bones_joints;
-            case 'Lungs Specialist': return ENDPOINTS.patient_get_doctors_lungs_specialist;
-            case 'Mental Health': return ENDPOINTS.patient_get_doctors_mental_health;
-            case 'Cancer Specialist': return ENDPOINTS.patient_get_doctors_cancer_specialist;
-            case 'Liver Specialist': return ENDPOINTS.patient_get_doctors_liver_specialist;
-            case 'thyroid Specialist': return ENDPOINTS.patient_get_doctors_thyroid_specialist;
-            case 'Sexual Health': return ENDPOINTS.patient_get_doctors_sexual_health;
-            case 'Pregnancy Specialist': return ENDPOINTS.patient_get_doctors_pregnancy_specialist;
-            case 'Ayurveda Specialist': return ENDPOINTS.patient_get_doctors_ayurveda_specialist;
-            case 'Unani Specialist': return ENDPOINTS.patient_get_doctors_unani_specialist;
-            case 'General Surgeon': return ENDPOINTS.patient_get_doctors_general_surgeon;
-            case 'Cardiac Surgeon': return ENDPOINTS.patient_get_doctors_cardiac_surgeon;
-            case 'Orthopedic Surgeon': return ENDPOINTS.patient_get_doctors_orthopedic_surgeon;
-            case 'Plastic Surgeon': return ENDPOINTS.patient_get_doctors_plastic_surgeon;
-            case 'Urologist Surgeon': return ENDPOINTS.patient_get_doctors_urologist_surgeon;
-            case 'Vascular Surgeon': return ENDPOINTS.patient_get_doctors_vascular_surgeon;
-            case 'Gynecologist Surgeon': return ENDPOINTS.patient_get_doctors_gynecologist_surgeon;
-            case 'Oncology Surgeon': return ENDPOINTS.patient_get_doctors_oncologist_surgeon;
-            case 'Pediatric Surgeon': return ENDPOINTS.patient_get_doctors_pediatric_surgeon;
-            case 'Dental Surgeon': return ENDPOINTS.patient_get_doctors_dental_surgeon;
-            case 'Eye Surgeon': return ENDPOINTS.patient_get_doctors_eye_surgeon;
-            case 'Cosmetic Surgeon': return ENDPOINTS.patient_get_doctors_cosmetic_surgeon;
-            case 'Obesity Surgeon': return ENDPOINTS.patient_get_doctors_bariatric_surgeon;
-            case 'Maxillofacial Surgeon': return ENDPOINTS.patient_get_doctors_maxillofacial_surgeon;
-            case 'Urinary Specialist': return ENDPOINTS.patient_get_doctors_urinary_specialist;
-            case 'Veterinary Doctor': return ENDPOINTS.patient_get_doctors_veterinary_doctor;
-            case 'Physiotherapist': return ENDPOINTS.patient_get_doctors_physiotherapist;
-            case 'Gynecologist': return ENDPOINTS.patient_get_doctors_gynecologist;
-            case 'Pediatrician Doctor': return ENDPOINTS.patient_get_doctors_pediatrician;
-            case 'Cardiologist': return ENDPOINTS.patient_get_doctors_cardiologist;
-            case 'Dermatologis': return ENDPOINTS.patient_get_doctors_dermatologist;
-            case 'Psychiatrist': return ENDPOINTS.patient_get_doctors_psychiatrist;
-            case 'Ear Nose Throat Specialist': return ENDPOINTS.patient_get_doctors_ear_nose_throat;
-            default:
-                console.warn('Unknown category, using default endpoint.');
-                return ENDPOINTS.patient_get_doctors_default;
-        }
-    };
+  const getEndpointByCategory = () => {
+    switch (categoryName) {
+
+        case 'Physician':
+            return ENDPOINTS.patient_get_doctors_general_physician;
+
+        case 'Dentist':
+            return ENDPOINTS.patient_get_doctors_dentist;
+
+        case 'Eye Specialist':
+            return ENDPOINTS.patient_get_doctors_ophthalmology;
+
+        case 'Neurologist':
+        case 'Neurologist Doctor':
+            return ENDPOINTS.patient_get_doctors_neurologist;
+
+        case 'Child Specialist':
+        case 'Paediatrician':
+            return ENDPOINTS.patient_get_doctors_paediatrician;
+
+        case 'ENT':
+        case 'Ear Nose Throat Specialist':
+        case 'ENT Surgeon':
+            return ENDPOINTS.patient_get_doctors_ent;
+
+        case 'Gynecologist':
+            return ENDPOINTS.patient_get_doctors_gynecologist;
+
+        case 'Cardiologist':
+            return ENDPOINTS.patient_get_doctors_cardiologist;
+
+        case 'Cardiac Surgeon':
+            return ENDPOINTS.patient_get_doctors_cardiac_surgeon;
+
+        case 'Cardiac Critical Care':
+            return ENDPOINTS.patient_get_doctors_cardiac_critical_care;
+
+        case 'Pulmonologist':
+        case 'Lungs Specialist':
+            return ENDPOINTS.patient_get_doctors_pulmonologist;
+
+        case 'Nephrologist':
+        case 'Kidney Specialist':
+            return ENDPOINTS.patient_get_doctors_nephrologist;
+
+        case 'Urologist':
+            return ENDPOINTS.patient_get_doctors_urologist;
+
+        case 'Gastro Medicine':
+        case 'Stomach Specialist':
+            return ENDPOINTS.patient_get_doctors_gastro_medicine;
+
+        case 'Gastro Surgery':
+            return ENDPOINTS.patient_get_doctors_gastro_surgery;
+
+        case 'Hematologist':
+            return ENDPOINTS.patient_get_doctors_hematologist;
+
+        case 'Orthopedics':
+        case 'Bone Joints':
+            return ENDPOINTS.patient_get_doctors_orthopedics;
+
+        case 'Oncology':
+        case 'Cancer Specialist':
+            return ENDPOINTS.patient_get_doctors_onco_medicine;
+
+        case 'Onco Surgeon':
+            return ENDPOINTS.patient_get_doctors_onco_surgeon;
+
+        case 'Plastic Surgeon':
+            return ENDPOINTS.patient_get_doctors_plastic_surgeon;
+
+        case 'Dermatologist':
+        case 'Skin & Hair':
+            return ENDPOINTS.patient_get_doctors_dermatologist;
+
+        case 'Radiologist':
+            return ENDPOINTS.patient_get_doctors_radiologist;
+
+        case 'Anesthesiologist':
+            return ENDPOINTS.patient_get_doctors_anesthesiologist;
+
+        case 'Pathologist':
+            return ENDPOINTS.patient_get_doctors_pathologist;
+
+        case 'Sports Medicine':
+            return ENDPOINTS.patient_get_doctors_sports_medicine;
+
+        case 'General Surgeon':
+        case 'Laparoscopic Surgeon':
+            return ENDPOINTS.patient_get_doctors_laparoscopic_surgeon;
+
+        case 'Spine Surgeon':
+            return ENDPOINTS.patient_get_doctors_spine_surgeon;
+
+        default:
+            console.warn('Unknown category → fallback to Physician');
+            return ENDPOINTS.patient_get_doctors_general_physician;
+    }
+};
+
 
     const GetDoctorCategory = async () => {
         try {
             dispatch(showLoader());
             const endpoint = getEndpointByCategory();
             const response = await ApiService.get(endpoint);
+
             if (response?.data) {
-                const cleanedData = response.data.map((doc) => ({
-                    ...doc,
-                    specialization: Array.isArray(doc.specialization)
+                const cleanedData = response.data.map((doc) => {
+                    let specializationArray = Array.isArray(doc.specialization)
                         ? doc.specialization
                         : typeof doc.specialization === 'string'
                             ? [doc.specialization]
-                            : [],
-                    surgery: Array.isArray(doc.surgery)
+                            : [];
+
+                    let surgeryArray = Array.isArray(doc.surgery)
                         ? doc.surgery
                         : typeof doc.surgery === 'string'
                             ? [doc.surgery]
-                            : [],
-                }));
+                            : [];
+
+                    // ⚡ ENT Surgeon fix for UI
+                    if (categoryName === 'ENT Surgeon') {
+                        // Remove duplicate "Ear Nose Throat Specialist"
+                        specializationArray = specializationArray.filter(
+                            (spec) => spec !== 'Ear Nose Throat Specialist'
+                        );
+                        // Always add "ENT Surgeon" in UI
+                        if (!specializationArray.includes('ENT Surgeon')) {
+                            specializationArray.push('ENT Surgeon');
+                        }
+                    }
+
+                    // ⚡ Ear Nose Throat Specialist fix
+                    if (categoryName === 'Ear Nose Throat Specialist') {
+                        if (!specializationArray.includes('Ear Nose Throat Specialist')) {
+                            specializationArray.push('Ear Nose Throat Specialist');
+                        }
+                    }
+
+                    return {
+                        ...doc,
+                        specialization: specializationArray,
+                        surgery: surgeryArray,
+                    };
+                });
+
                 setDoctors(cleanedData);
             }
         } catch (error) {
@@ -140,7 +213,7 @@ const CategoriesScreen = ({ route }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <LinearGradient
-                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#fff', '#fff', '#fff', '#fff', '#fff']}
                 style={styles.gradientContainer}
             >
                 <Header
@@ -167,7 +240,6 @@ export default CategoriesScreen;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     gradientContainer: {
@@ -176,6 +248,5 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-       
     },
 });

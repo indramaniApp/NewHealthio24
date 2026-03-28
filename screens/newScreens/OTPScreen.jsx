@@ -109,7 +109,7 @@ const OTPScreen = ({ navigation, route }) => {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: 'Main' }],
+            routes: [{ name: 'Splash' }],
           })
         );
       }
@@ -142,7 +142,7 @@ const OTPScreen = ({ navigation, route }) => {
   };
 
   return (
-    <LinearGradient colors={['#00b4db', '#fff','#fff']} style={{ flex: 1 }}>
+    <LinearGradient colors={['#001F3F', '#003366', '#fff','#fff']} style={{ flex: 1 }}>
       <SafeAreaView style={[styles.area, { backgroundColor: 'transparent' }]}>
         <StatusBar
           barStyle={'light-content'}
@@ -151,9 +151,10 @@ const OTPScreen = ({ navigation, route }) => {
         />
         <View style={[styles.container, { backgroundColor: 'transparent' }]}>
           <ScrollView keyboardShouldPersistTaps="handled">
-            <Text style={[styles.title, { color: dark ? "#fff" : '#181A20' }]}>
-              OTP has been sent to {phoneNumber ? `+91 ${phoneNumber.slice(0, 2)}****${phoneNumber.slice(-2)}` : "your number"}
-            </Text>
+            <Text style={[styles.title, { color: "#fff" }]}>
+  OTP has been sent to {phoneNumber ? `+91 ${phoneNumber.slice(0, 2)}****${phoneNumber.slice(-2)}` : "your number"}
+</Text>
+
 
             <View style={[styles.otpContainer, { maxWidth: width * 0.9 }]}>
               {otp.map((digit, index) => (
@@ -177,7 +178,7 @@ const OTPScreen = ({ navigation, route }) => {
             </View>
 
             <View style={styles.codeContainer}>
-              <Text style={[styles.code, { color: dark ? '#fff' : '#212121' }]}>
+              <Text style={{color:'#fff'}}>
                 Resend code in
               </Text>
               <Text style={styles.time}>{`  ${time}  `}</Text>

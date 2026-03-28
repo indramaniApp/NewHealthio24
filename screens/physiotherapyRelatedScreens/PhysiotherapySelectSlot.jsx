@@ -51,17 +51,32 @@ const PhysiotherapySelectSlot = ({ navigation, route }) => {
         });
     };
 
+    // Function to check if a slot is in the past
+    const isSlotDisabled = (slot) => {
+        if (!selectedDate) return false;
+        const today = new Date().toISOString().split('T')[0];
+        if (selectedDate !== today) return false;
+
+        const [slotHour, slotMinute] = slot.split(':').map(Number);
+        const now = new Date();
+        const slotTime = new Date();
+        slotTime.setHours(slotHour, slotMinute, 0, 0);
+
+        return slotTime <= now;
+    };
+const getToday = () => {
+  return new Date().toLocaleDateString('en-CA');
+};
+
     return (
-        // 2. मुख्य कंटेनर को LinearGradient से बदलें
         <LinearGradient
-            colors={['#00b4db', '#f5fcff', '#fff']}
+            colors={['#fff', '#f5fcff', '#fff']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={styles.safeArea}>
                 <Header
                     title="Select Appointment Slot"
                     onBackPress={() => navigation.goBack()}
-                    // 3. हेडर को ट्रांसपेरेंट करें
                     style={{ backgroundColor: 'transparent', marginTop: 40 }}
                 />
 
@@ -72,7 +87,7 @@ const PhysiotherapySelectSlot = ({ navigation, route }) => {
                         <View style={styles.calendarCard}>
                             <Calendar
                                 onDayPress={(day) => setSelectedDate(day.dateString)}
-                                minDate={new Date().toISOString().split('T')[0]}
+                              minDate={getToday()}
                                 markedDates={{
                                     [selectedDate]: {
                                         selected: true,
@@ -107,14 +122,25 @@ const PhysiotherapySelectSlot = ({ navigation, route }) => {
 
                         <View style={styles.slotGrid}>
                             {hoursData.map((item) => {
+                                const disabled = isSlotDisabled(item.hour);
                                 const isSelected = selectedHour === item.hour;
+
                                 return (
                                     <TouchableOpacity
                                         key={item.id}
-                                        style={[styles.hourBox, isSelected && styles.selectedHourBox]}
-                                        onPress={() => handleHourSelect(item.hour)}
+                                        style={[
+                                            styles.hourBox,
+                                            isSelected && styles.selectedHourBox,
+                                            disabled && styles.disabledHourBox
+                                        ]}
+                                        onPress={() => !disabled && handleHourSelect(item.hour)}
+                                        disabled={disabled}
                                     >
-                                        <Text style={[styles.hourText, isSelected && styles.selectedHourText]}>
+                                        <Text style={[
+                                            styles.hourText,
+                                            isSelected && styles.selectedHourText,
+                                            disabled && styles.disabledHourText
+                                        ]}>
                                             {item.hour}
                                         </Text>
                                     </TouchableOpacity>
@@ -128,7 +154,6 @@ const PhysiotherapySelectSlot = ({ navigation, route }) => {
                     <Button title="Next" filled style={styles.btn} onPress={handleNext} />
                 </View>
 
-                {/* Modal for Payment Method */}
                 <Modal
                     visible={showPaymentModal}
                     transparent
@@ -158,7 +183,7 @@ export default PhysiotherapySelectSlot;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: 'transparent', 
+        backgroundColor: 'transparent',
     },
     container: {
         padding: 16,
@@ -212,6 +237,13 @@ const styles = StyleSheet.create({
     selectedHourText: {
         color: '#fff',
         fontWeight: '600',
+    },
+    disabledHourBox: {
+        backgroundColor: '#eee',
+        borderColor: '#ccc',
+    },
+    disabledHourText: {
+        color: '#999',
     },
     bottomBar: {
         position: 'absolute',

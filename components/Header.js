@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import { SIZES, COLORS, icons } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Header = ({
   title,
@@ -11,26 +12,28 @@ const Header = ({
   cartCount = 0,
   onCartPress,
   onBackPress,
+  backCircleStyle,
+  backIconStyle,
+  cartCircleStyle,
+  cartIconStyle,
+  bottomLineStyle,
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   return (
-    <View
-      style={[
-        styles.container,
-        style,
-    
-      ]}
-    >
+    <View style={[styles.container, style]}>
       {/* Back Button */}
       <TouchableOpacity onPress={onBackPress} style={styles.backContainer}>
-        <View style={styles.backCircle}>
+        <LinearGradient
+          colors={backCircleStyle?.colors || ['#F0F4FF', '#F0F4FF']}
+          style={[styles.backCircle, backCircleStyle?.style]}
+        >
           <Image
             source={icons.back}
             resizeMode="contain"
-            style={[styles.backIcon, { tintColor: colors.text }]}
+            style={[styles.backIcon, { tintColor: colors.text }, backIconStyle]}
           />
-        </View>
+        </LinearGradient>
       </TouchableOpacity>
 
       {/* Title */}
@@ -45,11 +48,11 @@ const Header = ({
           style={styles.cartContainer}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <View style={styles.cartCircle}>
+          <View style={[styles.cartCircle, cartCircleStyle]}>
             <Image
               source={icons.cart}
               resizeMode="contain"
-              style={[styles.cartIcon, { tintColor: colors.text }]}
+              style={[styles.cartIcon, { tintColor: colors.text }, cartIconStyle]}
             />
             {cartCount > 0 && (
               <View style={styles.badge}>
@@ -61,7 +64,7 @@ const Header = ({
       )}
 
       {/* Divider Line */}
-      <View style={styles.bottomLine} />
+      <View style={[styles.bottomLine, bottomLineStyle]} />
     </View>
   );
 };
@@ -76,21 +79,15 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     position: 'relative',
   },
-  backContainer: {
-    marginLeft: 10,
-  },
+  backContainer: { marginLeft: 10 },
   backCircle: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#F0F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    width: 20,
-    height: 20,
-  },
+  backIcon: { width: 20, height: 20 },
   title: {
     fontSize: 24,
     fontFamily: 'Urbanist-Bold',
@@ -98,9 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  cartContainer: {
-    marginRight: 10,
-  },
+  cartContainer: { marginRight: 10 },
   cartCircle: {
     width: 36,
     height: 36,
@@ -110,10 +105,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  cartIcon: {
-    width: 20,
-    height: 20,
-  },
+  cartIcon: { width: 20, height: 20 },
   badge: {
     position: 'absolute',
     right: -2,
@@ -126,19 +118,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 4,
   },
-  badgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  bottomLine: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: '#E0E0E0',
-  },
+  badgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
+  bottomLine: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, backgroundColor: '#E0E0E0' },
 });
 
 export default Header;

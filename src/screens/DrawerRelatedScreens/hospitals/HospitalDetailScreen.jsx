@@ -9,22 +9,28 @@ import {
     Platform,
     StatusBar,
     Image,
+    Dimensions,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch } from 'react-redux';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient'; 
+import LinearGradient from 'react-native-linear-gradient';
 
-import { COLORS } from '../../../../constants';
+import { COLORS, SIZES } from '../../../../constants';
 import Header from '../../../../components/Header';
 import { showLoader, hideLoader } from '../../../redux/slices/loaderSlice';
 import ApiService from '../../../api/ApiService';
 import { ENDPOINTS } from '../../../constants/Endpoints';
+import { useTheme } from '../../../../theme/ThemeProvider';
+
+const { width } = Dimensions.get('window');
 
 const HospitalDetailScreen = () => {
     const dispatch = useDispatch();
     const route = useRoute();
     const navigation = useNavigation();
+    const { dark } = useTheme();
     const { hospitalId, hospitalData } = route.params;
 
     const [hospital, setHospital] = useState(hospitalData || null);
@@ -33,7 +39,6 @@ const HospitalDetailScreen = () => {
         try {
             dispatch(showLoader());
             const response = await ApiService.get(`${ENDPOINTS.patient_get_hospital_detail}/${hospitalId}`);
-            console.log('=====hospitalDetails======', response.data);
             setHospital(response.data);
         } catch (error) {
             console.log('Error fetching hospital detail:', error);
@@ -44,241 +49,298 @@ const HospitalDetailScreen = () => {
 
     useFocusEffect(
         useCallback(() => {
-            if (!hospitalData) {
-                fetchHospitalDetail();
-            }
+            if (!hospitalData) fetchHospitalDetail();
         }, [hospitalId])
     );
 
     const departments = [
-        {
-            key: 'clinical',
-            name: 'Clinical Department',
-            icon: 'stethoscope',
-            count: hospital?.clinical_department?.length || 0,
-            description: 'Handles general patient care and diagnostics.',
-            screen: 'ClinicalDepartment',
-            data: hospital?.clinical_department || [],
-        },
-        {
-            key: 'surgical',
-            name: 'Surgical Department',
-            icon: 'user-md',
-            count: hospital?.surgical_department?.length || 0,
-            description: 'Responsible for all surgical operations and procedures.',
-            screen: 'SurgicalDepartment',
-            data: hospital?.surgical_department || [],
-        },
-        {
-            key: 'preventive',
-            name: 'Specialty Preventive Department',
-            icon: 'heartbeat',
-            count: hospital?.specialty_preventive_department?.length || 0,
-            description: 'Focuses on preventive healthcare and wellness programs.',
-            screen: 'SpecialPreventDepartment',
-            data: hospital?.specialty_preventive_department || [],
-        },
+        { key: 'clinical', name: 'Clinical', icon: 'stethoscope', count: hospital?.clinical_department?.length || 0, color: '#00d2ff', screen: 'ClinicalDepartment', data: hospital?.clinical_department || [] },
+        { key: 'surgical', name: 'Surgical', icon: 'hand-holding-medical', count: hospital?.surgical_department?.length || 0, color: '#3a7bd5', screen: 'SurgicalDepartment', data: hospital?.surgical_department || [] },
+        { key: 'preventive', name: 'Preventive', icon: 'heartbeat', count: hospital?.specialty_preventive_department?.length || 0, color: '#ee1212', screen: 'SpecialPreventDepartment', data: hospital?.specialty_preventive_department || [] },
     ];
 
-    const renderDepartmentCard = (dept) => (
-        <TouchableOpacity
-            key={dept.key}
-            style={styles.deptCard}
-            onPress={() => {
-                navigation.navigate(dept.screen, {
-                    departmentType: dept.name,
-                    departmentIds: dept.data,
-                    hospitalId: hospital._id,
-                    data: dept.data,
-                });
-            }}
-        >
-            <View style={styles.circleIcon}>
-                <FontAwesome5 name={dept.icon} size={20} color={'#0077b6'} />
-                <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{dept.count}</Text>
-                </View>
-            </View>
-            <View style={styles.deptTextContainer}>
-                <Text style={styles.deptName}>{dept.name}</Text>
-                <Text style={styles.deptCount}>Doctors: {dept.count}</Text>
-                <Text style={styles.deptDescription}>{dept.description}</Text>
-            </View>
-            <FontAwesome5 name="chevron-right" size={16} color="#888" style={styles.arrowIcon} />
-        </TouchableOpacity>
-    );
+const renderInfoRow = (icon, label, value, isLast = false) => (
+    <View style={[
+        styles.infoRow,
+        !isLast && styles.borderBottom,
+    ]}>
+        <View style={[
+            styles.iconCircle,
+            { backgroundColor: dark ? 'rgba(255,255,255,0.08)' : '#f8f9fa' }
+        ]}>
+            <FontAwesome5 name={icon} size={14} color={COLORS.primary} />
+        </View>
 
-    const renderHospitalDetailCard = () => {
-        if (!hospital) return null;
+        <View style={styles.rowTextWrap}>
+            <Text style={styles.infoLabel}>{label}</Text>
 
-        return (
-            <View style={styles.hospitalCard}>
-                <Text style={styles.hospitalTitle}>{hospital.hospitalName}</Text>
+            <Text
+                style={[
+                    styles.infoValue,
+                    { color: dark ? '#fff' : '#222' }
+                ]}
+            >
+                {value || 'N/A'}
+            </Text>
+        </View>
+    </View>
+);
 
-                {hospital.hospitalExteriorPhoto && (
-                    <Image source={{ uri: hospital.hospitalExteriorPhoto }} style={styles.image} resizeMode="cover" />
-                )}
 
-                {[
-                    { icon: 'id-card', label: 'Reg No', value: hospital.registrationNumber },
-                    { icon: 'calendar-alt', label: 'Established', value: hospital.dateOfEstablishment },
-                    { icon: 'hospital', label: 'Type', value: Array.isArray(hospital.hospitalType) ? hospital.hospitalType.join(', ') : hospital.hospitalType },
-                    { icon: 'map-marker-alt', label: 'Address', value: `${hospital.streetAddress}, ${hospital.city}, ${hospital.state} - ${hospital.postalCode}, ${hospital.country}` },
-                    { icon: 'user-tie', label: 'Key Contact', value: `${hospital.keyContactPersonName} (${hospital.keyContactPersonDesignation}) - ${hospital.keyContactPersonContactNumber}` },
-                    { icon: 'bed', label: 'Beds', value: `${hospital.totalBeds} (ICU: ${hospital.icuBeds}, SCU: ${hospital.specialCareUnitBeds}, Other: ${hospital.otherBeds})` },
-                    { icon: 'university', label: 'Bank', value: `${hospital.bankName} - ${hospital.branchAddress}` },
-                    { icon: 'id-badge', label: 'Account', value: `${hospital.accountHolderName} | A/C: ${hospital.accountNumber} | IFSC: ${hospital.ifscCode}` },
-                    { icon: 'globe', label: 'Website', value: hospital.websiteLink },
-                    { icon: 'signature', label: 'TC Date', value: hospital.tcDate },
-                ].map((row, idx) => (
-                    <View key={idx} style={styles.detailRow}>
-                        <FontAwesome5 name={row.icon} size={14} color={'#0077b6'} />
-                        <Text style={styles.label}> {row.label}: </Text>
-                        <Text style={styles.value}>{row.value || 'N/A'}</Text>
-                    </View>
-                ))}
-            </View>
-        );
-    };
 
     return (
-        <LinearGradient
-            colors={['#00b4db', '#fff']}
-            style={{ flex: 1 }}
-        >
-            <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={styles.safeArea}>
+            <LinearGradient colors={dark ? ['#121212', '#1a1a1a'] : ['#f4f7f7', '#f8f9fa']} style={styles.mainGradient}>
                 <Header title="Hospital Details" onBackPress={() => navigation.goBack()} />
-                <ScrollView contentContainerStyle={styles.container}>
-                    <Text style={styles.sectionTitle}>Departments</Text>
-                    {departments.map(renderDepartmentCard)}
-                    <Text style={styles.sectionTitle}>Hospital Info</Text>
-                    {renderHospitalDetailCard()}
+
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                    
+                    {/* Hero Section */}
+                    <View style={styles.heroContainer}>
+                        <Image 
+                            source={hospital?.hospitalExteriorPhoto?.startsWith('http') ? { uri: hospital.hospitalExteriorPhoto } : require('../../../../assets/hospital.png')} 
+                            style={styles.heroImage}
+                        />
+                        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={styles.heroOverlay}>
+                            <Text style={styles.heroName}>{hospital?.hospitalName}</Text>
+                            <View style={styles.locBadge}>
+                                <Icon name="map-marker-radius" size={16} color="#00d4ff" />
+                                <Text style={styles.locText}>{hospital?.city}, {hospital?.state}</Text>
+                            </View>
+                        </LinearGradient>
+                    </View>
+
+                   {/* Department Grid */}
+<View style={styles.deptRow}>
+    {departments.map((dept) => (
+        <TouchableOpacity 
+            key={dept.key} 
+            style={[styles.deptCard, { backgroundColor: dark ? '#222' : '#fff' }]}
+            onPress={() => navigation.navigate(dept.screen, { 
+                departmentType: dept.name, 
+                hospitalId: hospital?._id, 
+                data: dept.data 
+            })}
+        >
+            <LinearGradient colors={[dept.color, dept.color + 'CC']} style={styles.deptIcon}>
+                <FontAwesome5 name={dept.icon} size={18} color="#fff" />
+            </LinearGradient>
+            
+            <Text style={[styles.deptTitle, { color: dark ? '#fff' : '#333' }]} numberOfLines={1}>
+                {dept.name}
+            </Text>
+
+            {/* Modern Pill Badge for Count */}
+            <View style={[styles.countBadge, { backgroundColor: dept.color + '15', borderColor: dept.color + '40' }]}>
+                <Text style={[styles.countText, { color: dept.color }]}>
+                    {dept.count} {dept.count === 1 ? 'Doctor' : 'Doctors'}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    ))}
+</View>
+
+                   {/* Unified Information Card - Now Full Width */}
+<View style={[styles.unifiedCard, { backgroundColor: dark ? '#1a1a1a' : '#fff' }]}>
+    {/* Drag handle for modal look */}
+    <View style={styles.dragHandle} />
+
+    <View style={styles.sheetContent}>
+        <View style={styles.cardHeader}>
+            <Icon name="information-variant" size={22} color={COLORS.primary} />
+            <Text style={[styles.cardHeaderText, { color: dark ? '#fff' : '#000' }]}>Full Specifications</Text>
+        </View>
+
+        {/* General Section */}
+        {renderInfoRow('id-card', 'Registration Number', hospital?.registrationNumber)}
+        {renderInfoRow('calendar-check', 'Established', hospital?.dateOfEstablishment)}
+        {renderInfoRow('hospital-symbol', 'Type', Array.isArray(hospital?.hospitalType) ? hospital.hospitalType.join(', ') : hospital?.hospitalType)}
+        {renderInfoRow('bed', 'Bed Count', `${hospital?.totalBeds} (ICU: ${hospital?.icuBeds})`)}
+        {renderInfoRow('user-circle', 'Contact Person', hospital?.keyContactPersonName)}
+        {renderInfoRow('phone-alt', 'Contact Number', hospital?.keyContactPersonContactNumber)}
+        {renderInfoRow('link', 'Website', hospital?.websiteLink)}
+
+        {/* Payment Sub-Section with Modern Divider */}
+        <View style={styles.subHeader}>
+            <LinearGradient 
+                colors={[COLORS.primary + '20', 'transparent']} 
+                start={{x:0, y:0}} end={{x:1, y:0}} 
+                style={styles.subHeaderGradient}
+            >
+                <Text style={styles.subHeaderText}>Banking & Payments</Text>
+            </LinearGradient>
+        </View>
+
+        {renderInfoRow('university', 'Bank Name', hospital?.bankName)}
+        {renderInfoRow('user-check', 'Account Holder', hospital?.accountHolderName)}
+        {renderInfoRow('list-alt', 'Account Number', hospital?.accountNumber)}
+        {renderInfoRow('barcode', 'IFSC Code', hospital?.ifscCode, true)}
+    </View>
+    
+    <View style={{ height: 50 }} />
+</View>
+
+                    <View style={{ height: 30 }} />
                 </ScrollView>
-            </SafeAreaView>
-        </LinearGradient>
+            </LinearGradient>
+        </SafeAreaView>
     );
 };
 
-export default HospitalDetailScreen;
-
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: 'transparent', 
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    safeArea: { flex: 1, backgroundColor: '#00b4db' },
+    mainGradient: { flex: 1 },
+    scrollContent: { padding: 16 },
+
+    // Hero Header
+    heroContainer: { height: 180, borderRadius: 20, overflow: 'hidden', elevation: 12, shadowColor: '#000', marginBottom: 20 },
+    heroImage: { width: '100%', height: '100%' },
+    heroOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'flex-end', padding: 20 },
+    heroName: { color: '#fff', fontSize: 24, fontWeight: '800', letterSpacing: 0.5 },
+    locBadge: { flexDirection: 'row', alignItems: 'center', marginTop: 8, backgroundColor: 'rgba(255,255,255,0.15)', alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
+    locText: { color: '#00d4ff', fontSize: 13, marginLeft: 6, fontWeight: '600' },
+
+    // Departments
+  deptRow: { 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        paddingVertical: 20 
     },
-    container: {
-        padding: 16,
-        backgroundColor: 'transparent', // Changed from '#f2f2f2'
-        paddingBottom: 40,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#005a8d', 
-        marginBottom: 16,
-    },
-    deptCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: COLORS.white,
-        padding: 14,
-        borderRadius: 12,
-        marginBottom: 12,
-        elevation: 3,
+    deptCard: { 
+        width: (width - 64) / 3, 
+        paddingTop: 18,
+        paddingBottom: 12,
+        paddingHorizontal: 8, 
+        borderRadius: 24, 
+        alignItems: 'center', 
+        elevation: 4,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
     },
-    circleIcon: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: '#e0f7fa',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-        position: 'relative',
+    deptIcon: { 
+        width: 46, 
+        height: 46, 
+        borderRadius: 16, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        marginBottom: 12 
     },
-    badge: {
-        position: 'absolute',
-        top: -4,
-        right: -4,
-        backgroundColor: '#d9534f', 
-        borderRadius: 10,
-        paddingHorizontal: 5,
-        paddingVertical: 1,
-        minWidth: 18,
-        alignItems: 'center',
-        justifyContent: 'center',
+    deptTitle: { 
+        fontSize: 12, 
+        fontWeight: '700', 
+        marginBottom: 8,
+        textAlign: 'center'
     },
-    badgeText: {
-        color: COLORS.white,
-        fontSize: 10,
-        fontWeight: '700',
-    },
-    deptTextContainer: {
-        flex: 1,
-        paddingRight: 8,
-    },
-    arrowIcon: {
-        marginLeft: 8,
-    },
-    deptName: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#2c3e50',
-    },
-    deptCount: {
-        fontSize: 13,
-        color: '#555',
-        marginTop: 4,
-    },
-    deptDescription: {
-        fontSize: 12,
-        color: '#777',
+    countBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        borderWidth: 1,
         marginTop: 2,
     },
-    hospitalCard: {
-        backgroundColor: COLORS.white,
-        padding: 16,
-        borderRadius: 12,
-        elevation: 3,
-        marginBottom: 16,
+    countText: {
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.2,
+    },
+
+ unifiedCard: { 
+        width: width, // Takes full screen width
+        borderTopLeftRadius: 40, 
+        borderTopRightRadius: 40, 
+        paddingTop: 10,
+        marginTop: 10,
+        elevation: 25, 
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: -12 },
+        shadowOpacity: 0.15,
+        shadowRadius: 15,
+        // Important: ensures it touches edges if ScrollView has padding
+        marginLeft: -16, // Agar ScrollView padding 16 hai toh use nullify karega
     },
-    hospitalTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#0077b6',
-        marginBottom: 12,
-        textAlign: 'center',
+    dragHandle: {
+        width: 45,
+        height: 5,
+        backgroundColor: '#EAEAEA',
+        borderRadius: 10,
+        alignSelf: 'center',
+        marginVertical: 15,
     },
-    image: {
-        height: 180,
-        width: '100%',
-        borderRadius: 12,
-        marginBottom: 12,
+    sheetContent: {
+        paddingHorizontal: 25, // Internal spacing for text
     },
-    detailRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 8,
+    cardHeader: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        marginBottom: 20, 
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,0.05)'
     },
-    label: {
-        fontSize: 13,
-        color: '#333',
-        fontWeight: '600',
-        marginLeft: 8,
+    cardHeaderText: { 
+        fontSize: 18, 
+        fontWeight: '800', 
+        marginLeft: 10,
+        letterSpacing: -0.5
     },
-    value: {
-        fontSize: 13,
-        color: '#555',
-        flex: 1,
-        flexWrap: 'wrap',
+    subHeader: { 
+        marginTop: 30, 
+        // marginBottom: 15 
     },
+    subHeaderGradient: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+    },
+    subHeaderText: { 
+        fontSize: 13, 
+        fontWeight: '900', 
+        color: COLORS.primary, 
+        letterSpacing: 1.2,
+        textTransform: 'uppercase'
+    },
+    
+   infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+},
+
+rowTextWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+},
+
+infoLabel: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '600',
+},
+
+infoValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    maxWidth: '55%',   // prevents overlap
+    textAlign: 'right',
+},
+
+iconCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 5,   // ← gap increase (15 → 22)
+},
+
+    // Sub Section Divider
+    subHeader: { flexDirection: 'row', alignItems: 'center', marginTop: 20, marginBottom: 10 },
+    subHeaderText: { fontSize: 13, fontWeight: 'bold', color: COLORS.primary, marginRight: 10 },
+    line: { flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }
 });
+
+export default HospitalDetailScreen;

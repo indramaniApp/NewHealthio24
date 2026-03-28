@@ -1,55 +1,100 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-} from 'react-native';
-import Header from '../../../components/Header';
-import { COLORS } from '../../../constants';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
 
-const AppointmentHistory = ({navigation}) => {
+import CompletedScreen from '../DrawerRelatedScreens/appointmenthistory/CompletedScreen'
+import UploadedScreen from '../../screens/DrawerRelatedScreens/appointmenthistory/UploadedScreen'
+const AppointmentHistory = () => {
+
+  const [selectedTab, setSelectedTab] = useState('Uploaded')
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Header title="Appointment History" 
-      onBackPress={() => navigation.goBack()}
-      />
-      <View style={styles.container}>
-        <Text style={styles.title}>🗓️ Appointment History</Text>
-        <Text style={styles.description}>
-          This is the Appointment History screen.
-        </Text>
-      </View>
-    </SafeAreaView>
-  );
-};
+    <View style={styles.container}>
+      
+      {/* Top Header */}
+      <View style={styles.topHeader}>
 
-export default AppointmentHistory;
+        <TouchableOpacity 
+          style={styles.tab}
+          onPress={() => setSelectedTab('Uploaded')}
+        >
+          <Text style={[
+            styles.tabText,
+            selectedTab === 'Uploaded' && styles.activeText
+          ]}>
+            Uploaded
+          </Text>
+
+          {selectedTab === 'Uploaded' && <View style={styles.activeLine} />}
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.tab}
+          onPress={() => setSelectedTab('Completed')}
+        >
+          <Text style={[
+            styles.tabText,
+            selectedTab === 'Completed' && styles.activeText
+          ]}>
+            Completed
+          </Text>
+
+          {selectedTab === 'Completed' && <View style={styles.activeLine} />}
+        </TouchableOpacity>
+
+      </View>
+
+      {/* Body */}
+      <View style={styles.body}>
+        {selectedTab === 'Uploaded' 
+          ? <UploadedScreen/> 
+          : <CompletedScreen />}
+      </View>
+
+    </View>
+  )
+}
+
+export default AppointmentHistory
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f7',
-    padding: 20,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+
+  topHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  title: {
-    fontSize: 24,
+
+  tab: {
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+
+  tabText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#999',
+  },
+
+  activeText: {
+    color: '#2E86DE',
     fontWeight: '700',
-    color: '#2c3e50',
-    marginBottom: 10,
   },
-  description: {
-    fontSize: 16,
-    color: '#7f8c8d',
-    textAlign: 'center',
+
+  activeLine: {
+    marginTop: 6,
+    height: 3,
+    width: '100%',
+    backgroundColor: '#2E86DE',
+    borderRadius: 5,
   },
-});
+
+  body: {
+    flex: 1,
+  }
+})

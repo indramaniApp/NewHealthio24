@@ -1,175 +1,356 @@
-
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Image,
-  Alert,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES, images } from '../constants';
-import { reducer } from '../utils/reducers/formReducers';
-import { validateInput } from '../utils/actions/formActions';
 import Button from '../components/Button';
-import { useTheme } from '../theme/ThemeProvider';
-import { useDispatch } from 'react-redux';
-import { showLoader, hideLoader } from '../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
 import AuthService from '../src/api/AuthService';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
-
-const isTestMode = false;
-
-const initialState = {
-  inputValues: {},
-  inputValidities: {
-    phone: false,
-  },
-  formIsValid: false,
-};
+import { useDispatch } from 'react-redux';
+import { showLoader, hideLoader } from '../src/redux/slices/loaderSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
-  const [formState, dispatchFormState] = useReducer(reducer, initialState);
-  const [error, setError] = useState(null);
-  const { colors, dark } = useTheme();
-  const [rawPhone, setRawPhone] = useState(isTestMode ? '9876543210' : '');
-  const [formattedPhone, setFormattedPhone] = useState(isTestMode ? '987 654 3210' : '');
-  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const dispatch = useDispatch();
 
-  const inputChangedHandler = useCallback(
-    (inputId, inputValue) => {
-      const result = validateInput(inputId, inputValue);
-      dispatchFormState({ inputId, validationResult: result, inputValue });
-    },
-    [dispatchFormState]
-  );
+  const [rawPhone, setRawPhone] = useState('');
+  const [formattedPhone, setFormattedPhone] = useState('');
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [fullName, setFullName] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [referredBy, setReferredBy] = useState('');
+
+  // ✅ CHECK EXISTING LOGIN SESSION
   useEffect(() => {
-    if (error) {
-      Alert.alert('An error occurred', error);
-    }
-  }, [error]);
+    checkLoginState();
+  }, []);
 
+  const checkLoginState = async () => {
+    const token = await AsyncStorage.getItem('USER_TOKEN');
+
+    if (token) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
+      });
+    }
+  };
   const handleMobileInput = (inputValue) => {
     let digits = inputValue.replace(/\D/g, '').slice(0, 10);
     setRawPhone(digits);
-    setIsPhoneValid(digits.length === 10 && /^[6-9]\d{9}$/.test(digits));
 
-    let formatted = digits.replace(/(\d{3})(\d{3})(\d{0,4})/, (_, p1, p2, p3) => {
-      return p3 ? `${p1} ${p2} ${p3}` : `${p1} ${p2}`;
-    });
+    const valid = digits.length === 10 && /^[0-9]\d{9}$/.test(digits);
+    setIsPhoneValid(valid);
+
+    let formatted = digits.replace(
+      /(\d{3})(\d{3})(\d{0,4})/,
+      (_, p1, p2, p3) => (p3 ? `${p1} ${p2} ${p3}` : `${p1} ${p2}`)
+    );
+
     setFormattedPhone(formatted.trim());
   };
 
-  const handleLogin = () => {
-    if (isPhoneValid) {
-      handleSendOtp();
-    } else {
-      Toast.show('Please enter a valid 10-digit mobile number starting with 6,7,8, or 9');
+  const handleLogin = async () => {
+    if (!isPhoneValid) {
+      Toast.show('Please enter valid mobile number');
+      return;
+    }
+
+    try {
+      dispatch(showLoader());
+
+      const response = await AuthService.sendOtp({
+        contactNumber: rawPhone,
+      });
+
+      Toast.show(response.message);
+
+      navigation.navigate('OTP', {
+        phone: rawPhone,
+        data: response.data,
+      });
+
+    } catch (error) {
+      Toast.show(error.message);
+    } finally {
+      dispatch(hideLoader());
     }
   };
 
-  const handleSendOtp = async () => {
-    if (isPhoneValid) {
-      try {
-        dispatch(showLoader());
-        const response = await AuthService.sendOtp(rawPhone);
-        Toast.show(response.message);
-        // navigate to OTP screen — pass phone and verification id
-        navigation.replace('OTP', { phone: rawPhone, data: response.data });
-      } catch (error) {
-        Toast.show("Error: " + error.message);
-      } finally {
-        dispatch(hideLoader());
-      }
-    } else {
-      Toast.show("Please enter a valid phone number.");
+  const handleRegister = async () => {
+    if (!fullName.trim()) {
+      Toast.show('Enter full name');
+      return;
+    }
+
+    if (!emailAddress.trim()) {
+      Toast.show('Enter email address');
+      return;
+    }
+
+    try {
+      dispatch(showLoader());
+
+      const response = await AuthService.sendOtp({
+        contactNumber: rawPhone,
+        fullName: fullName.trim(),
+        emailAddress: emailAddress.trim(),
+        referred_by_patient_mitra: referredBy.trim(),
+      });
+
+      setModalVisible(false);
+
+      Toast.show(response.message);
+
+      navigation.navigate('OTP', {
+        phone: rawPhone,
+        data: response.data,
+      });
+
+    } catch (error) {
+      Toast.show(error.message);
+    } finally {
+      dispatch(hideLoader());
     }
   };
+
+  const renderInput = (
+    label,
+    icon,
+    placeholder,
+    value,
+    onChangeText,
+    keyboardType = 'default'
+  ) => (
+    <View style={{ marginBottom: 12 }}>
+      <Text style={[styles.modalLabel]}>{label}</Text>
+
+      <View style={styles.inputWrapper}>
+        <View style={styles.iconContainer}>
+          <Feather name={icon} size={20} color={COLORS.primary} />
+        </View>
+
+        <TextInput
+          style={styles.inputField}
+          placeholder={placeholder}
+          placeholderTextColor="#999"
+          keyboardType={keyboardType}
+          autoCapitalize="none"
+          value={value}
+          onChangeText={onChangeText}
+        />
+      </View>
+    </View>
+  );
 
   return (
-    // your existing UI (unchanged)
-    <LinearGradient colors={['#00b4db', '#fff', '#fff']} style={{ flex: 1 }}>
-      <SafeAreaView style={[styles.area, { backgroundColor: 'transparent' }]}>
-        <View style={[styles.container, { backgroundColor: 'transparent' }]}>
+    <LinearGradient colors={['#001F3F', '#003366', '#fff', '#fff']} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            <Image source={images.Logo} resizeMode="contain" style={[styles.logo, { tintColor: COLORS.primary }]} />
-            <Text style={[styles.tagline, { color: dark ? COLORS.grayTie : COLORS.darkGray }]}>
-              Trusted Healthcare Companion
-            </Text>
-            <Text style={[styles.infoText, { color: dark ? COLORS.white : COLORS.black }]}>
-              Please enter your mobile number to log in and access your account.
+            <Image source={images.Logo} resizeMode="contain" style={styles.logo} />
+
+            <Text style={styles.tagline}>Trusted Healthcare Companion</Text>
+
+            <Text style={styles.infoText}>
+              Please enter your details to log in and access your account.
             </Text>
 
-            <View style={styles.formContainer}>
-              <Text style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}>
-                Login to Your Account
-              </Text>
+            <Text style={styles.title}>Login to Your Account</Text>
 
-              <View style={[
-                  styles.inputWrapper,
-                  { backgroundColor: dark ? COLORS.darkCard : '#F4F6F9', borderColor: isPhoneValid ? COLORS.green : COLORS.primary }
-                ]}>
-                <View style={styles.iconContainer}>
-                  <Feather name="phone" size={20} color={COLORS.primary} />
-                </View>
-                <TextInput
-                  style={[styles.inputField, { color: dark ? COLORS.white : COLORS.black }]}
-                  placeholder="Enter your mobile number"
-                  placeholderTextColor={dark ? COLORS.grayTie : COLORS.gray}
-                  keyboardType="numeric"
-                  value={formattedPhone}
-                  onChangeText={handleMobileInput}
-                />
+            <Text style={styles.label}>Contact Number</Text>
+
+            <View style={styles.inputWrapper}>
+              <View style={styles.iconContainer}>
+                <Feather name="phone" size={20} color={COLORS.primary} />
               </View>
 
-              <Button
-                title="Login"
-                filled
-                onPress={handleLogin}
-                style={[styles.button, { backgroundColor: isPhoneValid ? COLORS.primary : COLORS.gray }]}
-                disabled={!isPhoneValid}
+              <TextInput
+                style={styles.inputField}
+                placeholder="Enter mobile number"
+                placeholderTextColor="#000"
+                keyboardType="numeric"
+                value={formattedPhone}
+                onChangeText={handleMobileInput}
               />
             </View>
+
+            <Button
+              title="Login"
+              filled
+              onPress={handleLogin}
+              style={styles.button}
+              disabled={!isPhoneValid}
+            />
+
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Text style={styles.registerText}>
+                Don’t have an account? Register
+              </Text>
+            </TouchableOpacity>
+
           </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
+<Modal visible={modalVisible} transparent animationType="slide">
+  <View style={styles.modalContainer}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={styles.modalBox}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <Text style={styles.modalTitle}>Complete Registration</Text>
+
+          {renderInput(
+            'Contact Number',
+            'phone',
+            'Enter mobile number',
+            formattedPhone,
+            handleMobileInput,
+            'numeric'
+          )}
+
+          {renderInput('Full Name', 'user', 'Enter full name', fullName, setFullName)}
+
+          {renderInput(
+            'Email Address',
+            'mail',
+            'Enter email',
+            emailAddress,
+            setEmailAddress,
+            'email-address'
+          )}
+
+          {renderInput(
+            'Referral Code',
+            'users',
+            'Optional',
+            referredBy,
+            (text) => setReferredBy(text.toUpperCase())
+          )}
+
+          <Button
+            title="Continue"
+            filled
+            onPress={handleRegister}
+            disabled={!isPhoneValid}
+          />
+
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
+
+        </ScrollView>
+      </View>
+      {/* 🟢 YE WALA VIEW GAP FILL KAREGA 🟢 */}
+      <View style={{ height: 500, backgroundColor: '#fff', position: 'absolute', bottom: -500, left: 0, right: 0 }} />
+    </KeyboardAvoidingView>
+  </View>
+</Modal>
+
+
+
       </SafeAreaView>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  area: { flex: 1 },
-  container: { flex: 1, padding: 16 },
-  logo: { width: SIZES.width * 0.5, height: SIZES.width * 0.3, marginBottom: 12 },
-  tagline: { fontSize: 14, fontFamily: 'Urbanist Medium', textAlign: 'center', marginBottom: 6 },
-  infoText: { fontSize: 16, fontFamily: 'Urbanist Regular', textAlign: 'center', marginBottom: 16 },
-  formContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16, width: '100%' },
-  title: { fontSize: 20, fontFamily: 'Urbanist Bold', textAlign: 'center', marginBottom: 24 },
+  scrollViewContent: { flexGrow: 1, padding: 20 },
+
+  logo: {
+    width: SIZES.width * 0.5,
+    height: SIZES.width * 0.3,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+
+  tagline: { fontSize: 14, textAlign: 'center', marginBottom: 4, color: '#fff' },
+  infoText: { fontSize: 16, textAlign: 'center', marginBottom: 20, color: '#fff' },
+  title: { fontSize: 24, textAlign: 'center', marginBottom: 30, color: '#fff' },
+
+  label: { marginBottom: 6, fontSize: 14, color: '#fff' },
+
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 14,
     borderWidth: 1.5,
+    borderColor: COLORS.primary,
     paddingHorizontal: 12,
-    width: '100%',
     height: 55,
     marginBottom: 16,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: '#F4F6F9',
   },
-  iconContainer: { backgroundColor: COLORS.white, padding: 8, borderRadius: 50, marginRight: 10 },
-  inputField: { flex: 1, fontSize: 18, fontFamily: 'Urbanist Medium', paddingVertical: 8 },
-  button: { marginTop: 8, width: '100%', borderRadius: 30 },
-  scrollViewContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' },
+
+  iconContainer: {
+    backgroundColor: COLORS.white,
+    padding: 8,
+    borderRadius: 50,
+    marginRight: 10,
+  },
+
+  inputField: { flex: 1, fontSize: 17, color: '#000' },
+
+  button: { marginTop: 10, borderRadius: 30 },
+
+  registerText: {
+    textAlign: 'center',
+    marginTop: 22,
+    color: COLORS.primary,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+
+ modalContainer: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.6)', // Thoda dark takki peeche ka "Register" text na dikhe
+  justifyContent: 'flex-end',
+},
+modalBox: {
+  backgroundColor: '#fff',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  padding: 20,
+  width: '100%',
+  maxHeight: SIZES.height * 0.8, // Takki keyboard ke liye jagah bache
+  overflow: 'hidden', // Extra safety
+},
+
+  modalTitle: { fontSize: 20, marginBottom: 20, textAlign: 'center' },
+
+  modalLabel: {
+    marginBottom: 6,
+    fontSize: 14,
+    color: '#000',
+  },
+
+  cancelText: {
+    textAlign: 'center',
+    marginTop: 10,
+    color: 'red',
+  },
 });
 
 export default Login;

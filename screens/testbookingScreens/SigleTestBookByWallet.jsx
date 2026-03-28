@@ -21,7 +21,6 @@ import { showLoader, hideLoader } from '../../src/redux/slices/loaderSlice';
 import LinearGradient from 'react-native-linear-gradient';
 
 const SingleTestBookByWallet = ({ navigation, route }) => {
-    // Pichli screen se referralId bhi le rahe hain
     const { testId, startedDate, selectedHour, referralId: passedReferralId } = route.params || {};
     const { colors } = useTheme();
     const dispatch = useDispatch();
@@ -30,7 +29,6 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
     const [patientAge, setPatientAge] = useState('');
     const [gender, setGender] = useState('');
     const [appointmentType, setAppointmentType] = useState('');
-    // referralId ke liye state bana di
     const [referralId, setReferralId] = useState(passedReferralId || '');
 
     const handleSubmit = async () => {
@@ -51,10 +49,7 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                 patient_gender: gender,
             };
 
-            // Agar referralId hai, to use payload me add kar do
-            if (referralId.trim()) {
-                payload.referral_id = referralId.trim();
-            }
+            if (referralId.trim()) payload.referral_id = referralId.trim();
 
             const finalUrl = `${ENDPOINTS.book_test_wallet}/${testId}`;
             const response = await ApiService.post(finalUrl, payload, true, false);
@@ -78,56 +73,57 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
-                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
+                colors={['#fff', '#fff']}
                 style={{ flex: 1 }}
             >
                 <Header
                     title="Complete Blood Test"
                     onBackPress={() => navigation.goBack()}
                     style={{ backgroundColor: 'transparent', marginTop: 40 }}
+                    titleStyle={{ color: '#4A148C' }}
                 />
 
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <LinearGradient
-                        colors={['#F7FBFF', '#FFFFFF']}
+                        colors={['#F3E5F5', '#E1BEE7']}
                         style={styles.card}
                     >
-                        <Text style={[styles.cardText, { color: colors.text }]}>
+                        <Text style={[styles.cardText, { color: '#6A1B9A' }]}>
                             Appointment Date: {startedDate}
                         </Text>
-                        <Text style={[styles.cardText, { color: colors.text }]}>
+                        <Text style={[styles.cardText, { color: '#6A1B9A' }]}>
                             Appointment Time: {selectedHour}
                         </Text>
                     </LinearGradient>
 
                     {/* Form */}
                     <View style={styles.formSection}>
-                        <Text style={[styles.label, { color: colors.text }]}>Patient Name</Text>
+                        <Text style={[styles.label, { color: '#6A1B9A' }]}>Patient Name</Text>
                         <TextInput
-                            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: '#FFFFFF' }]}
+                            style={[styles.input, { backgroundColor: '#fff', borderColor: '#6A1B9A', color: '#000' }]}
                             value={patientName}
                             onChangeText={setPatientName}
                             placeholder="Enter patient name"
-                            placeholderTextColor={colors.text + '88'}
+                            placeholderTextColor="#888"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>Age</Text>
+                        <Text style={[styles.label, { color: '#6A1B9A' }]}>Age</Text>
                         <TextInput
-                            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: '#FFFFFF' }]}
+                            style={[styles.input, { backgroundColor: '#fff', borderColor: '#6A1B9A', color: '#000' }]}
                             value={patientAge}
                             onChangeText={setPatientAge}
                             placeholder="Enter age"
-                            placeholderTextColor={colors.text + '88'}
+                            placeholderTextColor="#888"
                             keyboardType="numeric"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>Gender</Text>
-                        <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
+                        <Text style={[styles.label, { color: '#6A1B9A' }]}>Gender</Text>
+                        <View style={[styles.pickerWrapper, { borderColor: '#6A1B9A', backgroundColor: '#fff' }]}>
                             <Picker
                                 selectedValue={gender}
                                 onValueChange={(itemValue) => setGender(itemValue)}
-                                style={[styles.picker, { color: colors.text }]}
-                                dropdownIconColor={colors.text}
+                                style={styles.picker}
+                                dropdownIconColor="#6A1B9A"
                             >
                                 <Picker.Item label="Select Gender" value="" color="#888" />
                                 <Picker.Item label="Male" value="Male" />
@@ -136,13 +132,13 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                             </Picker>
                         </View>
 
-                        <Text style={[styles.label, { color: colors.text }]}>Appointment Type</Text>
-                        <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
+                        <Text style={[styles.label, { color: '#6A1B9A' }]}>Appointment Type</Text>
+                        <View style={[styles.pickerWrapper, { borderColor: '#6A1B9A', backgroundColor: '#fff' }]}>
                             <Picker
                                 selectedValue={appointmentType}
                                 onValueChange={(itemValue) => setAppointmentType(itemValue)}
-                                style={[styles.picker, { color: appointmentType ? colors.text : '#888' }]}
-                                dropdownIconColor={colors.text}
+                                style={styles.picker}
+                                dropdownIconColor="#6A1B9A"
                             >
                                 <Picker.Item label="Select Appointment Type" value="" color="#888" />
                                 <Picker.Item label="Center Visit" value="center-visit" />
@@ -150,15 +146,14 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                             </Picker>
                         </View>
 
-                        {/* Referral ID Input Box */}
-                        <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+                        {/* <Text style={[styles.label, { color: '#6A1B9A' }]}>Referral ID (Optional)</Text>
                         <TextInput
-                            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: '#FFFFFF' }]}
+                            style={[styles.input, { backgroundColor: '#fff', borderColor: '#6A1B9A', color: '#000' }]}
                             value={referralId}
                             onChangeText={setReferralId}
                             placeholder="Enter referral ID"
-                            placeholderTextColor={colors.text + '88'}
-                        />
+                            placeholderTextColor="#888"
+                        /> */}
 
                         <TouchableOpacity
                             onPress={handleSubmit}
@@ -166,9 +161,9 @@ const SingleTestBookByWallet = ({ navigation, route }) => {
                             style={{ opacity: patientName && patientAge && gender && appointmentType ? 1 : 0.5 }}
                         >
                             <LinearGradient
-                                colors={['#00b4db', '#0077b6']}
+                                colors={['#6A1B9A', '#AB47BC']}
                                 start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
+                                end={{ x: 1, y: 0 }}
                                 style={styles.button}
                             >
                                 <Text style={styles.buttonText}>Proceed to Pay</Text>

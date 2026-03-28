@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, StatusBar } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
@@ -12,32 +12,66 @@ import { hoursData } from '../data';
 const BookAppointment = ({ navigation, route }) => {
     const { colors, dark } = useTheme();
     let { doctorId, method } = route?.params;
-console.log('doctorId====',doctorId);
-    const [selectedHour, setSelectedHour] = useState(null);
-    const [startedDate, setStartedDate] = useState(
-        new Date().toISOString().split('T')[0]
-    ); // YYYY-MM-DD
 
-    const handleHourSelect = (hour) => {
-        setSelectedHour(hour);
+    const [selectedHour, setSelectedHour] = useState(null);
+    const [startedDate, setStartedDate] = useState(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
+
+    const handleHourSelect = (hour) => setSelectedHour(hour);
+
+    // Check if a slot is in the past
+    const isSlotDisabled = (slot) => {
+        if (!startedDate) return false;
+
+        const today = new Date().toISOString().split('T')[0];
+        if (startedDate !== today) return false;
+
+        const now = new Date();
+        const [time, modifier] = slot.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        const slotTime = new Date();
+        slotTime.setHours(hours, minutes, 0, 0);
+
+        return slotTime <= now;
     };
 
     const renderHourItem = ({ item }) => {
+        const disabled = isSlotDisabled(item.hour);
         const isSelected = selectedHour === item.hour;
+
         return (
-            <TouchableOpacity onPress={() => handleHourSelect(item.hour)} style={{ flex: 1 }}>
+            <TouchableOpacity
+                onPress={() => !disabled && handleHourSelect(item.hour)}
+                style={{ flex: 1 }}
+                disabled={disabled}
+            >
                 {isSelected ? (
                     <LinearGradient
-                        colors={['#0077b6', '#00b4db']}
+                        colors={['#001F3F', '#003366']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={[styles.hourButton, { borderWidth: 0 }]}
                     >
-                        <Text style={styles.selectedHourText}>{item.hour}</Text>
+                        <Text style={[styles.selectedHourText, { color: '#fff' }]}>{item.hour}</Text>
                     </LinearGradient>
                 ) : (
-                    <View style={styles.hourButton}>
-                        <Text style={styles.hourText}>{item.hour}</Text>
+                    <View
+                        style={[
+                            styles.hourButton,
+                            { backgroundColor: COLORS.white, borderColor: '#001F3F' },
+                            disabled && styles.disabledHourBox,
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                styles.hourText,
+                                { color: disabled ? '#b0b0b0' : '#001F3F' },
+                            ]}
+                        >
+                            {item.hour}
+                        </Text>
                     </View>
                 )}
             </TouchableOpacity>
@@ -45,71 +79,70 @@ console.log('doctorId====',doctorId);
     };
 
     return (
-   
         <LinearGradient
-            colors={['#00b4db', '#fff', '#fff', '#fff', '#fff', '#fff']}
+            colors={['#001F3F', '#003366', '#fff', '#fff', '#fff', '#fff']}
             style={{ flex: 1 }}
         >
-           
+            <StatusBar backgroundColor="#001F3F" barStyle="light-content" />
             <SafeAreaView style={styles.area}>
-            
                 <View style={styles.container}>
-              
-                    <Header title="Book Appointment" onBackPress={() => navigation.goBack()} />
+                    <Header
+                        title="Book Appointment"
+                        onBackPress={() => navigation.goBack()}
+                        titleStyle={{ fontSize: 28, color: '#fff' }}
+                        backCircleStyle={{ backgroundColor: '#fff' }}
+                        backIconStyle={{ tintColor: '#000' }}
+                        bottomLineStyle={{ backgroundColor: 'transparent' }}
+                    />
 
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ paddingBottom: 120 }}
                         keyboardShouldPersistTaps="handled"
                     >
-                        <Text
-                            style={[
-                                styles.title,
-                                { color: dark ? COLORS.white : COLORS.greyscale900 },
-                            ]}>
-                            Select Date
-                        </Text>
+                       {/* Select Date */}
+<Text style={[styles.title, { color: '#FFFFFF' }]}>
+    Select Date
+</Text>
 
-                        {/* Stylish Gradient Calendar */}
+
                         <LinearGradient
-                            colors={['#0077b6', '#00b4db']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
+                            colors={['#fff', '#fff']}
                             style={styles.calendarWrapper}
                         >
                             <Calendar
-                                onDayPress={(day) => setStartedDate(day.dateString)}
+                                onDayPress={(day) => {
+                                    setStartedDate(day.dateString);
+                                    setSelectedHour(null);
+                                }}
                                 markedDates={{
                                     [startedDate]: {
                                         selected: true,
-                                        selectedColor: '#FFFFFF',
-                                        selectedTextColor: '#0077b6',
+                                        selectedColor: '#001F3F',
+                                        selectedTextColor: '#fff',
                                     },
                                 }}
                                 theme={{
                                     calendarBackground: 'transparent',
-                                    dayTextColor: '#FFFFFF',
+                                    dayTextColor: dark ? COLORS.white : '#001F3F',
                                     textDisabledColor: '#B0BEC5',
-                                    monthTextColor: '#FFFFFF',
-                                    arrowColor: '#FFFFFF',
+                                    monthTextColor: dark ? COLORS.white : '#001F3F',
+                                    arrowColor: dark ? COLORS.white : '#001F3F',
                                     todayTextColor: '#FFEB3B',
-                                    selectedDayTextColor: '#0077b6',
-                                    selectedDayBackgroundColor: '#FFFFFF',
                                     textSectionTitleColor: '#FFD700',
                                     textDayFontFamily: 'Urbanist SemiBold',
                                     textMonthFontFamily: 'Urbanist Bold',
                                     textDayHeaderFontFamily: 'Urbanist SemiBold',
+                                    selectedDayTextColor: '#fff',
+                                    selectedDayBackgroundColor: '#001F3F',
                                 }}
                                 minDate={new Date().toISOString().split('T')[0]}
                                 disableAllTouchEventsForDisabledDays={true}
                             />
                         </LinearGradient>
 
-                        <Text
-                            style={[
-                                styles.title,
-                                { color: dark ? COLORS.white : COLORS.greyscale900 },
-                            ]}>
+                        {/* Select Hour */}
+                        <Text style={[styles.title, { color: dark ? COLORS.white : '#001F3F' }]}>
                             Select Hour
                         </Text>
 
@@ -124,25 +157,23 @@ console.log('doctorId====',doctorId);
                     </ScrollView>
                 </View>
 
-                {/* Gradient Button */}
-                <View
-                    style={[
-                        styles.bottomContainer,
-                        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-                    ]}>
+                {/* Next Button */}
+                <View style={[styles.bottomContainer, { backgroundColor: dark ? COLORS.dark2 : COLORS.white }]}>
                     <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() =>
-                            navigation.navigate('SelectPackage', {
-                                startedDate,
-                                selectedHour,
-                                doctorId,
-                                method,
-                            })
-                        }
+                        activeOpacity={selectedHour ? 0.8 : 1}
+                        onPress={() => {
+                            if (selectedHour) {
+                                navigation.navigate('SelectPackage', {
+                                    startedDate,
+                                    selectedHour,
+                                    doctorId,
+                                    method,
+                                });
+                            }
+                        }}
                     >
                         <LinearGradient
-                            colors={['#0077b6', '#00b4db']}
+                            colors={selectedHour ? ['#001F3F', '#003366'] : ['#ccc', '#ddd']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                             style={styles.gradientBtn}
@@ -157,15 +188,14 @@ console.log('doctorId====',doctorId);
 };
 
 const styles = StyleSheet.create({
-   
     area: { flex: 1 },
     container: { flex: 1, padding: 16 },
     title: {
         fontSize: 20,
         fontFamily: 'Urbanist Bold',
-        color: COLORS.black,
         marginTop: 12,
         marginBottom: 8,
+        color:'#fff'
     },
     calendarWrapper: {
         borderRadius: 16,
@@ -179,32 +209,33 @@ const styles = StyleSheet.create({
     hourButton: {
         borderRadius: 32,
         margin: 5,
-        borderColor: '#0077b6',
         borderWidth: 1.4,
-        width: (SIZES.width - 32) / 3 - 9,
+        width: (SIZES.width - 42) / 3,
         height: 45,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: COLORS.white,
     },
     selectedHourText: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Urbanist SemiBold',
-        color: COLORS.white,
     },
     hourText: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Urbanist SemiBold',
-        color: '#0077b6',
+    },
+    disabledHourBox: {
+        backgroundColor: '#f2f2f2',
+        borderColor: '#e0e0e0',
     },
     bottomContainer: {
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        height: 99,
+        height: 90,
         borderRadius: 32,
         alignItems: 'center',
         justifyContent: 'center',
+        elevation: 10,
     },
     gradientBtn: {
         width: SIZES.width - 32,
@@ -212,10 +243,6 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 6,
-        shadowColor: '#0077b6',
-        shadowOpacity: 0.25,
-        shadowRadius: 6,
     },
     btnText: {
         color: COLORS.white,

@@ -21,7 +21,15 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import LinearGradient from 'react-native-linear-gradient';
 
 const PatientMitraSelectSlot = ({ navigation, route }) => {
-    const { packageId } = route.params || {};
+    const { patientMitraId } = route.params || {};
+    //  // 🔥 Check for missing package ID
+    // if (!patientMitraId) {
+    //     alert('Package ID missing! Please select a package first.');
+    //     navigation.goBack();
+    //     return null; // screen render ko rok do
+    // }
+
+    console.log('patientMitraId===sss==ss', patientMitraId);
     const { colors, dark } = useTheme();
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedHour, setSelectedHour] = useState(null);
@@ -42,9 +50,9 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
         navigation.navigate('PatientMitraBookByWallet', {
             startedDate: selectedDate,
             selectedHour,
-            packageId,
+            patientMitraId,
         });
-        console.log('Navigating with packageId:===========s====', packageId);
+        console.log('Navigating with patientMitraId:===========s====', patientMitraId);
     };
 
     const handleBookByPayment = () => {
@@ -52,14 +60,14 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
         navigation.navigate('PatientMitraBookByPayment', {
             startedDate: selectedDate,
             selectedHour,
-            packageId,
+            patientMitraId,
         });
     };
 
     return (
         // 🔥 LinearGradient wrap
         <LinearGradient
-            colors={dark ? ['#1A202C', '#2D3748'] : ['#00b4db', '#f4f4f5', '#f4f4f5']}
+            colors={dark ? ['#1A202C', '#2D3748'] : ['#fff', '#f4f4f5', '#f4f4f5']}
             style={{ flex: 1 }}
         >
             <SafeAreaView style={[styles.safeArea, { backgroundColor: 'transparent' }]}>
@@ -181,7 +189,7 @@ const PatientMitraSelectSlot = ({ navigation, route }) => {
                 <Modal
                     visible={showPaymentModal}
                     transparent
-                    animationType="fade"
+                    animationType="slide"
                     onRequestClose={() => setShowPaymentModal(false)}
                 >
                     <View style={styles.modalOverlay}>

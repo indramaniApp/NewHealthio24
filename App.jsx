@@ -1,136 +1,115 @@
-
 globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 
 import React, { useEffect } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import AppNavigation from './navigations/AppNavigation';
 import {
-  LogBox,
-  StatusBar,
   View,
-  Alert,
   PermissionsAndroid,
   Platform,
+  Linking,
 } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import AppNavigation from './navigations/AppNavigation';
 import Loader from './components/Loader';
-import { useSelector } from 'react-redux';
-import Orientation from 'react-native-orientation-locker';
+
 import messaging from '@react-native-firebase/messaging';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import 'react-native-reanimated';
-
-LogBox.ignoreAllLogs();
-
-const FCM_STORAGE_KEY = 'FCM_TOKEN';
-
+import { navigationRef } from './navigations/AppNavigation';
 const App = () => {
-  const loading = useSelector((state) => state.loader.isLoading);
+
+
+
+
 
   useEffect(() => {
-    console.log('🔵 App mounted – starting FCM setup');
-    Orientation.lockToPortrait();
-
-    /* ✅ 1. Android 13+ notification permission popup */
-    const requestAndroidPermission = async () => {
-      try {
-        if (Platform.OS === 'android' && Platform.Version >= 33) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-          );
-          console.log('🔵 POST_NOTIFICATIONS granted:', granted);
+    // Check if the user accepted a call in Headless state natively via Deep Linking
+    const handleDeepLink = (event) => {
+      const url = event?.url || event;
+      if (url && url.startsWith('healthio24://call')) {
+        const getQuery = (param) => url.split(param + '=')[1]?.split('&')[0];
+        const action = getQuery('action');
+        if (action === 'accept' || action === 'view') {
+          // Keep trying to navigate until AppNavigation finishes mounting and hydration completes
+          let attempts = 0;
+          const navigateInterval = setInterval(() => {
+            attempts++;
+            if (navigationRef.isReady()) {
+              clearInterval(navigateInterval);
+              // Small delay to allow initialRouteName to settle before pushing a new screen
+              setTimeout(() => {
+                navigationRef.navigate('PatientVideoCallScreen', {
+                  appointmentId: getQuery('appointmentId'),
+                  fcmAppointmentId: getQuery('fcmAppointmentId'),
+                  doctorName: decodeURIComponent(getQuery('doctorName') || 'Doctor'),
+                  callAcceptedViaCallKeep: action === 'accept',
+                });
+              }, 400); // 400ms delay protects against navigation reset bugs
+            }
+            if (attempts > 100) clearInterval(navigateInterval); // Stop after 5 seconds
+          }, 50);
         }
-      } catch (err) {
-        console.error('❌ POST_NOTIFICATIONS request error:', err);
       }
     };
 
-    requestAndroidPermission(); 
-    /* ✅ 2. Ask Firebase messaging permission & store token */
-    const getAndStoreFcmToken = async () => {
-      try {
-        console.log('🔵 Requesting FCM permission…');
-        const authStatus = await messaging().requestPermission();
-        console.log('🔵 messaging.requestPermission status:', authStatus);
+    // Check for cold boot launch
+    Linking.getInitialURL().then(url => {
+      if (url) handleDeepLink(url);
+    });
 
-        const enabled =
-          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    // Check for warm/background launch
+    const linkingSubscription = Linking.addEventListener('url', handleDeepLink);
 
-        if (!enabled) {
-          console.log('❌ Push notification permission not granted');
-          return;
-        }
-
-        console.log('🔵 Getting FCM token…');
-        const token = await messaging().getToken();
-        console.log('✅ FCM token:', token);
-
-        if (token) {
-          await AsyncStorage.setItem(FCM_STORAGE_KEY, token);
-          console.log('✅ FCM token saved locally');
-          // ⚠️ Send this token to backend only AFTER successful login
-        } else {
-          console.log('⚠️ FCM token was empty');
-        }
-      } catch (err) {
-        console.error('❌ getAndStoreFcmToken error:', err);
+    // ✅ Permissions
+    const initPermissions = async () => {
+      if (Platform.OS === 'android') {
+        await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+        ]);
       }
     };
+    initPermissions();
 
-    getAndStoreFcmToken();
+    // ✅ Foreground Message
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      console.log('📱 Foreground:', JSON.stringify(remoteMessage));
+      if (remoteMessage?.data?.type === 'incoming_call') {
+        const callDataStr = await AsyncStorage.getItem('CALL_DATA');
+        let callUUID = remoteMessage.data.callUUID; // fallback
 
-    /* ✅ 3. Refresh token listener */
-    const unsubscribeTokenRefresh = messaging().onTokenRefresh(async (newToken) => {
-      console.log('🔄 Token refreshed:', newToken);
-      try {
-        await AsyncStorage.setItem(FCM_STORAGE_KEY, newToken);
-      } catch (e) {
-        console.error('❌ Failed to save refreshed token:', e);
+        if (!callUUID) {
+          // It's a new call
+          callUUID = Date.now().toString();
+          await AsyncStorage.setItem('CALL_DATA', JSON.stringify({ ...remoteMessage.data, callUUID }));
+        }
+
+        // Send to Redux or display directly so user can interact
+        // Just jumping to PatientVideoCallScreen natively
+        if (navigationRef.isReady()) {
+          navigationRef.navigate('PatientVideoCallScreen', {
+            appointmentId: remoteMessage.data.appointmentId,
+            fcmAppointmentId: remoteMessage.data.fcmAppointmentId,
+            doctorName: remoteMessage.data.doctorName || 'Doctor',
+            callAcceptedViaCallKeep: false,
+          });
+        }
       }
     });
-
-    /* ✅ 4. Foreground messages */
-    const unsubscribeForeground = messaging().onMessage(async (remoteMessage) => {
-      console.log('🔔 Foreground FCM message:', remoteMessage);
-      Alert.alert(
-        remoteMessage.notification?.title || 'Notification',
-        remoteMessage.notification?.body || ''
-      );
-    });
-
-    /* ✅ 5. Background (user taps while in background) */
-    const unsubscribeOpened = messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log('📩 Opened from background:', remoteMessage);
-      // navigate based on remoteMessage.data if needed
-    });
-
-    /* ✅ 6. App launched from killed state */
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage) {
-          console.log('🚀 Opened from quit/kill state:', remoteMessage);
-          // handle initial notification if required
-        }
-      })
-      .catch((e) => console.error('❌ getInitialNotification error:', e));
 
     return () => {
-      console.log('🔵 Cleaning up listeners========');
-      unsubscribeForeground();
-      unsubscribeOpened();
-      unsubscribeTokenRefresh();
-      Orientation.unlockAllOrientations();
+      if (unsubscribe) unsubscribe();
+      if (linkingSubscription) linkingSubscription.remove();
     };
   }, []);
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Loader visible={loading} />
-      <View style={{ flex: 1, backgroundColor: '#00b4db' }}>
+      {/* <Loader visible={loading} /> */}
+      <View style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <StatusBar barStyle="light-content" backgroundColor="#00b4db" />
           <AppNavigation />
         </SafeAreaProvider>
       </View>

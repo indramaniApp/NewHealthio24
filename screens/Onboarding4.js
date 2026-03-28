@@ -31,7 +31,7 @@ const Onboarding4 = ({ navigation }) => {
     return (
         // 2. Wrap the entire screen in the LinearGradient component
         <LinearGradient
-            colors={['#00b4db', '#fff','#fff']} // Added gradient colors like in Home.js
+            colors={['#001F3F', '#003366', '#fff','#fff']} // Added gradient colors like in Home.js
             style={{ flex: 1 }}
         >
             {/* 3. Make the SafeAreaView background transparent */}

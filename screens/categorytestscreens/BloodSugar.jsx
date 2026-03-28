@@ -6,8 +6,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
-    Platform,
     StatusBar,
+    Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Header from '../../components/Header';
@@ -18,7 +18,7 @@ import { ENDPOINTS } from '../../src/constants/Endpoints';
 import ApiService from '../../src/api/ApiService';
 import { hideLoader, showLoader } from '../../src/redux/slices/loaderSlice';
 import Toast from 'react-native-simple-toast';
-import LinearGradient from 'react-native-linear-gradient'; // 1. IMPORT LinearGradient
+import LinearGradient from 'react-native-linear-gradient';
 
 const BloodSugar = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -30,9 +30,9 @@ const BloodSugar = ({ navigation }) => {
             dispatch(showLoader());
             const response = await ApiService.get(ENDPOINTS.comparison_blood_sugar_tests);
             setTestData(response?.data || []);
-            dispatch(hideLoader());
         } catch (error) {
             console.log('Error fetching blood sugar tests:', error);
+        } finally {
             dispatch(hideLoader());
         }
     };
@@ -40,8 +40,7 @@ const BloodSugar = ({ navigation }) => {
     const fetchCartCount = async () => {
         try {
             const response = await ApiService.get(ENDPOINTS.get_cart_count, true);
-            const count = response?.data || 0;
-            setCartCount(count);
+            setCartCount(response?.data || 0);
         } catch (error) {
             console.log('Error fetching cart count:', error.message);
         }
@@ -50,25 +49,17 @@ const BloodSugar = ({ navigation }) => {
     const handleAddToCart = async (productId) => {
         try {
             dispatch(showLoader());
-            const payload = { productId };
-            const response = await ApiService.post(
-                ENDPOINTS.add_to_cart,
-                payload,
-                true,
-                false
-            );
-            dispatch(hideLoader());
-
+            const response = await ApiService.post(ENDPOINTS.add_to_cart, { productId }, true, false);
             if (response?.status === 'success') {
-                Toast.show(response.message || 'Added to cart!');
+                Toast.show('Added to cart!');
                 fetchCartCount();
             } else {
-                Toast.show('Failed: ' + (response.message || 'Invalid response'));
+                Toast.show('Failed to add');
             }
         } catch (error) {
+            Toast.show('Error adding to cart');
+        } finally {
             dispatch(hideLoader());
-            console.log('Add to Cart Error:', error.response?.data || error.message);
-            Toast.show('Error adding to cart. Please try again.');
         }
     };
 
@@ -84,10 +75,7 @@ const BloodSugar = ({ navigation }) => {
         tests.forEach((item) => {
             const labId = item?.pathologyId?._id;
             if (!grouped[labId]) {
-                grouped[labId] = {
-                    labDetails: item?.pathologyId,
-                    tests: [],
-                };
+                grouped[labId] = { labDetails: item?.pathologyId, tests: [] };
             }
             grouped[labId].tests.push(item);
         });
@@ -95,22 +83,23 @@ const BloodSugar = ({ navigation }) => {
     };
 
     const groupedLabs = groupTestsByLabId(testData);
-    
-    // 2. WRAP the screen with LinearGradient
+
     return (
         <LinearGradient
-            colors={['#00b4db', '#fff', '#fff', '#fff']}
+            colors={['#fff', '#fff', '#fff']}
             style={{ flex: 1 }}
         >
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.safeArea}>
+                <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+
                 <Header
                     title="Blood Sugar Tests"
-                    titleStyle={{ color: COLORS.white }} 
+                    titleStyle={{ color: '#4A148C' }}
                     showCart
                     cartCount={cartCount}
                     onBackPress={() => navigation.goBack()}
                     onCartPress={() => navigation.navigate('CartScreen')}
-                    style={{ backgroundColor: 'transparent', marginTop: 40 }} 
+                    style={{ backgroundColor: 'transparent',marginTop:20 }}
                 />
 
                 <ScrollView contentContainerStyle={{ padding: 16 }}>
@@ -124,17 +113,22 @@ const BloodSugar = ({ navigation }) => {
 
                             {tests.map((item) => (
                                 <View key={item._id} style={styles.testCard}>
-                                    <View style={styles.accentStrip} />
+                                    <LinearGradient
+                                        colors={['#F06292', '#6A1B9A']}
+                                        style={styles.accentStrip}
+                                    />
+
                                     <View style={styles.cardContent}>
                                         <View style={{ flex: 1 }}>
                                             <Text style={styles.testName}>
-                                                <Icon name="flask-outline" size={16} color={COLORS.primary} /> {item.testDescription?.testName}
+                                                <Icon name="flask-outline" size={16} color="#6A1B9A" /> {item.testDescription?.testName}
                                             </Text>
-                                            {item.testDescription?.description ? (
+
+                                            {item.testDescription?.description && (
                                                 <Text style={styles.testDescription}>
                                                     <Icon name="text" size={13} color="#6b7280" /> {item.testDescription.description}
                                                 </Text>
-                                            ) : null}
+                                            )}
 
                                             <View style={styles.priceRow}>
                                                 {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
@@ -144,11 +138,9 @@ const BloodSugar = ({ navigation }) => {
                                                 {item.testDescription?.higherTestFee > item.testDescription?.testFee && (
                                                     <Text style={styles.discountText}>
                                                         {Math.round(
-                                                            ((item.testDescription?.higherTestFee - item.testDescription?.testFee) /
-                                                                item.testDescription?.higherTestFee) *
-                                                            100
-                                                        )}
-                                                        % OFF
+                                                            ((item.testDescription.higherTestFee - item.testDescription.testFee) /
+                                                                item.testDescription.higherTestFee) * 100
+                                                        )}% OFF
                                                     </Text>
                                                 )}
                                             </View>
@@ -159,14 +151,15 @@ const BloodSugar = ({ navigation }) => {
                                                 style={styles.cartBtn}
                                                 onPress={() => handleAddToCart(item._id)}
                                             >
-                                                <Icon name="cart-plus" size={16} color={COLORS.primary} />
+                                                <Icon name="cart-plus" size={16} color="#6A1B9A" />
                                                 <Text style={styles.cartText}>Add</Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity style={styles.bookBtn}
-                                                onPress={() => navigation.navigate('SingleTestSelectSlot', {
-                                                    testId: item._id,
 
-                                                })}
+                                            <TouchableOpacity
+                                                style={styles.bookBtn}
+                                                onPress={() =>
+                                                    navigation.navigate('SingleTestSelectSlot', { testId: item._id })
+                                                }
                                             >
                                                 <Icon name="calendar-check" size={16} color="#fff" />
                                                 <Text style={styles.bookText}>Book</Text>
@@ -185,16 +178,15 @@ const BloodSugar = ({ navigation }) => {
 
 export default BloodSugar;
 
-// 3. UPDATE styles for the gradient
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
-        backgroundColor: 'transparent', // Make background transparent to show gradient
-        // paddingTop is now handled by SafeAreaView
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
+
     labCard: {
         marginBottom: 24,
-        backgroundColor: '#FAFCFF',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         padding: 14,
         elevation: 2,
@@ -202,29 +194,25 @@ const styles = StyleSheet.create({
     labName: {
         fontSize: 18,
         fontWeight: '700',
-        color: COLORS.primary,
+        color: '#6A1B9A',
         marginBottom: 6,
     },
     labDetail: {
         fontSize: 14,
-        color: '#333',
+        color: '#444',
         marginBottom: 2,
     },
+
     testCard: {
         flexDirection: 'row',
         backgroundColor: '#fff',
         borderRadius: 12,
         elevation: 2,
         marginTop: 14,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 1 },
-        shadowRadius: 2,
-        overflow: 'hidden'
+        overflow: 'hidden',
     },
     accentStrip: {
         width: 6,
-        backgroundColor: COLORS.primary,
     },
     cardContent: {
         flex: 1,
@@ -232,24 +220,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
+
     testName: {
         fontSize: 15,
         fontWeight: '700',
-        color: COLORS.primary,
+        color: '#6A1B9A',
         marginBottom: 4,
     },
     testDescription: {
         fontSize: 13,
         color: '#6b7280',
-        marginTop: 2,
         marginBottom: 6,
     },
+
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
         marginTop: 4,
-        backgroundColor: '#e6f2ff',
+        backgroundColor: '#F3E5F5',
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 6,
@@ -262,15 +251,16 @@ const styles = StyleSheet.create({
     },
     priceTagText: {
         fontSize: 13,
-        fontWeight: '600',
-        color: COLORS.primary,
+        fontWeight: '700',
+        color: '#6A1B9A',
     },
     discountText: {
         fontSize: 12,
-        color: '#10b981',
+        color: '#D81B60',
         fontWeight: '700',
         marginLeft: 6,
     },
+
     buttonColumn: {
         justifyContent: 'space-between',
         alignItems: 'flex-end',
@@ -279,14 +269,14 @@ const styles = StyleSheet.create({
     cartBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#E3ECFF',
+        backgroundColor: '#F3E5F5',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 20,
         marginBottom: 8,
     },
     cartText: {
-        color: COLORS.primary,
+        color: '#6A1B9A',
         fontSize: 13,
         marginLeft: 6,
         fontWeight: '600',
@@ -294,7 +284,7 @@ const styles = StyleSheet.create({
     bookBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.primary,
+        backgroundColor: '#6A1B9A',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 20,

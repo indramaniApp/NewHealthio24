@@ -173,14 +173,14 @@ const PackagesTestBookByWallet = ({ route }) => {
           </TouchableOpacity>
 
           {/* 4. Referral ID Input Box */}
-          <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+          {/* <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
           <TextInput
             placeholder="Enter referral ID"
             placeholderTextColor={placeholderColor}
             style={[styles.input, { backgroundColor: '#F9FAFB', color: colors.text }]}
             value={referralId}
             onChangeText={setReferralId}
-          />
+          /> */}
 
           {/* Submit Button */}
           <TouchableOpacity onPress={handleSubmit} disabled={!isFormValid}>

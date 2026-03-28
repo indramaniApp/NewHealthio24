@@ -21,6 +21,7 @@ import { hideLoader, showLoader } from '../../redux/slices/loaderSlice';
 import ApiService from '../../api/ApiService';
 import { ENDPOINTS } from '../../constants/Endpoints';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import LinearGradient from 'react-native-linear-gradient';
 import user from '../../../assets/images/doctors/doctor1.jpeg';
 
 const PatientMitra = ({ navigation }) => {
@@ -34,8 +35,7 @@ const PatientMitra = ({ navigation }) => {
     try {
       dispatch(showLoader());
       const response = await ApiService.get(ENDPOINTS.patient_get_patient_mitras);
-      const data = [...(response.data || [])]; // deep clone
-      setPatientMitraData(data);
+      setPatientMitraData([...(response.data || [])]);
     } catch (error) {
       console.log('Error fetching Patient Mitra:', error);
     } finally {
@@ -43,20 +43,15 @@ const PatientMitra = ({ navigation }) => {
     }
   };
 
-  // On screen focus
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', fetchPatientMitra);
     return unsubscribe;
   }, [navigation]);
 
-
   useEffect(() => {
-    const listener = DeviceEventEmitter.addListener('PATIENT_MITRA_ADDED', () => {
-      fetchPatientMitra();
-    });
+    const listener = DeviceEventEmitter.addListener('PATIENT_MITRA_ADDED', fetchPatientMitra);
     return () => listener.remove();
   }, []);
-
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextState) => {
@@ -81,15 +76,8 @@ const PatientMitra = ({ navigation }) => {
   });
 
   const PatientCard = ({ patient }) => {
-    const fullName = patient.fullName || '';
-    const gender = patient.gender || '';
-    const dob = patient.dateOfBirth || '';
-    const email = patient.emailAddress || '';
-    const address = `${patient.streetAddress?.trim() || ''}${patient.city ? ', ' + patient.city.trim() : ''}${patient.state ? ', ' + patient.state : ''}${patient.postalCode ? ' - ' + patient.postalCode : ''}`;
-    const education = (patient.educationQualifications && patient.educationQualifications.length > 0)
-      ? patient.educationQualifications.join(', ')
-      : '';
-    const isValidUri = patient.profilePhoto &&
+    const isValidUri =
+      patient.profilePhoto &&
       !patient.profilePhoto.startsWith('blob:') &&
       (patient.profilePhoto.startsWith('http') || patient.profilePhoto.startsWith('data:image'));
 
@@ -97,59 +85,64 @@ const PatientMitra = ({ navigation }) => {
 
     return (
       <TouchableOpacity
+        activeOpacity={0.9}
         style={[
           styles.card,
-          {
-            backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-            shadowColor: dark ? COLORS.black : '#aaa',
-          },
+          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
         ]}
       >
         <View style={styles.topRow}>
-          <Image source={profilePhoto} style={styles.newProfile} resizeMode="cover" />
-          <View style={{ flex: 1, marginLeft: 16 }}>
-            <Text style={[styles.name, { color: dark ? COLORS.white : COLORS.black }]}>{fullName.trim()}</Text>
-            {(gender || dob) ? (
-              <Text style={[styles.subText, { color: dark ? COLORS.greyscale400 : COLORS.grayscale700 }]}>
-                {gender}{dob ? ` | DOB: ${dob}` : ''}
-              </Text>
-            ) : null}
+          <Image source={profilePhoto} style={styles.avatar} />
+          <View style={styles.nameContainer}>
+            <Text style={[styles.name, { color: dark ? COLORS.white : COLORS.black }]}>
+              {patient.fullName}
+            </Text>
+            <Text style={[styles.subText, { color: dark ? COLORS.greyscale400 : COLORS.grayscale700 }]}>
+              {patient.gender} {patient.dateOfBirth ? `| DOB: ${patient.dateOfBirth}` : ''}
+            </Text>
           </View>
         </View>
 
-        <View style={{ marginTop: 14 }}>
-          {email ? (
+        <View style={styles.infoContainer}>
+          {!!patient.emailAddress && (
             <View style={styles.infoRow}>
-              <Icon name="envelope" size={14} color={COLORS.primary} style={styles.infoIcon} />
-              <Text style={[styles.infoText, { color: dark ? COLORS.greyscale300 : COLORS.grayscale700 }]}>{email}</Text>
-            </View>
-          ) : null}
-
-          {address ? (
-            <View style={styles.infoRow}>
-              <Icon name="map-marker-alt" size={14} color={COLORS.primary} style={styles.infoIcon} />
-              <Text style={[styles.infoText, { color: dark ? COLORS.greyscale300 : COLORS.grayscale700 }]} numberOfLines={2}>
-                {address}
-              </Text>
-            </View>
-          ) : null}
-
-          {education ? (
-            <View style={styles.infoRow}>
-              <Icon name="graduation-cap" size={14} color={COLORS.primary} style={styles.infoIcon} />
+              <Icon name="envelope" size={13} color={COLORS.primary} />
               <Text style={[styles.infoText, { color: dark ? COLORS.greyscale300 : COLORS.grayscale700 }]}>
-                {education}
+                {patient.emailAddress}
               </Text>
             </View>
-          ) : null}
+          )}
+
+          {!!patient.city && (
+            <View style={styles.infoRow}>
+              <Icon name="map-marker-alt" size={13} color={COLORS.primary} />
+              <Text style={[styles.infoText, { color: dark ? COLORS.greyscale300 : COLORS.grayscale700 }]}>
+                {patient.city}, {patient.state}
+              </Text>
+            </View>
+          )}
         </View>
 
         <TouchableOpacity
-          style={styles.bookButton}
-          onPress={() => navigation.navigate('PatientMitraSelectSlot', { patientMitraId: patient._id })}
+          activeOpacity={0.85}
+          onPress={() =>
+            navigation.navigate('PatientMitraSelectSlot', {
+              patientMitraId: patient._id,
+            })
+          }
         >
-          {console.log('Navigating with patientMitraId:', patient._id)}
-          <Text style={styles.bookButtonText}>Book Patient-Mitra for Help</Text>
+       <LinearGradient
+  colors={["#e515b5", '#29c8e8']}
+  start={{ x: 0, y: 0 }}
+  end={{ x: 1, y: 0 }}
+  style={styles.bookButton}
+>
+  <View style={styles.buttonContent}>
+    <Icon name="calendar-check" size={12} color="#fff" />
+    <Text style={styles.bookButtonText}>Book Patient-Mitra</Text>
+  </View>
+</LinearGradient>
+
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -160,7 +153,7 @@ const PatientMitra = ({ navigation }) => {
       <Header title="Patient Mitra List" onBackPress={() => navigation.goBack()} />
 
       <View style={[styles.searchBarWrapper, { backgroundColor: dark ? '#1c1c1e' : '#f4f4f5' }]}>
-        <Icon name="search" size={16} color={dark ? COLORS.greyscale400 : COLORS.gray} style={styles.searchIcon} />
+        <Icon name="search" size={15} color={dark ? COLORS.greyscale400 : COLORS.gray} />
         <TextInput
           placeholder="Search by name, email or city"
           placeholderTextColor={dark ? COLORS.greyscale500 : '#999'}
@@ -172,20 +165,20 @@ const PatientMitra = ({ navigation }) => {
 
       <FlatList
         data={filteredData}
-        keyExtractor={(item) => item._id || Math.random().toString()}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => <PatientCard patient={item} />}
-        ListEmptyComponent={
-          <Text style={{ textAlign: 'center', marginTop: 30, color: dark ? '#fff' : '#000' }}>
-            No Patient Mitra found.
-          </Text>
-        }
+        // refreshing={refreshing}
+        // onRefresh={onRefresh}
         showsVerticalScrollIndicator={false}
-        onRefresh={onRefresh}
-        refreshing={refreshing}
         contentContainerStyle={{
           paddingBottom: 100,
           backgroundColor: dark ? COLORS.dark1 : COLORS.lightGray,
         }}
+        ListEmptyComponent={
+          <Text style={{ textAlign: 'center', marginTop: 40, color: dark ? '#fff' : '#000' }}>
+            No Patient Mitra found.
+          </Text>
+        }
       />
     </SafeAreaView>
   );
@@ -201,84 +194,82 @@ const styles = StyleSheet.create({
   searchBarWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
-    marginVertical: 10,
-    paddingHorizontal: 12,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 6,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  searchIcon: {
-    marginRight: 8,
-    padding: 6,
-    backgroundColor: '#e6e6e6',
-    borderRadius: 20,
+    margin: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 30,
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
-    paddingVertical: 0,
+    marginLeft: 10,
+    fontSize: 14,
     fontFamily: 'Urbanist-Regular',
   },
   card: {
     marginHorizontal: 16,
-    marginVertical: 10,
-    borderRadius: 16,
+    marginVertical: 8,
+    borderRadius: 18,
     padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
+    elevation: 4,
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  newProfile: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: COLORS.primary,
-    backgroundColor: '#eaeaea',
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 18,
+    backgroundColor: '#eee',
+  },
+  nameContainer: {
+    marginLeft: 14,
+    flex: 1,
   },
   name: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: 'Urbanist-Bold',
-    marginBottom: 4,
   },
   subText: {
-    fontSize: 14,
+    fontSize: 13,
+    marginTop: 4,
     fontFamily: 'Urbanist-Regular',
+  },
+  infoContainer: {
+    marginTop: 12,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 4,
-  },
-  infoIcon: {
-    marginRight: 10,
+    marginVertical: 3,
+    gap: 8,
   },
   infoText: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: 'Urbanist-Regular',
-    flex: 1,
   },
-  bookButton: {
-    marginTop: 16,
-    backgroundColor: COLORS.primary,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  bookButtonText: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontFamily: 'Urbanist-SemiBold',
-  },
+ bookButton: {
+  marginTop: 14,
+  paddingVertical: 8,          // smaller height
+  paddingHorizontal: 14,       // compact width
+  borderRadius: 8,
+  alignItems: 'center',
+  alignSelf: 'flex-end',       // ✅ right side
+},
+buttonContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+bookButtonText: {
+  marginLeft: 6,
+  color: COLORS.white,
+  fontSize: 13,
+  fontFamily: 'Urbanist-SemiBold',
+},
+
+
 });

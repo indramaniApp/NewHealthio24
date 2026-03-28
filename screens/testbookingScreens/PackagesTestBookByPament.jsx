@@ -205,14 +205,14 @@ const PackagesTestBookByPament = ({ route }) => {
             <Icon name="chevron-down" size={20} color={colors.text} />
           </TouchableOpacity>
           
-          <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
+          {/* <Text style={[styles.label, { color: colors.text }]}>Referral ID (Optional)</Text>
           <TextInput
             placeholder="Enter referral ID"
             placeholderTextColor={dark ? '#aaa' : '#666'}
             style={[styles.input, { backgroundColor: '#F9FAFB', color: colors.text }]}
             value={referralId}
             onChangeText={setReferralId}
-          />
+          /> */}
 
           <TouchableOpacity onPress={handleSubmit} disabled={!isFormValid}>
             <LinearGradient

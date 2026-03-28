@@ -47,6 +47,7 @@ const EditProfile = ({ navigation, route }) => {
             emergencyContactNumber: profile[0].emergencyContactNumber,
             nationality: profile[0].nationality,
             dateOfBirth: profile[0].dateOfBirth,
+             referralId: profile[0]?.referralId || '',
         },
         inputValidities: {
             fullName: true,
@@ -54,6 +55,7 @@ const EditProfile = ({ navigation, route }) => {
             emergencyContactNumber: true,
             nationality: true,
             dateOfBirth: true,
+              referralId: true, 
         },
     };
 
@@ -144,6 +146,7 @@ const EditProfile = ({ navigation, route }) => {
         appendIfNotEmpty('nationality', inputValues.nationality);
         appendIfNotEmpty('dateOfBirth', dateOfBirth);
         appendIfNotEmpty('gender', selectedGender);
+         appendIfNotEmpty('referralId', inputValues.referralId);
 
         if (image && image.uri && !image.uri.startsWith('http')) {
             const filename = image.uri.split('/').pop();
@@ -248,7 +251,7 @@ const EditProfile = ({ navigation, route }) => {
     return (
         <SafeAreaView style={styles.area}>
             <LinearGradient
-                colors={['#00b4db', '#fff', '#fff', '#fff', '#fff']}
+                colors={['#fff', '#fff', '#fff', '#fff', '#fff']}
                 style={styles.gradientContainer}
             >
                 <View style={styles.container}>
@@ -288,6 +291,14 @@ const EditProfile = ({ navigation, route }) => {
                             value={selectedGender}
                             style={{ inputIOS: styles.pickerInput, inputAndroid: styles.pickerInput }}
                         />
+                        <Input
+    id="referralId"
+    value={formState.inputValues.referralId}
+    onInputChanged={inputChangedHandler}
+    placeholder="Enter referral ID (if any)"
+    label="Referral ID (Optional)"
+/>
+
                     </ScrollView>
 
                     <DatePicker

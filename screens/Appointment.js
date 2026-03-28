@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, SafeAreaView, StatusBar } from 'react-native';
 import { UpcomingBooking, CompletedBooking, CancelledBooking } from '../tabs';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -28,9 +28,12 @@ const Appointment = ({ navigation }) => {
     return (
 
         <SafeAreaView style={styles.safeArea}>
-         
+           <StatusBar
+        backgroundColor="#FFFFFF"
+        barStyle="dark-content"
+    />
             <LinearGradient
-                colors={['#00b4db', '#E0F7FA', '#FFFFFF']}
+                colors={['#fff', '#E0F7FA', '#FFFFFF']}
                 style={styles.gradientContainer}
             >
                 {/* Tabs */}
